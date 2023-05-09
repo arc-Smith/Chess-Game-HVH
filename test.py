@@ -173,11 +173,11 @@ class ChessBoard(tk.Canvas):
             return
 
         # removing the ability to do en passant or get en passant because the action was or wasn't taken
-        for key, val in self.squares.items():
-            if val[1] != None and (val[1].notation == "P" or val[1].notation == "Pb"):
-                val[1].do_en_pass = False
-                val[1].get_en_pass = False
-                print(f"I am the {val[1].color} Pawn at ({val[1].pos_r}, {val[1].pos_c})")
+        # for key, val in self.squares.items():
+        #     if val[1] != None and (val[1].notation == "P" or val[1].notation == "Pb"):
+        #         val[1].do_en_pass = False
+        #         val[1].get_en_pass = False
+        #         print(f"I am the {val[1].color} Pawn at ({val[1].pos_r}, {val[1].pos_c})")
         
         # make sure all pieces have their correct legal moves
         # for key, val in self.squares.items():
@@ -220,7 +220,7 @@ class ChessBoard(tk.Canvas):
             # flip board for next player
             # self.scale("all", 3.5, 3.5, 1, -1)
         
-        if actual_piece.notation == "B" or actual_piece.notation == "Bb": # 
+        if actual_piece.notation == "B" or actual_piece.notation == "Bb":
             # removing the piece's existence then its image from prior square
             self.squares[(from_square_r, from_square_c)][1] = None
             root.after(0000, self.delete, self.squares[(from_square_r, from_square_c)][2])
@@ -343,11 +343,15 @@ class ChessBoard(tk.Canvas):
                 self.squares[(r, c)][2] = None
             elif (self.squares[(r,c)][1] == None) and (self.squares[(r+1,c)][1] != None) and (self.squares[(r+1,c)][1].notation == "Pb") and (actual_piece.notation == "P") and (actual_piece.do_en_pass == True) and (self.squares[(r+1,c)][1].get_en_pass == True):
                 # removing the piece if it has been en passant-ed by White Pawn
+                print("REMOVING the BLACK pawn to the left/right of WHITE pawn")
+                print(f"BLACK pawn to be removed is at ({r+1},{c})")
                 self.squares[(r+1, c)][1] = None
                 root.after(0000, self.delete, self.squares[(r+1, c)][2])
                 self.squares[(r+1, c)][2] = None
             elif (self.squares[(r,c)][1] == None) and (self.squares[(r-1,c)][1] != None) and (self.squares[(r-1,c)][1].notation == "P") and (actual_piece.notation == "Pb") and (actual_piece.do_en_pass == True) and (self.squares[(r-1,c)][1].get_en_pass == True):
                 # removing the piece if it has been en passant-ed by Black Pawn
+                print("REMOVING the WHITE pawn to the left/right of BLACK pawn")
+                print(f"WHITE pawn to be removed is at ({r-1},{c})")
                 self.squares[(r-1, c)][1] = None
                 root.after(0000, self.delete, self.squares[(r-1, c)][2])
                 self.squares[(r-1, c)][2] = None
@@ -396,24 +400,6 @@ class ChessBoard(tk.Canvas):
 
             # flip board for next player and update the 
             # self.flip_board()
-
-    # def flip_board(self):
-        # self.scale("all", self.size/2, self.size/2, 1, 1)
-        
-        # Convert the angle from degrees to radians
-        # angle = math.radians(180)
-        
-        # # Get the current coordinates of the item
-        # x1, y1, x2, y2 = self.coords()
-        
-        # # Calculate the new coordinates after rotation
-        # new_x1 = cx + (x1 - cx) * math.cos(angle) - (y1 - cy) * math.sin(angle)
-        # new_y1 = cy + (x1 - cx) * math.sin(angle) + (y1 - cy) * math.cos(angle)
-        # new_x2 = cx + (x2 - cx) * math.cos(angle) - (y2 - cy) * math.sin(angle)
-        # new_y2 = cy + (x2 - cx) * math.sin(angle) + (y2 - cy) * math.cos(angle)
-        
-        # # Update the item's position on the canvas
-        # canvas.coords(item, new_x1, new_y1, new_x2, new_y2)
 
     def get_legal_moves(self, actual_piece, r, c, **kwargs):
         # if actual_piece.notation == "K" or actual_piece.notation == "Kb":
