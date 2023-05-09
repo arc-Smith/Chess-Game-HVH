@@ -172,18 +172,6 @@ class ChessBoard(tk.Canvas):
             self.bind("<Button-1>", lambda e: self.move_piece(e, from_square_r, from_square_c, from_square_id, actual_piece))
             return
 
-        # removing the ability to do en passant or get en passant because the action was or wasn't taken
-        # for key, val in self.squares.items():
-        #     if val[1] != None and (val[1].notation == "P" or val[1].notation == "Pb"):
-        #         val[1].do_en_pass = False
-        #         val[1].get_en_pass = False
-        #         print(f"I am the {val[1].color} Pawn at ({val[1].pos_r}, {val[1].pos_c})")
-        
-        # make sure all pieces have their correct legal moves
-        # for key, val in self.squares.items():
-        #     if val[1] != None:
-        #         val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
-
         if actual_piece.notation == "Q" or actual_piece.notation == "Qb":
             # removing the piece's existence then its image from prior square
             self.squares[(from_square_r, from_square_c)][1] = None
@@ -202,23 +190,6 @@ class ChessBoard(tk.Canvas):
 
             # placing the piece onto a new square with its image
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves)
-
-            # DESELECTION / no more outline
-            self.itemconfigure(self.clicked, outline=None, width=0)
-            self.update()
-            self.clicked = None
-
-            # putting the next left click back onto the select_piece function
-            self.bind("<Button-1>", self.select_piece)
-            # print("LEGAL MOVES FOR {} {} ARE = {}".format(actual_piece.color, actual_piece.notation, actual_piece.legal_moves))
-
-            # make sure all pieces have their correct legal moves
-            for key, val in self.squares.items():
-                if val[1] != None:
-                    val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
-            
-            # flip board for next player
-            # self.scale("all", 3.5, 3.5, 1, -1)
         
         if actual_piece.notation == "B" or actual_piece.notation == "Bb":
             # removing the piece's existence then its image from prior square
@@ -238,23 +209,6 @@ class ChessBoard(tk.Canvas):
 
             # placing the piece onto a new square with its image
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves)
-
-            # DESELECTION / no more outline
-            self.itemconfigure(self.clicked, outline=None, width=0)
-            self.update()
-            self.clicked = None
-
-            # putting the next left click back onto the select_piece function
-            self.bind("<Button-1>", self.select_piece)
-            # print("LEGAL MOVES FOR {} {} ARE = {}".format(actual_piece.color, actual_piece.notation, actual_piece.legal_moves))
-
-            # make sure all pieces have their correct legal moves
-            for key, val in self.squares.items():
-                if val[1] != None:
-                    val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
-
-            # flip board for next player
-            # self.scale("all", 0, 0, -1, 1)
         
         if actual_piece.notation == "N" or actual_piece.notation == "Nb":
             # removing the piece's existence then its image from prior square
@@ -275,23 +229,6 @@ class ChessBoard(tk.Canvas):
             # placing the piece onto a new square with its image
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, moved=True)
 
-            # DESELECTION / no more outline
-            self.itemconfigure(self.clicked, outline=None, width=0)
-            self.update()
-            self.clicked = None
-
-            # putting the next left click back onto the select_piece function
-            self.bind("<Button-1>", self.select_piece)
-            # print("LEGAL MOVES FOR {} {} ARE = {}".format(actual_piece.color, actual_piece.notation, actual_piece.legal_moves))
-
-            # make sure all pieces have their correct legal moves
-            for key, val in self.squares.items():
-                if val[1] != None:
-                    val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
-            
-            # flip board for next player
-            # self.scale("all", 0, 0, -1, 1)
-
         if actual_piece.notation == "R" or actual_piece.notation == "Rb":
             # removing the piece's existence then its image from prior square
             self.squares[(from_square_r, from_square_c)][1] = None
@@ -310,24 +247,6 @@ class ChessBoard(tk.Canvas):
 
             # placing the piece onto a new square with its image
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, moved=True)
-
-            # DESELECTION / no more outline
-            self.itemconfigure(self.clicked, outline=None, width=0)
-            self.update()
-            self.clicked = None
-
-            # putting the next left click back onto the select_piece function
-            self.bind("<Button-1>", self.select_piece)
-            # print("LEGAL MOVES FOR {} {} ARE = {}".format(actual_piece.color, actual_piece.notation, actual_piece.legal_moves))
-
-            # make sure all pieces have their correct legal moves
-            for key, val in self.squares.items():
-                if val[1] != None:
-                    val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
-            
-            # flip board for next player
-            # self.scale("all", 0, 0, -1, 1)
-            # self.scale("all", 0, 0, 1, -1)
 
         if actual_piece.notation == "P" or actual_piece.notation == "Pb":
             # removing the piece's existence then its image from prior square
@@ -356,28 +275,39 @@ class ChessBoard(tk.Canvas):
                 root.after(0000, self.delete, self.squares[(r-1, c)][2])
                 self.squares[(r-1, c)][2] = None
 
+            # removing the ability to do en passant or get en passant because the action was or wasn't taken
+            # for key, val in self.squares.items():
+            #     if val[1] != None and (val[1].notation == "P" or val[1].notation == "Pb") and (val[1].do_en_pass == True):              
+            #         val[1].do_en_pass = False
+            #         val[1].get_en_pass = False
+            #         print(f"I am the {val[1].color} Pawn at ({val[1].pos_r}, {val[1].pos_c}) and my en passant abilities are GONE")
+
+            # en passant given to enemy piece that's on left of white pawn
+            if (c >= 1):
+                if (r==(from_square_r-2)) and (actual_piece.two_spaces == True) and (actual_piece.notation == "P") and (self.squares[(r,c-1)][1] != None) and (self.squares[(r,c-1)][1].color != actual_piece.color):
+                    self.squares[(r,c-1)][1].do_en_pass = True
+                    actual_piece.get_en_pass = True
+            # en passant given to enemy piece that's on right of white pawn
+            if (c <= 6):
+                if (r==(from_square_r-2)) and (actual_piece.two_spaces == True) and (actual_piece.notation == "P") and (self.squares[(r,c+1)][1] != None) and (self.squares[(r,c+1)][1].color != actual_piece.color):
+                    self.squares[(r,c+1)][1].do_en_pass = True
+                    actual_piece.get_en_pass = True  
+            # en passant given to enemy piece that's on left of black pawn
+            if (c >= 1):
+                if (r==(from_square_r+2)) and (actual_piece.two_spaces == True) and (actual_piece.notation == "Pb") and (self.squares[(r,c-1)][1] != None) and (self.squares[(r,c-1)][1].color != actual_piece.color):
+                    self.squares[(r,c-1)][1].do_en_pass = True
+                    actual_piece.get_en_pass = True
+            # en passant given to enemy piece that's on right of black pawn
+            if (c <= 6):
+                if (r==(from_square_r+2)) and (actual_piece.two_spaces == True) and (actual_piece.notation == "Pb") and (self.squares[(r,c+1)][1] != None) and (self.squares[(r,c+1)][1].color != actual_piece.color):
+                    self.squares[(r,c+1)][1].do_en_pass = True
+                    actual_piece.get_en_pass = True
+
             # promoting pawn to a selected piece
             new_notation = None
             if r==0:
                 new_notation = actual_piece.promote()
                 actual_piece.notation = new_notation
-
-            # en passant given to enemy piece that's on left of white pawn
-            if (r==(from_square_r-2)) and (actual_piece.two_spaces == True) and (actual_piece.notation == "P") and (self.squares[(r,c-1)][1] != None) and (self.squares[(r,c-1)][1].color != actual_piece.color):
-                self.squares[(r,c-1)][1].do_en_pass = True
-                actual_piece.get_en_pass = True
-            # en passant given to enemy piece that's on right of white pawn
-            if (r==(from_square_r-2)) and (actual_piece.two_spaces == True) and (actual_piece.notation == "P") and (self.squares[(r,c+1)][1] != None) and (self.squares[(r,c+1)][1].color != actual_piece.color):
-                self.squares[(r,c+1)][1].do_en_pass = True
-                actual_piece.get_en_pass = True  
-            # en passant given to enemy piece that's on left of black pawn
-            if (r==(from_square_r+2)) and (actual_piece.two_spaces == True) and (actual_piece.notation == "Pb") and (self.squares[(r,c-1)][1] != None) and (self.squares[(r,c-1)][1].color != actual_piece.color):
-                self.squares[(r,c-1)][1].do_en_pass = True
-                actual_piece.get_en_pass = True
-            # en passant given to enemy piece that's on right of black pawn
-            if (r==(from_square_r+2)) and (actual_piece.two_spaces == True) and (actual_piece.notation == "Pb") and (self.squares[(r,c+1)][1] != None) and (self.squares[(r,c+1)][1].color != actual_piece.color):
-                self.squares[(r,c+1)][1].do_en_pass = True
-                actual_piece.get_en_pass = True
 
             # find the next legal moves for this piece
             add_legal_moves = self.get_legal_moves(actual_piece, r, c)
@@ -385,21 +315,21 @@ class ChessBoard(tk.Canvas):
             # placing the piece onto a new square with its image
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, two_spaces=False, do_en_pass=actual_piece.do_en_pass, get_en_pass=actual_piece.get_en_pass)
 
-            # DESELECTION / no more outline
-            self.itemconfigure(self.clicked, outline=None, width=0)
-            self.update()
-            self.clicked = None
+        # DESELECTION / no more outline
+        self.itemconfigure(self.clicked, outline=None, width=0)
+        self.update()
+        self.clicked = None
 
-            # putting the next left click back onto the select_piece function
-            self.bind("<Button-1>", self.select_piece)
+        # putting the next left click back onto the select_piece function
+        self.bind("<Button-1>", self.select_piece)
 
-            # make sure all pieces have their correct legal moves
-            for key, val in self.squares.items():
-                if val[1] != None:
-                    val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
+        # make sure all pieces have their correct legal moves
+        for key, val in self.squares.items():
+            if val[1] != None:
+                val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
 
-            # flip board for next player and update the 
-            # self.flip_board()
+        # flip board for next player
+        # self.flip_board()
 
     def get_legal_moves(self, actual_piece, r, c, **kwargs):
         # if actual_piece.notation == "K" or actual_piece.notation == "Kb":
