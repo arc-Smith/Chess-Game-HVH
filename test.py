@@ -177,7 +177,7 @@ class ChessBoard(tk.Canvas):
             self.squares[(from_square_r, from_square_c)][1] = None
             root.after(0000, self.delete, self.squares[(from_square_r, from_square_c)][2])
             self.squares[(from_square_r, from_square_c)][2] = None
-
+           
             # TAKING A PIECE
             if (self.squares[(r,c)][1] != None):
                 # removing the piece if it has been eaten by Queen
@@ -190,6 +190,19 @@ class ChessBoard(tk.Canvas):
 
             # placing the piece onto a new square with its image
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves)
+
+            # DESELECTION / no more outline
+            self.itemconfigure(self.clicked, outline=None, width=0)
+            self.update()
+            self.clicked = None
+
+            # putting the next left click back onto the select_piece function
+            self.bind("<Button-1>", self.select_piece)
+
+            # make sure all pieces have their correct legal moves
+            for key, val in self.squares.items():
+                if val[1] != None:
+                    val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
         
         if actual_piece.notation == "B" or actual_piece.notation == "Bb":
             # removing the piece's existence then its image from prior square
@@ -209,6 +222,19 @@ class ChessBoard(tk.Canvas):
 
             # placing the piece onto a new square with its image
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves)
+
+            # DESELECTION / no more outline
+            self.itemconfigure(self.clicked, outline=None, width=0)
+            self.update()
+            self.clicked = None
+
+            # putting the next left click back onto the select_piece function
+            self.bind("<Button-1>", self.select_piece)
+
+            # make sure all pieces have their correct legal moves
+            for key, val in self.squares.items():
+                if val[1] != None:
+                    val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
         
         if actual_piece.notation == "N" or actual_piece.notation == "Nb":
             # removing the piece's existence then its image from prior square
@@ -229,6 +255,19 @@ class ChessBoard(tk.Canvas):
             # placing the piece onto a new square with its image
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, moved=True)
 
+            # DESELECTION / no more outline
+            self.itemconfigure(self.clicked, outline=None, width=0)
+            self.update()
+            self.clicked = None
+
+            # putting the next left click back onto the select_piece function
+            self.bind("<Button-1>", self.select_piece)
+
+            # make sure all pieces have their correct legal moves
+            for key, val in self.squares.items():
+                if val[1] != None:
+                    val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
+
         if actual_piece.notation == "R" or actual_piece.notation == "Rb":
             # removing the piece's existence then its image from prior square
             self.squares[(from_square_r, from_square_c)][1] = None
@@ -247,6 +286,19 @@ class ChessBoard(tk.Canvas):
 
             # placing the piece onto a new square with its image
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, moved=True)
+
+            # DESELECTION / no more outline
+            self.itemconfigure(self.clicked, outline=None, width=0)
+            self.update()
+            self.clicked = None
+
+            # putting the next left click back onto the select_piece function
+            self.bind("<Button-1>", self.select_piece)
+
+            # make sure all pieces have their correct legal moves
+            for key, val in self.squares.items():
+                if val[1] != None:
+                    val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
 
         if actual_piece.notation == "P" or actual_piece.notation == "Pb":
             # removing the piece's existence then its image from prior square
@@ -315,18 +367,18 @@ class ChessBoard(tk.Canvas):
             # placing the piece onto a new square with its image
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, two_spaces=False, do_en_pass=actual_piece.do_en_pass, get_en_pass=actual_piece.get_en_pass)
 
-        # DESELECTION / no more outline
-        self.itemconfigure(self.clicked, outline=None, width=0)
-        self.update()
-        self.clicked = None
+            # DESELECTION / no more outline
+            self.itemconfigure(self.clicked, outline=None, width=0)
+            self.update()
+            self.clicked = None
 
-        # putting the next left click back onto the select_piece function
-        self.bind("<Button-1>", self.select_piece)
+            # putting the next left click back onto the select_piece function
+            self.bind("<Button-1>", self.select_piece)
 
-        # make sure all pieces have their correct legal moves
-        for key, val in self.squares.items():
-            if val[1] != None:
-                val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
+            # make sure all pieces have their correct legal moves
+            for key, val in self.squares.items():
+                if val[1] != None:
+                    val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
 
         # flip board for next player
         # self.flip_board()
