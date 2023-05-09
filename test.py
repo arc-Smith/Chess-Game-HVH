@@ -130,7 +130,7 @@ class ChessBoard(tk.Canvas):
         square_id = self.squares[(r, c)][0]
         self.clicked_piece = self.squares[(r, c)][1]
         
-        # if a square was selected already and the new square has a piece 
+        # if a square was selected already and the new square has a piece - not sure anymore what purpose is here
         if self.clicked != None and self.squares[(r, c)][1] != None:
             self.itemconfigure(self.clicked, outline=None, width=0)
             self.update()
@@ -327,13 +327,6 @@ class ChessBoard(tk.Canvas):
                 root.after(0000, self.delete, self.squares[(r-1, c)][2])
                 self.squares[(r-1, c)][2] = None
 
-            # removing the ability to do en passant or get en passant because the action was or wasn't taken
-            # for key, val in self.squares.items():
-            #     if val[1] != None and (val[1].notation == "P" or val[1].notation == "Pb") and (val[1].do_en_pass == True):              
-            #         val[1].do_en_pass = False
-            #         val[1].get_en_pass = False
-            #         print(f"I am the {val[1].color} Pawn at ({val[1].pos_r}, {val[1].pos_c}) and my en passant abilities are GONE")
-
             # en passant given to enemy piece that's on left of white pawn
             if (c >= 1):
                 if (r==(from_square_r-2)) and (actual_piece.two_spaces == True) and (actual_piece.notation == "P") and (self.squares[(r,c-1)][1] != None) and (self.squares[(r,c-1)][1].color != actual_piece.color):
@@ -366,6 +359,14 @@ class ChessBoard(tk.Canvas):
 
             # placing the piece onto a new square with its image
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, two_spaces=False, do_en_pass=actual_piece.do_en_pass, get_en_pass=actual_piece.get_en_pass)
+
+            # # removing the ability to do en passant or get en passant because the action was or wasn't taken
+            for key, val in self.squares.items():
+                if val[1] != None and (val[1].notation == "P" or val[1].notation == "Pb") and ((val[1].do_en_pass == True) or (val[1].get_en_pass == True)):     
+                    # print("I can and SHALL alter en passant FINALLY")         
+                    val[1].do_en_pass = False
+                    val[1].get_en_pass = False
+                    print(f"I am the {val[1].color} Pawn at ({val[1].pos_r}, {val[1].pos_c}) and my en passant abilities are GONE")
 
             # DESELECTION / no more outline
             self.itemconfigure(self.clicked, outline=None, width=0)
