@@ -111,7 +111,7 @@ class ChessBoard(tk.Canvas):
         self.squares[(row, col)][2] = self.create_image(x, y, image=image, anchor="nw")
 
     def select_piece(self, event):
-        print("begin the selection")
+        # print("begin the selection")
 
         # finding the selected square
         r = 0
@@ -145,7 +145,7 @@ class ChessBoard(tk.Canvas):
                     self.bind("<Button-1>", lambda e: self.move_piece(e, r, c, square_id, self.clicked_piece))
     
     def move_piece(self, event, from_square_r, from_square_c, from_square_id, actual_piece):        
-        print("TIME TO MOVE A PIECE")
+        #print("TIME TO MOVE A PIECE")
 
         # finding the row and col of the next selected square
         r = 0
