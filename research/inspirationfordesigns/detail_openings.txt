@@ -1,0 +1,2 @@
+Maybe do something with the messageboxes or some popup so that an explanation of the opening that the bot used 
+can be explained to the user for them to improve. This'll be a toggle feature perhaps.
