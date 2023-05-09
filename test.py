@@ -53,11 +53,13 @@ class ChessBoard(tk.Canvas):
             "Qb": tk.PhotoImage(file=b_queen),
             "Kb": tk.PhotoImage(file=b_king)
         }
-        self.bind("<Button-1>", self.select_piece)
+        self.bind("<Button-1>", self.select_piece) # allows for a piece to be selected using left mouse click
+
         self.clicked_r = None
         self.clicked_c = None
         self.clicked = None
         self.clicked_piece = None
+
         self.turn_based = ["white", "black"]
         self.turns = 0
 
@@ -217,10 +219,8 @@ class ChessBoard(tk.Canvas):
             
             # flip board for next player
             # self.scale("all", 3.5, 3.5, 1, -1)
-
-        #### NEW CONSTRUCTION ############################################################################################################
         
-        if actual_piece.notation == "B" or actual_piece.notation == "Bb":
+        if actual_piece.notation == "B" or actual_piece.notation == "Bb": # 
             # removing the piece's existence then its image from prior square
             self.squares[(from_square_r, from_square_c)][1] = None
             root.after(0000, self.delete, self.squares[(from_square_r, from_square_c)][2])
