@@ -109,7 +109,7 @@ class ChessBoard(tk.Canvas):
         else:
             self.squares[(row, col)][1] = Piece(notation, color, row, col, legal_moves)
 
-        # giving the square a unique image id to be used when moving pieces
+        # giving the square a unique image id to be used when moving pieces or removing pieces
         self.squares[(row, col)][2] = self.create_image(x, y, image=image, anchor="nw")
 
     def select_piece(self, event):
