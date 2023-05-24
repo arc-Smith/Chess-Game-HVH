@@ -149,6 +149,11 @@ class ChessBoard(tk.Canvas):
     def move_piece(self, event, from_square_r, from_square_c, from_square_id, actual_piece):        
         #print("TIME TO MOVE A PIECE")
 
+        # make sure all pieces have their correct legal moves
+            for key, val in self.squares.items():
+                if val[1] != None:
+                    val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
+
         # finding the row and col of the next selected square
         r = 0
         c = 0
@@ -350,9 +355,13 @@ class ChessBoard(tk.Canvas):
 
             # promoting pawn to a selected piece
             new_notation = None
-            if r==0:
+            if r==0 and actual_piece.notation == "P":
                 new_notation = actual_piece.promote()
                 actual_piece.notation = new_notation
+            elif r==7 and actual_piece.notation == "Pb":
+                new_notation = actual_piece.promote()
+                actual_piece.notation = new_notation
+            
 
             # find the next legal moves for this piece
             add_legal_moves = self.get_legal_moves(actual_piece, r, c)
@@ -380,9 +389,6 @@ class ChessBoard(tk.Canvas):
             for key, val in self.squares.items():
                 if val[1] != None:
                     val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
-
-        # flip board for next player
-        # self.flip_board()
 
     def get_legal_moves(self, actual_piece, r, c, **kwargs):
         # if actual_piece.notation == "K" or actual_piece.notation == "Kb":
