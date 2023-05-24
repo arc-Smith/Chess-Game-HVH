@@ -866,7 +866,7 @@ class ChessBoard(tk.Canvas):
 
 # not classes and functions
 root = tk.Tk()
-root.title("Terminal Chess Game Using Python")
+root.title("Chess Game")
 root.configure(bg="#242320")
 board = ChessBoard(root, size=800)
 board.pack()
