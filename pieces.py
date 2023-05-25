@@ -57,7 +57,7 @@ class Pawn(Piece):
 
         if self.color == "white":
             radio_var = tk.StringVar()
-            radio_var.set("Q")
+            radio_var.set("Q") # automatically select white Queen
 
             label = tk.Label(promotion_window, text="Choose a piece to promote to:")
             label.pack()
@@ -73,7 +73,7 @@ class Pawn(Piece):
     
         else:
             radio_var = tk.StringVar()
-            radio_var.set("Qb")
+            radio_var.set("Qb") # automatically select black Queen
 
             label = tk.Label(promotion_window, text="Choose a piece to promote to:")
             label.pack()
@@ -86,8 +86,6 @@ class Pawn(Piece):
             radio_bishop.pack()
             radio_knight = tk.Radiobutton(promotion_window, text="Knight", variable=radio_var, value="Nb")
             radio_knight.pack()
-
-        # print("WE GOT A " + (radio_var.get()))
 
         # window is waiting for a selection to be made and confirmed with the destroying of the window 
         ok_button = tk.Button(promotion_window, text="Ok", command=promotion_window.destroy)
