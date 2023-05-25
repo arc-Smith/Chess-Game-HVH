@@ -157,13 +157,6 @@ class ChessBoard(tk.Canvas):
                         self.bind("<Button-1>", lambda e: self.move_piece(e, r, c, square_id, self.clicked_piece))
     
     def move_piece(self, event, from_square_r, from_square_c, from_square_id, actual_piece):        
-        #print("TIME TO MOVE A PIECE")
-
-        # # make sure all pieces have their correct legal moves
-        # for key, val in self.squares.items():
-        #     if val[1] != None:
-        #         val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
-
         # finding the row and col of the next selected square
         r = 0
         c = 0
@@ -186,6 +179,38 @@ class ChessBoard(tk.Canvas):
             print("\n")
             self.bind("<Button-1>", lambda e: self.move_piece(e, from_square_r, from_square_c, from_square_id, actual_piece))
             return
+
+        if actual_piece.notation == "K" or actual_piece.notation == "Kb":
+            # removing the piece's existence then its image from prior square
+            self.squares[(from_square_r, from_square_c)][1] = None
+            root.after(0000, self.delete, self.squares[(from_square_r, from_square_c)][2])
+            self.squares[(from_square_r, from_square_c)][2] = None
+           
+            # TAKING A PIECE
+            if (self.squares[(r,c)][1] != None):
+                # removing the piece if it has been eaten by King
+                self.squares[(r, c)][1] = None
+                root.after(0000, self.delete, self.squares[(r, c)][2])
+                self.squares[(r, c)][2] = None
+
+            # find the next legal moves for this piece
+            add_legal_moves = self.get_legal_moves(actual_piece, r, c)
+
+            # placing the piece onto a new square with its image
+            self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves)
+
+            # DESELECTION / no more outline
+            self.itemconfigure(self.clicked, outline=None, width=0)
+            self.update()
+            self.clicked = None
+
+            # putting the next left click back onto the select_piece function
+            self.bind("<Button-1>", self.select_piece)
+
+            # make sure all pieces have their correct legal moves
+            for key, val in self.squares.items():
+                if val[1] != None:
+                    val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
 
         if actual_piece.notation == "Q" or actual_piece.notation == "Qb":
             # removing the piece's existence then its image from prior square
@@ -379,15 +404,6 @@ class ChessBoard(tk.Canvas):
             # placing the piece onto a new square with its image
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, two_spaces=False, do_en_pass=actual_piece.do_en_pass, get_en_pass=actual_piece.get_en_pass, en_pass_count=actual_piece.en_pass_count)
 
-            # removing the ability to do en passant or get en passant because the action was or wasn't taken
-            # THIS MUST BE MOVED ELSEWHERE
-            # for key, val in self.squares.items():
-            #     if val[1] != None and (val[1].notation == "P" or val[1].notation == "Pb") and ((val[1].do_en_pass == True) or (val[1].get_en_pass == True)):     
-            #         # print("I can and SHALL alter en passant FINALLY")         
-            #         val[1].do_en_pass = False
-            #         val[1].get_en_pass = False
-            #         print(f"I am the {val[1].color} Pawn at ({val[1].pos_r}, {val[1].pos_c}) and my en passant abilities are GONE")
-
             # DESELECTION / no more outline
             self.itemconfigure(self.clicked, outline=None, width=0)
             self.update()
@@ -417,29 +433,34 @@ class ChessBoard(tk.Canvas):
                         print(f"{val[1].color} pawn at ({val[1].pos_r},{val[1].pos_c}) get_en_pass is now {val[1].get_en_pass}")
 
     def get_legal_moves(self, actual_piece, r, c, **kwargs):
-        if actual_piece.notation == "K" or actual_piece.notation == "Kb":
+        if actual_piece.notation == "Kb":
             add_legal_moves = []
             
-            for i in range(1,8):
+            for i in range(1,2):
                 if r-i < 0 or c-i < 0:
-                    i=8
+                    i=2
                     break
                 # no piece to the diagonal top left
-                elif (self.squares[(r-i, c-i)][1] == None): 
+                elif (self.squares[(r-i, c-i)][1] == None):
                     add_legal_moves.append((r-i,c-i))
+                    # make sure king can't move to legal or attack spaces of opposing pieces
+                    # for key, val in self.squares.items():
+                    #     if val[1] != None:
+                    #         if val[1].notation == "R":
+                    #             val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
                 # a piece to the diagonal top left that CAN be captured has been reached
                 elif (self.squares[(r-i, c-i)][1] != None) and (self.squares[(r-i, c-i)][1].color != actual_piece.color):
                     add_legal_moves.append((r-i, c-i))
-                    i=8
+                    i=2
                     break
                 # a piece to the diagonal top left that CANNOT be captured has been reached
                 elif (self.squares[(r-i, c-i)][1] != None) and (self.squares[(r-i, c-i)][1].color == actual_piece.color):
-                    i=8
+                    i=2
                     break
             
-            for i in range(1,8):
+            for i in range(1,2):
                 if r+i > 7 or c-i < 0:
-                    i=8
+                    i=2
                     break
                 # no piece to the diagonal bottom left
                 elif (self.squares[(r+i, c-i)][1] == None): 
@@ -447,16 +468,16 @@ class ChessBoard(tk.Canvas):
                 # a piece to the diagonal bottom left that CAN be captured has been reached
                 elif (self.squares[(r+i, c-i)][1] != None) and (self.squares[(r+i, c-i)][1].color != actual_piece.color):
                     add_legal_moves.append((r+i, c-i))
-                    i=8
+                    i=2
                     break
                 # a piece to the diagonal bottom left that CANNOT be captured has been reached
                 elif (self.squares[(r+i, c-i)][1] != None) and (self.squares[(r+i, c-i)][1].color == actual_piece.color):
-                    i=8
+                    i=2
                     break
 
-            for i in range(1,8):
+            for i in range(1,2):
                 if r-i < 0 or c+i > 7:
-                    i=8
+                    i=2
                     break
                 # no piece to the diagonal top right
                 elif (self.squares[(r-i, c+i)][1] == None): 
@@ -464,16 +485,16 @@ class ChessBoard(tk.Canvas):
                 # a piece to the diagonal top right that CAN be captured has been reached
                 elif (self.squares[(r-i, c+i)][1] != None) and (self.squares[(r-i, c+i)][1].color != actual_piece.color):
                     add_legal_moves.append((r-i, c+i))
-                    i=8
+                    i=2
                     break
                 # a piece to the diagonal top right that CANNOT be captured has been reached
                 elif (self.squares[(r-i, c+i)][1] != None) and (self.squares[(r-i, c+i)][1].color == actual_piece.color):
-                    i=8
+                    i=2
                     break
 
-            for i in range(1,8):
+            for i in range(1,2):
                 if r+i > 7 or c+i > 7: 
-                    i=8
+                    i=2
                     break
                 # no piece to the diagonal bottom right
                 elif (self.squares[(r+i, c+i)][1] == None): 
@@ -481,75 +502,693 @@ class ChessBoard(tk.Canvas):
                 # a piece to the diagonal bottom right that CAN be captured has been reached
                 elif (self.squares[(r+i, c+i)][1] != None) and (self.squares[(r+i, c+i)][1].color != actual_piece.color):
                     add_legal_moves.append((r+i, c+i))
-                    i=8
+                    i=2
                     break
                 # a piece to the diagonal bottom right that CANNOT be captured has been reached
                 elif (self.squares[(r+i, c+i)][1] != None) and (self.squares[(r+i, c+i)][1].color == actual_piece.color):
-                    i=8
+                    i=2
                     break
             
-            for i in range(c,-1,-1):
+            for i in range(c,c-2,-1):
                 if i == c:
                     continue
+                if i < 0 or i > 7: 
+                    i=c-2
+                    break
                 # no piece to the left
                 if (self.squares[(r, i)][1] == None): 
                     add_legal_moves.append((r,i))
                 # a piece to the left that CAN be captured has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color != actual_piece.color):
                     add_legal_moves.append((r,i))
-                    i=-1
+                    i=c-2
                     break
                 # a piece to the left that CANNOT be captured has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color == actual_piece.color):
-                    i=-1
+                    i=c-2
                     break
 
-            for i in range(c,8):
+            for i in range(c,c+2):
                 if i == c:
                     continue
+                if i < 0 or i > 7: 
+                    i=c+2
+                    break
                 # no piece to the right
                 if (self.squares[(r, i)][1] == None): 
                     add_legal_moves.append((r,i))
                 # a piece to the right that CAN be captured has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color != actual_piece.color):
                     add_legal_moves.append((r,i))
-                    i=8
+                    i=c+2
                     break
                 # a piece to the right that CANNOT be captured has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color == actual_piece.color):
-                    i=8
+                    i=c+2
                     break
 
-            for i in range(r,-1,-1):
+            for i in range(r,r-2,-1):
                 if i == r:
                     continue
+                if i < 0 or i > 7: 
+                    i=r-2
+                    break
                 # no piece above
                 if (self.squares[(i, c)][1] == None): 
                     add_legal_moves.append((i,c))
                 # a piece to above that CAN be captured has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color != actual_piece.color):
                     add_legal_moves.append((i,c))
-                    i=-1
+                    i=r-2
                     break
                 # a piece above that CANNOT be captured has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color == actual_piece.color):
-                    i=-1
+                    i=r-2
                     break
 
-            for i in range(r,8):
+            for i in range(r,r+2):
                 if i == r:
                     continue
+                if i < 0 or i > 7: 
+                    i=r+2
+                    break
                 # no piece below
                 if (self.squares[(i, c)][1] == None): 
                     add_legal_moves.append((i,c))
                 # a piece below that CAN be captured has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color != actual_piece.color):
                     add_legal_moves.append((i,c))
-                    i=8
+                    i=r+2
                     break
                 # a piece below that CANNOT be captured has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color == actual_piece.color):
-                    i=8
+                    i=r+2
+                    break
+
+            return add_legal_moves
+
+        if actual_piece.notation == "K": 
+            add_legal_moves = []
+            
+            for i in range(1,2):
+                if r-i < 0 or c-i < 0:
+                    i=2
+                    break
+                # enemy piece to the diagonal top left
+                elif (self.squares[(r-i,c-i)][1] != None):
+                    if (self.squares[(r-i,c-i)][1].color != actual_piece.color):
+                        add_legal_moves.append((r-i,c-i))
+                        # make sure king can't move to legal or attack spaces of enemy pieces
+                        for key, val in self.squares.items():
+                            if val[1] != None and ((r-i,c-i) in add_legal_moves):
+                                if val[1].notation == "Bb":
+                                    if((r-i,c-i) in val[1].legal_moves):
+                                        # print("BISHOP prevents")
+                                        add_legal_moves.remove((r-i,c-i))
+                                if val[1].notation == "Rb":
+                                    if((r-i,c-i) in val[1].legal_moves):
+                                        # print("ROOK prevents")
+                                        add_legal_moves.remove((r-i,c-i))
+                                if val[1].notation == "Pb":
+                                    # checking the diagonals of the black Pawn
+                                    if((r-i,c-i) == (val[1].pos_r+1,val[1].pos_c-1)):
+                                        add_legal_moves.remove((r-i,c-i))
+                                    if ((r-i,c-i) == (val[1].pos_r+1,val[1].pos_c+1)):
+                                        add_legal_moves.remove((r-i,c-i))
+                                if val[1].notation == "Qb":
+                                    if((r-i,c-i) in val[1].legal_moves):
+                                        # print("QUEEN prevents")
+                                        add_legal_moves.remove((r-i,c-i))
+                                if val[1].notation == "Nb":
+                                    if((r-i,c-i) in val[1].legal_moves):
+                                        # print("KNIGHT prevents")
+                                        add_legal_moves.remove((r-i,c-i))
+                                if val[1].notation == "Kb":  
+                                    if((r-i,c-i) in val[1].legal_moves):
+                                        print("KING prevents")
+                                        add_legal_moves.remove((r-i,c-i))
+                # no piece to the diagonal top left
+                elif (self.squares[(r-i,c-i)][1] == None):
+                    add_legal_moves.append((r-i,c-i))
+                    # make sure king can't move to legal or attack spaces of opposing pieces
+                    for key, val in self.squares.items():
+                        if val[1] != None and ((r-i,c-i) in add_legal_moves):
+                            if val[1].notation == "Bb":
+                                if((r-i,c-i) in val[1].legal_moves):
+                                    # print("BISHOP prevents")
+                                    add_legal_moves.remove((r-i,c-i))
+                            if val[1].notation == "Rb":
+                                if((r-i,c-i) in val[1].legal_moves):
+                                    # print("ROOK prevents")
+                                    add_legal_moves.remove((r-i,c-i))
+                            if val[1].notation == "Pb":
+                                # checking the diagonals of the black Pawn
+                                if((r-i,c-i) == (val[1].pos_r+1,val[1].pos_c-1)):
+                                    add_legal_moves.remove((r-i,c-i))
+                                if ((r-i,c-i) == (val[1].pos_r+1,val[1].pos_c+1)):
+                                    add_legal_moves.remove((r-i,c-i))
+                            if val[1].notation == "Qb":
+                                if((r-i,c-i) in val[1].legal_moves):
+                                    # print("QUEEN prevents")
+                                    add_legal_moves.remove((r-i,c-i))
+                            if val[1].notation == "Nb":
+                                if((r-i,c-i) in val[1].legal_moves):
+                                    # print("KNIGHT prevents")
+                                    add_legal_moves.remove((r-i,c-i))
+                            if val[1].notation == "Kb":  
+                                if((r-i,c-i) in val[1].legal_moves):
+                                    print("KING prevents")
+                                    add_legal_moves.remove((r-i,c-i))
+                # ally piece to the diagonal top left
+                else:
+                    i=2
+                    break
+                    
+            
+            for i in range(1,2):
+                if r+i > 7 or c-i < 0:
+                    i=2
+                    break
+                # enemy piece to the diagonal bottom left
+                elif (self.squares[(r+i,c-i)][1] != None): 
+                    if (self.squares[(r+i,c-i)][1].color != actual_piece.color):
+                        add_legal_moves.append((r+i,c-i))
+                        # make sure king can't move to legal or attack spaces of opposing pieces
+                        for key, val in self.squares.items():
+                            if val[1] != None and ((r+i,c-i) in add_legal_moves):
+                                if val[1].notation == "Bb":
+                                    if((r+i,c-i) in val[1].legal_moves):
+                                        # print("BISHOP prevents")
+                                        add_legal_moves.remove((r+i,c-i))
+                                if val[1].notation == "Rb":
+                                    if((r+i,c-i) in val[1].legal_moves):
+                                        # print("ROOK prevents")
+                                        add_legal_moves.remove((r+i,c-i))
+                                if val[1].notation == "Pb":
+                                    # checking the diagonals of the black Pawn
+                                    if((r+i,c-i) == (val[1].pos_r+1,val[1].pos_c-1)):
+                                        add_legal_moves.remove((r+i,c-i))
+                                    if ((r+i,c-i) == (val[1].pos_r+1,val[1].pos_c+1)):
+                                        add_legal_moves.remove((r+i,c-i))
+                                if val[1].notation == "Qb":
+                                    if((r+i,c-i) in val[1].legal_moves):
+                                        # print("QUEEN prevents")
+                                        add_legal_moves.remove((r+i,c-i))
+                                if val[1].notation == "Nb":
+                                    if((r+i,c-i) in val[1].legal_moves):
+                                        # print("KNIGHT prevents")
+                                        add_legal_moves.remove((r+i,c-i))
+                                if val[1].notation == "Kb":  
+                                    if((r+i,c-i) in val[1].legal_moves):
+                                        print("KING prevents")
+                                        add_legal_moves.remove((r+i,c-i))
+                # no piece to the diagonal bottom left
+                elif (self.squares[(r+i,c-i)][1] == None): 
+                    add_legal_moves.append((r+i,c-i))
+                    # make sure king can't move to legal or attack spaces of opposing pieces
+                    for key, val in self.squares.items():
+                        if val[1] != None and ((r+i,c-i) in add_legal_moves):
+                            if val[1].notation == "Bb":
+                                if((r+i,c-i) in val[1].legal_moves):
+                                    # print("BISHOP prevents")
+                                    add_legal_moves.remove((r+i,c-i))
+                            if val[1].notation == "Rb":
+                                if((r+i,c-i) in val[1].legal_moves):
+                                    # print("ROOK prevents")
+                                    add_legal_moves.remove((r+i,c-i))
+                            if val[1].notation == "Pb":
+                                # checking the diagonals of the black Pawn
+                                if((r+i,c-i) == (val[1].pos_r+1,val[1].pos_c-1)):
+                                    add_legal_moves.remove((r+i,c-i))
+                                if ((r+i,c-i) == (val[1].pos_r+1,val[1].pos_c+1)):
+                                    add_legal_moves.remove((r+i,c-i))
+                            if val[1].notation == "Qb":
+                                if((r+i,c-i) in val[1].legal_moves):
+                                    # print("QUEEN prevents")
+                                    add_legal_moves.remove((r+i,c-i))
+                            if val[1].notation == "Nb":
+                                if((r+i,c-i) in val[1].legal_moves):
+                                    # print("KNIGHT prevents")
+                                    add_legal_moves.remove((r+i,c-i))
+                            if val[1].notation == "Kb":  
+                                if((r+i,c-i) in val[1].legal_moves):
+                                    print("KING prevents")
+                                    add_legal_moves.remove((r+i,c-i))
+                # ally piece to the diagonal bottom left
+                else:
+                    i=2
+                    break
+
+            for i in range(1,2):
+                if r-i < 0 or c+i > 7:
+                    i=2
+                    break
+                # enemy piece to the diagonal top right
+                elif (self.squares[(r-i,c+i)][1] != None): 
+                    if (self.squares[(r-i,c+i)][1].color != actual_piece.color):
+                        add_legal_moves.append((r-i,c+i))
+                        # make sure king can't move to legal or attack spaces of opposing pieces
+                        for key, val in self.squares.items():
+                            if val[1] != None and ((r-i,c+i) in add_legal_moves):
+                                if val[1].notation == "Bb":
+                                    if((r-i,c+i) in val[1].legal_moves):
+                                        # print("BISHOP prevents")
+                                        add_legal_moves.remove((r-i,c+i))
+                                if val[1].notation == "Rb":
+                                    if((r-i,c+i) in val[1].legal_moves):
+                                        # print("ROOK prevents")
+                                        add_legal_moves.remove((r-i,c+i))
+                                if val[1].notation == "Pb":
+                                    # checking the diagonals of the black Pawn
+                                    if((r-i,c+i) == (val[1].pos_r+1,val[1].pos_c-1)):
+                                        add_legal_moves.remove((r-i,c+i))
+                                    if ((r-i,c+i) == (val[1].pos_r+1,val[1].pos_c+1)):
+                                        add_legal_moves.remove((r-i,c+i))
+                                if val[1].notation == "Qb":
+                                    if((r-i,c+i) in val[1].legal_moves):
+                                        # print("QUEEN prevents")
+                                        add_legal_moves.remove((r-i,c+i))
+                                if val[1].notation == "Nb":
+                                    if((r-i,c+i) in val[1].legal_moves):
+                                        # print("KNIGHT prevents")
+                                        add_legal_moves.remove((r-i,c+i))
+                                if val[1].notation == "Kb":  
+                                    if((r-i,c+i) in val[1].legal_moves):
+                                        print("KING prevents")
+                                        add_legal_moves.remove((r-i,c+i))
+                # no piece to the diagonal top right
+                elif (self.squares[(r-i,c+i)][1] == None): 
+                    add_legal_moves.append((r-i,c+i))
+                    # make sure king can't move to legal or attack spaces of opposing pieces
+                    for key, val in self.squares.items():
+                        if val[1] != None and ((r-i,c+i) in add_legal_moves):
+                            if val[1].notation == "Bb":
+                                if((r-i,c+i) in val[1].legal_moves):
+                                    # print("BISHOP prevents")
+                                    add_legal_moves.remove((r-i,c+i))
+                            if val[1].notation == "Rb":
+                                if((r-i,c+i) in val[1].legal_moves):
+                                    # print("ROOK prevents")
+                                    add_legal_moves.remove((r-i,c+i))
+                            if val[1].notation == "Pb":
+                                # checking the diagonals of the black Pawn
+                                if((r-i,c+i) == (val[1].pos_r+1,val[1].pos_c-1)):
+                                    add_legal_moves.remove((r-i,c+i))
+                                if ((r-i,c+i) == (val[1].pos_r+1,val[1].pos_c+1)):
+                                    add_legal_moves.remove((r-i,c+i))
+                            if val[1].notation == "Qb":
+                                if((r-i,c+i) in val[1].legal_moves):
+                                    # print("QUEEN prevents")
+                                    add_legal_moves.remove((r-i,c+i))
+                            if val[1].notation == "Nb":
+                                if((r-i,c+i) in val[1].legal_moves):
+                                    # print("KNIGHT prevents")
+                                    add_legal_moves.remove((r-i,c+i))
+                            if val[1].notation == "Kb":  
+                                if((r-i,c+i) in val[1].legal_moves):
+                                    print("KING prevents")
+                                    add_legal_moves.remove((r-i,c+i))
+                # ally piece to the diagonal top right
+                else:
+                    i=2
+                    break
+
+            for i in range(1,2):
+                if r+i > 7 or c+i > 7: 
+                    i=2
+                    break
+                # enemy piece to the diagonal bottom right
+                elif (self.squares[(r+i,c+i)][1] != None): 
+                    if (self.squares[(r+i,c+i)][1].color != actual_piece.color):
+                        add_legal_moves.append((r+i,c+i))
+                        # make sure king can't move to legal or attack spaces of opposing pieces
+                        for key, val in self.squares.items():
+                            if val[1] != None and ((r+i,c+i) in add_legal_moves):
+                                if val[1].notation == "Bb":
+                                    if((r+i,c+i) in val[1].legal_moves):
+                                        # print("BISHOP prevents")
+                                        add_legal_moves.remove((r+i,c+i))
+                                if val[1].notation == "Rb":
+                                    if((r+i,c+i) in val[1].legal_moves):
+                                        # print("ROOK prevents")
+                                        add_legal_moves.remove((r+i,c+i))
+                                if val[1].notation == "Pb":
+                                    # checking the diagonals of the black Pawn
+                                    if((r+i,c+i) == (val[1].pos_r+1,val[1].pos_c-1)):
+                                        add_legal_moves.remove((r+i,c+i))
+                                    if ((r+i,c+i) == (val[1].pos_r+1,val[1].pos_c+1)):
+                                        add_legal_moves.remove((r+i,c+i))
+                                if val[1].notation == "Qb":
+                                    if((r+i,c+i) in val[1].legal_moves):
+                                        # print("QUEEN prevents")
+                                        add_legal_moves.remove((r+i,c+i))
+                                if val[1].notation == "Nb":
+                                    if((r+i,c+i) in val[1].legal_moves):
+                                        # print("KNIGHT prevents")
+                                        add_legal_moves.remove((r+i,c+i))
+                                if val[1].notation == "Kb":  
+                                    if((r+i,c+i) in val[1].legal_moves):
+                                        print("KING prevents")
+                                        add_legal_moves.remove((r+i,c+i))
+                # no piece to the diagonal bottom right
+                elif (self.squares[(r+i,c+i)][1] != None): 
+                    add_legal_moves.append((r+i,c+i))
+                    # make sure king can't move to legal or attack spaces of opposing pieces
+                    for key, val in self.squares.items():
+                        if val[1] != None and ((r+i,c+i) in add_legal_moves):
+                            if val[1].notation == "Bb":
+                                if((r+i,c+i) in val[1].legal_moves):
+                                    # print("BISHOP prevents")
+                                    add_legal_moves.remove((r+i,c+i))
+                            if val[1].notation == "Rb":
+                                if((r+i,c+i) in val[1].legal_moves):
+                                    # print("ROOK prevents")
+                                    add_legal_moves.remove((r+i,c+i))
+                            if val[1].notation == "Pb":
+                                # checking the diagonals of the black Pawn
+                                if((r+i,c+i) == (val[1].pos_r+1,val[1].pos_c-1)):
+                                    add_legal_moves.remove((r+i,c+i))
+                                if ((r+i,c+i) == (val[1].pos_r+1,val[1].pos_c+1)):
+                                    add_legal_moves.remove((r+i,c+i))
+                            if val[1].notation == "Qb":
+                                if((r+i,c+i) in val[1].legal_moves):
+                                    # print("QUEEN prevents")
+                                    add_legal_moves.remove((r+i,c+i))
+                            if val[1].notation == "Nb":
+                                if((r+i,c+i) in val[1].legal_moves):
+                                    # print("KNIGHT prevents")
+                                    add_legal_moves.remove((r+i,c+i))
+                            if val[1].notation == "Kb":  
+                                if((r+i,c+i) in val[1].legal_moves):
+                                    print("KING prevents")
+                                    add_legal_moves.remove((r+i,c+i))
+                # ally piece to the diagonal bottom right
+                else:
+                    i=2
+                    break
+            
+            for i in range(c,c-2,-1):
+                if i == c:
+                    continue
+                elif i < 0 or i > 7: 
+                    i=c-2
+                    break
+                # enemy piece to the left
+                elif (self.squares[(r,i)][1] != None): 
+                    if (self.squares[(r,i)][1].color != actual_piece.color):
+                        add_legal_moves.append((r,i))
+                        # make sure king can't move to legal or attack spaces of opposing pieces
+                        for key, val in self.squares.items():
+                            if val[1] != None and ((r,i) in add_legal_moves):
+                                if val[1].notation == "Bb":
+                                    if((r,i) in val[1].legal_moves):
+                                        # print("BISHOP prevents")
+                                        add_legal_moves.remove((r,i))
+                                if val[1].notation == "Rb":
+                                    if((r,i) in val[1].legal_moves):
+                                        # print("ROOK prevents")
+                                        add_legal_moves.remove((r,i))
+                                if val[1].notation == "Pb":
+                                    # checking the diagonals of the black Pawn
+                                    if((r,i) == (val[1].pos_r+1,val[1].pos_c-1)):
+                                        add_legal_moves.remove((r,i))
+                                    if ((r,i) == (val[1].pos_r+1,val[1].pos_c+1)):
+                                        add_legal_moves.remove((r,i))
+                                if val[1].notation == "Qb":
+                                    if((r,i) in val[1].legal_moves):
+                                        # print("QUEEN prevents")
+                                        add_legal_moves.remove((r,i))
+                                if val[1].notation == "Nb":
+                                    if((r,i) in val[1].legal_moves):
+                                        # print("KNIGHT prevents")
+                                        add_legal_moves.remove((r,i))
+                                if val[1].notation == "Kb":  
+                                    if((r,i) in val[1].legal_moves):
+                                        print("KING prevents")
+                                        add_legal_moves.remove((r,i))
+                # no piece to the left
+                elif (self.squares[(r,i)][1] == None): 
+                    add_legal_moves.append((r,i))
+                    # make sure king can't move to legal or attack spaces of opposing pieces
+                    for key, val in self.squares.items():
+                        if val[1] != None and ((r,i) in add_legal_moves):
+                            if val[1].notation == "Bb":
+                                if((r,i) in val[1].legal_moves):
+                                    # print("BISHOP prevents")
+                                    add_legal_moves.remove((r,i))
+                            if val[1].notation == "Rb":
+                                if((r,i) in val[1].legal_moves):
+                                    # print("ROOK prevents")
+                                    add_legal_moves.remove((r,i))
+                            if val[1].notation == "Pb":
+                                # checking the diagonals of the black Pawn
+                                if((r,i) == (val[1].pos_r+1,val[1].pos_c-1)):
+                                    add_legal_moves.remove((r,i))
+                                if ((r,i) == (val[1].pos_r+1,val[1].pos_c+1)):
+                                    add_legal_moves.remove((r,i))
+                            if val[1].notation == "Qb":
+                                if((r,i) in val[1].legal_moves):
+                                    # print("QUEEN prevents")
+                                    add_legal_moves.remove((r,i))
+                            if val[1].notation == "Nb":
+                                if((r,i) in val[1].legal_moves):
+                                    # print("KNIGHT prevents")
+                                    add_legal_moves.remove((r,i))
+                            if val[1].notation == "Kb":  
+                                if((r,i) in val[1].legal_moves):
+                                    print("KING prevents")
+                                    add_legal_moves.remove((r,i))
+                # ally piece to the left
+                else:
+                    i=c-2
+                    break
+
+            for i in range(c,c+2):
+                if i == c:
+                    continue
+                elif i < 0 or i > 7: 
+                    i=c+2
+                    break
+                # enemy piece to the right
+                elif (self.squares[(r,i)][1] != None): 
+                    if (self.squares[(r,i)][1].color != actual_piece.color):
+                        add_legal_moves.append((r,i))
+                        # make sure king can't move to legal or attack spaces of opposing pieces
+                        for key, val in self.squares.items():
+                            if val[1] != None and ((r,i) in add_legal_moves):                         
+                                if val[1].notation == "Bb":
+                                    if((r,i) in val[1].legal_moves):
+                                        # print("BISHOP prevents")
+                                        add_legal_moves.remove((r,i))
+                                elif val[1].notation == "Rb":
+                                    if((r,i) in val[1].legal_moves):
+                                        # print("ROOK prevents")
+                                        add_legal_moves.remove((r,i))
+                                elif val[1].notation == "Pb":
+                                    # checking the diagonals of the black Pawn
+                                    if((r,i) == (val[1].pos_r+1,val[1].pos_c-1)):
+                                        add_legal_moves.remove((r,i))
+                                    if ((r,i) == (val[1].pos_r+1,val[1].pos_c+1)):
+                                        add_legal_moves.remove((r,i))
+                                elif val[1].notation == "Qb":
+                                    if((r,i) in val[1].legal_moves):
+                                        # print("QUEEN prevents")
+                                        add_legal_moves.remove((r,i))
+                                elif val[1].notation == "Nb":
+                                    if((r,i) in val[1].legal_moves):
+                                        # print("KNIGHT prevents")
+                                        add_legal_moves.remove((r,i))
+                                elif val[1].notation == "Kb":  
+                                    if((r,i) in val[1].legal_moves):
+                                        print("KING prevents")
+                                        add_legal_moves.remove((r,i))
+                # no piece to the right
+                elif (self.squares[(r,i)][1] == None): 
+                    add_legal_moves.append((r,i))
+                    # make sure king can't move to legal or attack spaces of opposing pieces
+                    for key, val in self.squares.items():
+                        if val[1] != None and ((r,i) in add_legal_moves):
+                            if val[1].notation == "Bb":
+                                if((r,i) in val[1].legal_moves):
+                                    # print("BISHOP prevents")
+                                    add_legal_moves.remove((r,i))
+                            if val[1].notation == "Rb":
+                                if((r,i) in val[1].legal_moves):
+                                    # print("ROOK prevents")
+                                    add_legal_moves.remove((r,i))
+                            if val[1].notation == "Pb":
+                                # checking the diagonals of the black Pawn
+                                if((r,i) == (val[1].pos_r+1,val[1].pos_c-1)):
+                                    add_legal_moves.remove((r,i))
+                                if((r,i) == (val[1].pos_r+1,val[1].pos_c+1)):
+                                    add_legal_moves.remove((r,i)) # WORKING ON THIS PART to solve it all
+                            if val[1].notation == "Qb":
+                                if((r,i) in val[1].legal_moves):
+                                    # print("QUEEN prevents")
+                                    add_legal_moves.remove((r,i))
+                            if val[1].notation == "Nb":
+                                if((r,i) in val[1].legal_moves):
+                                    # print("KNIGHT prevents")
+                                    add_legal_moves.remove((r,i))
+                            if val[1].notation == "Kb":  
+                                if((r,i) in val[1].legal_moves):
+                                    print("KING prevents")
+                                add_legal_moves.remove((r,i))
+                # ally piece to the right
+                else:
+                    i=c+2
+                    break
+
+            for i in range(r,r-2,-1):
+                if i == r:
+                    continue
+                elif i < 0 or i > 7: 
+                    i=r-2
+                    break
+                # enemy piece above
+                elif (self.squares[(i,c)][1] != None):
+                    if (self.squares[(i,c)][1].color != actual_piece.color):
+                        add_legal_moves.append((i,c))
+                        # make sure king can't move to legal or attack spaces of opposing pieces
+                        for key, val in self.squares.items():
+                            if val[1] != None and ((i,c) in add_legal_moves):
+                                if val[1].notation == "Bb":
+                                    if((i,c) in val[1].legal_moves):
+                                        # print("BISHOP prevents")
+                                        add_legal_moves.remove((i,c))
+                                if val[1].notation == "Rb":
+                                    if((i,c) in val[1].legal_moves):
+                                        # print("ROOK prevents")
+                                        add_legal_moves.remove((i,c))
+                                if val[1].notation == "Pb":
+                                    # checking the diagonals of the black Pawn
+                                    if((i,c) == (val[1].pos_r+1,val[1].pos_c-1)):
+                                        add_legal_moves.remove((i,c))
+                                    if ((i,c) == (val[1].pos_r+1,val[1].pos_c+1)):
+                                        add_legal_moves.remove((i,c))
+                                if val[1].notation == "Qb":
+                                    if((i,c) in val[1].legal_moves):
+                                        # print("QUEEN prevents")
+                                        add_legal_moves.remove((i,c))
+                                if val[1].notation == "Nb":
+                                    if((i,c) in val[1].legal_moves):
+                                        # print("KNIGHT prevents")
+                                        add_legal_moves.remove((i,c))
+                                if val[1].notation == "Kb":  
+                                    if((i,c) in val[1].legal_moves):
+                                        print("KING prevents")
+                                        add_legal_moves.remove((i,c))
+                # no piece above
+                elif (self.squares[(i,c)][1] == None):
+                    add_legal_moves.append((i,c))
+                    # make sure king can't move to legal or attack spaces of opposing pieces
+                    for key, val in self.squares.items():
+                        if val[1] != None and ((i,c) in add_legal_moves):
+                            if val[1].notation == "Bb":
+                                if((i,c) in val[1].legal_moves):
+                                    # print("BISHOP prevents")
+                                    add_legal_moves.remove((i,c))
+                            if val[1].notation == "Rb":
+                                if((i,c) in val[1].legal_moves):
+                                    # print("ROOK prevents")
+                                    add_legal_moves.remove((i,c))
+                            if val[1].notation == "Pb":
+                                # checking the diagonals of the black Pawn
+                                if((i,c) == (val[1].pos_r+1,val[1].pos_c-1)):
+                                    add_legal_moves.remove((i,c))
+                                if ((i,c) == (val[1].pos_r+1,val[1].pos_c+1)):
+                                    add_legal_moves.remove((i,c))
+                            if val[1].notation == "Qb":
+                                if((i,c) in val[1].legal_moves):
+                                    # print("QUEEN prevents")
+                                    add_legal_moves.remove((i,c))
+                            if val[1].notation == "Nb":
+                                if((i,c) in val[1].legal_moves):
+                                    # print("KNIGHT prevents")
+                                    add_legal_moves.remove((i,c))
+                            if val[1].notation == "Kb":  
+                                if((i,c) in val[1].legal_moves):
+                                    print("KING prevents")
+                                    add_legal_moves.remove((i,c))
+                # ally piece above
+                else:
+                    i=r-2
+                    break
+
+            for i in range(r,r+2):
+                if i == r:
+                    continue
+                elif i < 0 or i > 7: 
+                    i=r+2
+                    break
+                # enemy piece below
+                elif (self.squares[(i,c)][1] != None): 
+                    if (self.squares[(i,c)][1].color != actual_piece.color):
+                        add_legal_moves.append((i,c))
+                        # make sure king can't move to legal or attack spaces of opposing pieces
+                        for key, val in self.squares.items():
+                            if val[1] != None and ((i,c) in add_legal_moves):
+                                if val[1].notation == "Bb":
+                                    if((i,c) in val[1].legal_moves):
+                                        # print("BISHOP prevents")
+                                        add_legal_moves.remove((i,c))
+                                if val[1].notation == "Rb":
+                                    if((i,c) in val[1].legal_moves):
+                                        # print("ROOK prevents")
+                                        add_legal_moves.remove((i,c))
+                                if val[1].notation == "Pb":
+                                    # checking the diagonals of the black Pawn
+                                    if((i,c) == (val[1].pos_r+1,val[1].pos_c-1)):
+                                        add_legal_moves.remove((i,c))
+                                    if ((i,c) == (val[1].pos_r+1,val[1].pos_c+1)):
+                                        add_legal_moves.remove((i,c))
+                                if val[1].notation == "Qb":
+                                    if((i,c) in val[1].legal_moves):
+                                        # print("QUEEN prevents")
+                                        add_legal_moves.remove((i,c))
+                                if val[1].notation == "Nb":
+                                    if((i,c) in val[1].legal_moves):
+                                        # print("KNIGHT prevents")
+                                        add_legal_moves.remove((i,c))
+                                if val[1].notation == "Kb":  
+                                    if((i,c) in val[1].legal_moves):
+                                        print("KING prevents")
+                                        add_legal_moves.remove((i,c))
+                # no piece below
+                elif (self.squares[(i,c)][1] == None):
+                    add_legal_moves.append((i,c))
+                    # make sure king can't move to legal or attack spaces of opposing pieces
+                    for key, val in self.squares.items():
+                        if val[1] != None and ((i,c) in add_legal_moves):
+                            if val[1].notation == "Bb":
+                                if((i,c) in val[1].legal_moves):
+                                    # print("BISHOP prevents")
+                                    add_legal_moves.remove((i,c))
+                            if val[1].notation == "Rb":
+                                if((i,c) in val[1].legal_moves):
+                                    # print("ROOK prevents")
+                                    add_legal_moves.remove((i,c))
+                            if val[1].notation == "Pb":
+                                # checking the diagonals of the black Pawn
+                                if((i,c) == (val[1].pos_r+1,val[1].pos_c-1)):
+                                    add_legal_moves.remove((i,c))
+                                if ((i,c) == (val[1].pos_r+1,val[1].pos_c+1)):
+                                    add_legal_moves.remove((i,c))
+                            if val[1].notation == "Qb":
+                                if((i,c) in val[1].legal_moves):
+                                    # print("QUEEN prevents")
+                                    add_legal_moves.remove((i,c))
+                            if val[1].notation == "Nb":
+                                if((i,c) in val[1].legal_moves):
+                                    # print("KNIGHT prevents")
+                                    add_legal_moves.remove((i,c))
+                            if val[1].notation == "Kb":  
+                                if((i,c) in val[1].legal_moves):
+                                    print("KING prevents")
+                                    add_legal_moves.remove((i,c))
+                # ally piece below
+                else:
+                    i=r+2
                     break
 
             return add_legal_moves
@@ -566,9 +1205,10 @@ class ChessBoard(tk.Canvas):
                     add_legal_moves.append((r-i,c-i))
                 # a piece to the diagonal top left that CAN be captured has been reached
                 elif (self.squares[(r-i, c-i)][1] != None) and (self.squares[(r-i, c-i)][1].color != actual_piece.color):
-                    add_legal_moves.append((r-i, c-i))
-                    i=8
-                    break
+                    if (self.squares[(r-i, c-i)][1].notation != "K") and (self.squares[(r-i, c-i)][1].notation != "Kb"):
+                        add_legal_moves.append((r-i, c-i))
+                        i=8
+                        break
                 # a piece to the diagonal top left that CANNOT be captured has been reached
                 elif (self.squares[(r-i, c-i)][1] != None) and (self.squares[(r-i, c-i)][1].color == actual_piece.color):
                     i=8
@@ -583,9 +1223,10 @@ class ChessBoard(tk.Canvas):
                     add_legal_moves.append((r+i,c-i))
                 # a piece to the diagonal bottom left that CAN be captured has been reached
                 elif (self.squares[(r+i, c-i)][1] != None) and (self.squares[(r+i, c-i)][1].color != actual_piece.color):
-                    add_legal_moves.append((r+i, c-i))
-                    i=8
-                    break
+                    if (self.squares[(r+i, c-i)][1].notation != "K") and (self.squares[(r+i, c-i)][1].notation != "Kb"):
+                        add_legal_moves.append((r+i, c-i))
+                        i=8
+                        break
                 # a piece to the diagonal bottom left that CANNOT be captured has been reached
                 elif (self.squares[(r+i, c-i)][1] != None) and (self.squares[(r+i, c-i)][1].color == actual_piece.color):
                     i=8
@@ -600,9 +1241,10 @@ class ChessBoard(tk.Canvas):
                     add_legal_moves.append((r-i, c+i))
                 # a piece to the diagonal top right that CAN be captured has been reached
                 elif (self.squares[(r-i, c+i)][1] != None) and (self.squares[(r-i, c+i)][1].color != actual_piece.color):
-                    add_legal_moves.append((r-i, c+i))
-                    i=8
-                    break
+                    if (self.squares[(r-i, c+i)][1].notation != "K") and (self.squares[(r-i, c+i)][1].notation != "Kb"):
+                        add_legal_moves.append((r-i, c+i))
+                        i=8
+                        break
                 # a piece to the diagonal top right that CANNOT be captured has been reached
                 elif (self.squares[(r-i, c+i)][1] != None) and (self.squares[(r-i, c+i)][1].color == actual_piece.color):
                     i=8
@@ -617,9 +1259,10 @@ class ChessBoard(tk.Canvas):
                     add_legal_moves.append((r+i, c+i))
                 # a piece to the diagonal bottom right that CAN be captured has been reached
                 elif (self.squares[(r+i, c+i)][1] != None) and (self.squares[(r+i, c+i)][1].color != actual_piece.color):
-                    add_legal_moves.append((r+i, c+i))
-                    i=8
-                    break
+                    if (self.squares[(r+i, c+i)][1].notation != "K") and (self.squares[(r+i, c+i)][1].notation != "Kb"):
+                        add_legal_moves.append((r+i, c+i))
+                        i=8
+                        break
                 # a piece to the diagonal bottom right that CANNOT be captured has been reached
                 elif (self.squares[(r+i, c+i)][1] != None) and (self.squares[(r+i, c+i)][1].color == actual_piece.color):
                     i=8
@@ -633,9 +1276,10 @@ class ChessBoard(tk.Canvas):
                     add_legal_moves.append((r,i))
                 # a piece to the left that CAN be captured has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color != actual_piece.color):
-                    add_legal_moves.append((r,i))
-                    i=-1
-                    break
+                    if (self.squares[(r, i)][1].notation != "K") and (self.squares[(r, i)][1].notation != "Kb"):
+                        add_legal_moves.append((r,i))
+                        i=-1
+                        break
                 # a piece to the left that CANNOT be captured has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color == actual_piece.color):
                     i=-1
@@ -649,9 +1293,10 @@ class ChessBoard(tk.Canvas):
                     add_legal_moves.append((r,i))
                 # a piece to the right that CAN be captured has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color != actual_piece.color):
-                    add_legal_moves.append((r,i))
-                    i=8
-                    break
+                    if (self.squares[(r, i)][1].notation != "K") and (self.squares[(r, i)][1].notation != "Kb"):
+                        add_legal_moves.append((r,i))
+                        i=8
+                        break
                 # a piece to the right that CANNOT be captured has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color == actual_piece.color):
                     i=8
@@ -665,9 +1310,10 @@ class ChessBoard(tk.Canvas):
                     add_legal_moves.append((i,c))
                 # a piece to above that CAN be captured has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color != actual_piece.color):
-                    add_legal_moves.append((i,c))
-                    i=-1
-                    break
+                    if (self.squares[(i, c)][1].notation != "K") and (self.squares[(i, c)][1].notation != "Kb"):
+                        add_legal_moves.append((i,c))
+                        i=-1
+                        break
                 # a piece above that CANNOT be captured has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color == actual_piece.color):
                     i=-1
@@ -681,9 +1327,10 @@ class ChessBoard(tk.Canvas):
                     add_legal_moves.append((i,c))
                 # a piece below that CAN be captured has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color != actual_piece.color):
-                    add_legal_moves.append((i,c))
-                    i=8
-                    break
+                    if (self.squares[(i, c)][1].notation != "K") and (self.squares[(i, c)][1].notation != "Kb"):
+                        add_legal_moves.append((i,c))
+                        i=8
+                        break
                 # a piece below that CANNOT be captured has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color == actual_piece.color):
                     i=8
@@ -703,9 +1350,10 @@ class ChessBoard(tk.Canvas):
                     add_legal_moves.append((r-i,c-i))
                 # a piece to the diagonal top left that CAN be captured has been reached
                 elif (self.squares[(r-i, c-i)][1] != None) and (self.squares[(r-i, c-i)][1].color != actual_piece.color):
-                    add_legal_moves.append((r-i, c-i))
-                    i=8
-                    break
+                    if (self.squares[(r-i, c-i)][1].notation != "K") and (self.squares[(r-i, c-i)][1].notation != "Kb"):
+                        add_legal_moves.append((r-i, c-i))
+                        i=8
+                        break
                 # a piece to the diagonal top left that CANNOT be captured has been reached
                 elif (self.squares[(r-i, c-i)][1] != None) and (self.squares[(r-i, c-i)][1].color == actual_piece.color):
                     i=8
@@ -720,9 +1368,10 @@ class ChessBoard(tk.Canvas):
                     add_legal_moves.append((r+i,c-i))
                 # a piece to the diagonal bottom left that CAN be captured has been reached
                 elif (self.squares[(r+i, c-i)][1] != None) and (self.squares[(r+i, c-i)][1].color != actual_piece.color):
-                    add_legal_moves.append((r+i, c-i))
-                    i=8
-                    break
+                    if (self.squares[(r+i, c-i)][1].notation != "K") and (self.squares[(r+i, c-i)][1].notation != "Kb"):
+                        add_legal_moves.append((r+i, c-i))
+                        i=8
+                        break
                 # a piece to the diagonal bottom left that CANNOT be captured has been reached
                 elif (self.squares[(r+i, c-i)][1] != None) and (self.squares[(r+i, c-i)][1].color == actual_piece.color):
                     i=8
@@ -737,9 +1386,10 @@ class ChessBoard(tk.Canvas):
                     add_legal_moves.append((r-i, c+i))
                 # a piece to the diagonal top right that CAN be captured has been reached
                 elif (self.squares[(r-i, c+i)][1] != None) and (self.squares[(r-i, c+i)][1].color != actual_piece.color):
-                    add_legal_moves.append((r-i, c+i))
-                    i=-8
-                    break
+                    if (self.squares[(r-i, c+i)][1].notation != "K") and (self.squares[(r-i, c+i)][1].notation != "Kb"):
+                        add_legal_moves.append((r-i, c+i))
+                        i=-8
+                        break
                 # a piece to the diagonal top right that CANNOT be captured has been reached
                 elif (self.squares[(r-i, c+i)][1] != None) and (self.squares[(r-i, c+i)][1].color == actual_piece.color):
                     i=-8
@@ -754,9 +1404,10 @@ class ChessBoard(tk.Canvas):
                     add_legal_moves.append((r+i, c+i))
                 # a piece to the diagonal bottom right that CAN be captured has been reached
                 elif (self.squares[(r+i, c+i)][1] != None) and (self.squares[(r+i, c+i)][1].color != actual_piece.color):
-                    add_legal_moves.append((r+i, c+i))
-                    i=8
-                    break
+                    if (self.squares[(r+i, c+i)][1].notation != "K") and (self.squares[(r+i, c+i)][1].notation != "Kb"):
+                        add_legal_moves.append((r+i, c+i))
+                        i=8
+                        break
                 # a piece to the diagonal bottom right that CANNOT be captured has been reached
                 elif (self.squares[(r+i, c+i)][1] != None) and (self.squares[(r+i, c+i)][1].color == actual_piece.color):
                     i=8
@@ -838,9 +1489,10 @@ class ChessBoard(tk.Canvas):
                     add_legal_moves.append((r,i))
                 # a piece to the left that CAN be captured has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color != actual_piece.color):
-                    add_legal_moves.append((r,i))
-                    i=-1
-                    break
+                    if (self.squares[(r, i)][1].notation != "K") and (self.squares[(r, i)][1].notation != "Kb"):
+                        add_legal_moves.append((r,i))
+                        i=-1
+                        break
                 # a piece to the left that CANNOT be captured has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color == actual_piece.color):
                     i=-1
@@ -854,9 +1506,10 @@ class ChessBoard(tk.Canvas):
                     add_legal_moves.append((r,i))
                 # a piece to the right that CAN be captured has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color != actual_piece.color):
-                    add_legal_moves.append((r,i))
-                    i=-1
-                    break
+                    if (self.squares[(r, i)][1].notation != "K") and (self.squares[(r, i)][1].notation != "Kb"):
+                        add_legal_moves.append((r,i))
+                        i=-1
+                        break
                 # a piece to the right that CANNOT be captured has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color == actual_piece.color):
                     i=-1
@@ -870,9 +1523,10 @@ class ChessBoard(tk.Canvas):
                     add_legal_moves.append((i,c))
                 # a piece to above that CAN be captured has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color != actual_piece.color):
-                    add_legal_moves.append((i,c))
-                    i=-1
-                    break
+                    if (self.squares[(i, c)][1].notation != "K") and (self.squares[(i, c)][1].notation != "Kb"):
+                        add_legal_moves.append((i,c))
+                        i=-1
+                        break
                 # a piece above that CANNOT be captured has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color == actual_piece.color):
                     i=-1
@@ -886,9 +1540,10 @@ class ChessBoard(tk.Canvas):
                     add_legal_moves.append((i,c))
                 # a piece below that CAN be captured has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color != actual_piece.color):
-                    add_legal_moves.append((i,c))
-                    i=-1
-                    break
+                    if (self.squares[(i, c)][1].notation != "K") and (self.squares[(i, c)][1].notation != "Kb"):
+                        add_legal_moves.append((i,c))
+                        i=-1
+                        break
                 # a piece below that CANNOT be captured has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color == actual_piece.color):
                     i=-1
@@ -928,7 +1583,6 @@ class ChessBoard(tk.Canvas):
                     if (key == (r+1, c)) and (actual_piece.two_spaces == True) and (self.squares[(r+2, c)][1] == None): 
                         add_legal_moves.append((r+2, c))
                     
-
             return add_legal_moves
 
         if actual_piece.notation == "P":
