@@ -43,31 +43,49 @@ class Rook(Piece):
         self.moved = moved
 
 class Pawn(Piece):
-    def __init__(self, notation, color, pos_r, pos_c, legal_moves, two_spaces, do_en_pass, get_en_pass):
+    def __init__(self, notation, color, pos_r, pos_c, legal_moves, two_spaces, do_en_pass, get_en_pass, en_pass_count):
         super().__init__(notation, color, pos_r, pos_c, legal_moves)
         self.two_spaces = two_spaces
         self.do_en_pass = do_en_pass
         self.get_en_pass = get_en_pass
+        self.en_pass_count = en_pass_count
 
     def promote(self):
         promotion_window = tk.Toplevel()
         promotion_window.title("Promote Pawn")
         promotion_window.geometry("300x150")
 
-        radio_var = tk.StringVar()
-        radio_var.set("Q")
+        if self.color == "white":
+            radio_var = tk.StringVar()
+            radio_var.set("Q")
 
-        label = tk.Label(promotion_window, text="Choose a piece to promote to:")
-        label.pack()
+            label = tk.Label(promotion_window, text="Choose a piece to promote to:")
+            label.pack()
 
-        radio_queen = tk.Radiobutton(promotion_window, text="Queen", variable=radio_var, value="Q")
-        radio_queen.pack()
-        radio_rook = tk.Radiobutton(promotion_window, text="Rook", variable=radio_var, value="R")
-        radio_rook.pack()
-        radio_bishop = tk.Radiobutton(promotion_window, text="Bishop", variable=radio_var, value="B")
-        radio_bishop.pack()
-        radio_knight = tk.Radiobutton(promotion_window, text="Knight", variable=radio_var, value="N")
-        radio_knight.pack()
+            radio_queen = tk.Radiobutton(promotion_window, text="Queen", variable=radio_var, value="Q")
+            radio_queen.pack()
+            radio_rook = tk.Radiobutton(promotion_window, text="Rook", variable=radio_var, value="R")
+            radio_rook.pack()
+            radio_bishop = tk.Radiobutton(promotion_window, text="Bishop", variable=radio_var, value="B")
+            radio_bishop.pack()
+            radio_knight = tk.Radiobutton(promotion_window, text="Knight", variable=radio_var, value="N")
+            radio_knight.pack()
+    
+        else:
+            radio_var = tk.StringVar()
+            radio_var.set("Qb")
+
+            label = tk.Label(promotion_window, text="Choose a piece to promote to:")
+            label.pack()
+
+            radio_queen = tk.Radiobutton(promotion_window, text="Queen", variable=radio_var, value="Qb")
+            radio_queen.pack()
+            radio_rook = tk.Radiobutton(promotion_window, text="Rook", variable=radio_var, value="Rb")
+            radio_rook.pack()
+            radio_bishop = tk.Radiobutton(promotion_window, text="Bishop", variable=radio_var, value="Bb")
+            radio_bishop.pack()
+            radio_knight = tk.Radiobutton(promotion_window, text="Knight", variable=radio_var, value="Nb")
+            radio_knight.pack()
 
         # print("WE GOT A " + (radio_var.get()))
 
