@@ -10,14 +10,15 @@ class Piece:
         self.pos_r = pos_r
         self.pos_c = pos_c
         self.legal_moves = legal_moves
+        self.defends = defends
 
 class Queen(Piece):
     def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends):
-        super().__init__(notation, color, pos_r, pos_c, legal_moves)
+        super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
 
 class King(Piece):
     def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, moved):
-        super().__init__(notation, color, pos_r, pos_c, legal_moves)
+        super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
         self.moved = moved
     
     def castle(self):
@@ -31,20 +32,20 @@ class King(Piece):
 
 class Bishop(Piece):
     def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends):
-        super().__init__(notation, color, pos_r, pos_c, legal_moves)
+        super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
 
 class Knight(Piece):
     def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends):
-        super().__init__(notation, color, pos_r, pos_c, legal_moves)
+        super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
 
 class Rook(Piece):
     def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, moved):
-        super().__init__(notation, color, pos_r, pos_c, legal_moves)
+        super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
         self.moved = moved
 
 class Pawn(Piece):
     def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, two_spaces, do_en_pass, get_en_pass, en_pass_count):
-        super().__init__(notation, color, pos_r, pos_c, legal_moves)
+        super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
         self.two_spaces = two_spaces
         self.do_en_pass = do_en_pass
         self.get_en_pass = get_en_pass
