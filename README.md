@@ -1,1 +1,1 @@
-# Terminal-Chess-Game
+# Chess-Game
