@@ -417,67 +417,142 @@ class ChessBoard(tk.Canvas):
                         print(f"{val[1].color} pawn at ({val[1].pos_r},{val[1].pos_c}) get_en_pass is now {val[1].get_en_pass}")
 
     def get_legal_moves(self, actual_piece, r, c, **kwargs):
-        # if actual_piece.notation == "K" or actual_piece.notation == "Kb":
-        #     add_legal_moves = []
+        if actual_piece.notation == "K" or actual_piece.notation == "Kb":
+            add_legal_moves = []
+            
+            for i in range(1,8):
+                if r-i < 0 or c-i < 0:
+                    i=8
+                    break
+                # no piece to the diagonal top left
+                elif (self.squares[(r-i, c-i)][1] == None): 
+                    add_legal_moves.append((r-i,c-i))
+                # a piece to the diagonal top left that CAN be captured has been reached
+                elif (self.squares[(r-i, c-i)][1] != None) and (self.squares[(r-i, c-i)][1].color != actual_piece.color):
+                    add_legal_moves.append((r-i, c-i))
+                    i=8
+                    break
+                # a piece to the diagonal top left that CANNOT be captured has been reached
+                elif (self.squares[(r-i, c-i)][1] != None) and (self.squares[(r-i, c-i)][1].color == actual_piece.color):
+                    i=8
+                    break
+            
+            for i in range(1,8):
+                if r+i > 7 or c-i < 0:
+                    i=8
+                    break
+                # no piece to the diagonal bottom left
+                elif (self.squares[(r+i, c-i)][1] == None): 
+                    add_legal_moves.append((r+i,c-i))
+                # a piece to the diagonal bottom left that CAN be captured has been reached
+                elif (self.squares[(r+i, c-i)][1] != None) and (self.squares[(r+i, c-i)][1].color != actual_piece.color):
+                    add_legal_moves.append((r+i, c-i))
+                    i=8
+                    break
+                # a piece to the diagonal bottom left that CANNOT be captured has been reached
+                elif (self.squares[(r+i, c-i)][1] != None) and (self.squares[(r+i, c-i)][1].color == actual_piece.color):
+                    i=8
+                    break
 
-        #     for key, val in self.squares.items():
-        #         if (val[1] != None): # there is a piece at the current square
-        #             # diagonal left top has an enemy
-        #             if (val[1].pos_r == r-1) and (val[1].pos_c == c-1) and ((val[1].color != actual_piece.color)):
-        #                 add_legal_moves.append((val[1].pos_r, val[1].pos_c))
-        #             # diagonal right top has an enemy
-        #             if (val[1].pos_r == r-1) and (val[1].pos_c == c+1) and ((val[1].color != actual_piece.color)):
-        #                 add_legal_moves.append((val[1].pos_r, val[1].pos_c))
-        #             # top has an enemy
-        #             if (val[1].pos_r == r-1) and (val[1].pos_c == c) and ((val[1].color != actual_piece.color)):
-        #                 add_legal_moves.append((val[1].pos_r, val[1].pos_c))
+            for i in range(1,8):
+                if r-i < 0 or c+i > 7:
+                    i=8
+                    break
+                # no piece to the diagonal top right
+                elif (self.squares[(r-i, c+i)][1] == None): 
+                    add_legal_moves.append((r-i, c+i))
+                # a piece to the diagonal top right that CAN be captured has been reached
+                elif (self.squares[(r-i, c+i)][1] != None) and (self.squares[(r-i, c+i)][1].color != actual_piece.color):
+                    add_legal_moves.append((r-i, c+i))
+                    i=8
+                    break
+                # a piece to the diagonal top right that CANNOT be captured has been reached
+                elif (self.squares[(r-i, c+i)][1] != None) and (self.squares[(r-i, c+i)][1].color == actual_piece.color):
+                    i=8
+                    break
 
-        #             # diagonal left bottom has an enemy
-        #             if (val[1].pos_r == r+1) and (val[1].pos_c == c-1) and ((val[1].color != actual_piece.color)) and (r>=0 and r<=7) and (c>=0 and c<=7):
-        #                 add_legal_moves.append((val[1].pos_r, val[1].pos_c))
-        #             # diagonal right bottom has an enemy
-        #             if (val[1].pos_r == r+1) and (val[1].pos_c == c+1) and ((val[1].color != actual_piece.color)):
-        #                 add_legal_moves.append((val[1].pos_r, val[1].pos_c))
-        #             # bottom has an enemy
-        #             if (val[1].pos_r == r-1) and (val[1].pos_c == c) and ((val[1].color != actual_piece.color)):
-        #                 add_legal_moves.append((val[1].pos_r, val[1].pos_c))
+            for i in range(1,8):
+                if r+i > 7 or c+i > 7: 
+                    i=8
+                    break
+                # no piece to the diagonal bottom right
+                elif (self.squares[(r+i, c+i)][1] == None): 
+                    add_legal_moves.append((r+i, c+i))
+                # a piece to the diagonal bottom right that CAN be captured has been reached
+                elif (self.squares[(r+i, c+i)][1] != None) and (self.squares[(r+i, c+i)][1].color != actual_piece.color):
+                    add_legal_moves.append((r+i, c+i))
+                    i=8
+                    break
+                # a piece to the diagonal bottom right that CANNOT be captured has been reached
+                elif (self.squares[(r+i, c+i)][1] != None) and (self.squares[(r+i, c+i)][1].color == actual_piece.color):
+                    i=8
+                    break
+            
+            for i in range(c,-1,-1):
+                if i == c:
+                    continue
+                # no piece to the left
+                if (self.squares[(r, i)][1] == None): 
+                    add_legal_moves.append((r,i))
+                # a piece to the left that CAN be captured has been reached
+                elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color != actual_piece.color):
+                    add_legal_moves.append((r,i))
+                    i=-1
+                    break
+                # a piece to the left that CANNOT be captured has been reached
+                elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color == actual_piece.color):
+                    i=-1
+                    break
 
-        #             # left has an enemy
-        #             if (val[1].pos_r == r) and (val[1].pos_c == c-1) and ((val[1].color != actual_piece.color)):
-        #                 add_legal_moves.append((val[1].pos_r, val[1].pos_c))
-        #             # right has an enemy
-        #             if (val[1].pos_r == r) and (val[1].pos_c == c+1) and ((val[1].color != actual_piece.color)):
-        #                 add_legal_moves.append((val[1].pos_r, val[1].pos_c))
-        #         else:
-        #             # diagonal left top is empty
-        #             if (val[1].pos_r == r-1) and (val[1].pos_c == c-1):
-        #                 if (val[1])
-        #                 add_legal_moves.append((val[1].pos_r, val[1].pos_c))
-        #             # diagonal right top is empty
-        #             if (val[1].pos_r == r-1) and (val[1].pos_c == c+1) and ((val[1].color != actual_piece.color)):
-        #                 add_legal_moves.append((val[1].pos_r, val[1].pos_c))
-        #             # top has an enemy
-        #             if (val[1].pos_r == r-1) and (val[1].pos_c == c) and ((val[1].color != actual_piece.color)):
-        #                 add_legal_moves.append((val[1].pos_r, val[1].pos_c))
+            for i in range(c,8):
+                if i == c:
+                    continue
+                # no piece to the right
+                if (self.squares[(r, i)][1] == None): 
+                    add_legal_moves.append((r,i))
+                # a piece to the right that CAN be captured has been reached
+                elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color != actual_piece.color):
+                    add_legal_moves.append((r,i))
+                    i=8
+                    break
+                # a piece to the right that CANNOT be captured has been reached
+                elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color == actual_piece.color):
+                    i=8
+                    break
 
-        #             # diagonal left bottom is empty
-        #             if (val[1].pos_r == r+1) and (val[1].pos_c == c-1) and ((val[1].color != actual_piece.color)) and (r>=0 and r<=7) and (c>=0 and c<=7):
-        #                 add_legal_moves.append((val[1].pos_r, val[1].pos_c))
-        #             # diagonal right bottom is empty
-        #             if (val[1].pos_r == r+1) and (val[1].pos_c == c+1) and ((val[1].color != actual_piece.color)):
-        #                 add_legal_moves.append((val[1].pos_r, val[1].pos_c))
-        #             # bottom is empty
-        #             if (val[1].pos_r == r-1) and (val[1].pos_c == c) and ((val[1].color != actual_piece.color)):
-        #                 add_legal_moves.append((val[1].pos_r, val[1].pos_c))
+            for i in range(r,-1,-1):
+                if i == r:
+                    continue
+                # no piece above
+                if (self.squares[(i, c)][1] == None): 
+                    add_legal_moves.append((i,c))
+                # a piece to above that CAN be captured has been reached
+                elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color != actual_piece.color):
+                    add_legal_moves.append((i,c))
+                    i=-1
+                    break
+                # a piece above that CANNOT be captured has been reached
+                elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color == actual_piece.color):
+                    i=-1
+                    break
 
-        #             # left is empty
-        #             if (val[1].pos_r == r) and (val[1].pos_c == c-1) and ((val[1].color != actual_piece.color)):
-        #                 add_legal_moves.append((val[1].pos_r, val[1].pos_c))
-        #             # right is empty
-        #             if (val[1].pos_r == r) and (val[1].pos_c == c+1) and ((val[1].color != actual_piece.color)):
-        #                 add_legal_moves.append((val[1].pos_r, val[1].pos_c))
-                    
-        #     return add_legal_moves
+            for i in range(r,8):
+                if i == r:
+                    continue
+                # no piece below
+                if (self.squares[(i, c)][1] == None): 
+                    add_legal_moves.append((i,c))
+                # a piece below that CAN be captured has been reached
+                elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color != actual_piece.color):
+                    add_legal_moves.append((i,c))
+                    i=8
+                    break
+                # a piece below that CANNOT be captured has been reached
+                elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color == actual_piece.color):
+                    i=8
+                    break
+
+            return add_legal_moves
         
         if actual_piece.notation == "Q" or actual_piece.notation == "Qb":
             add_legal_moves = []
@@ -526,11 +601,11 @@ class ChessBoard(tk.Canvas):
                 # a piece to the diagonal top right that CAN be captured has been reached
                 elif (self.squares[(r-i, c+i)][1] != None) and (self.squares[(r-i, c+i)][1].color != actual_piece.color):
                     add_legal_moves.append((r-i, c+i))
-                    i=-8
+                    i=8
                     break
                 # a piece to the diagonal top right that CANNOT be captured has been reached
                 elif (self.squares[(r-i, c+i)][1] != None) and (self.squares[(r-i, c+i)][1].color == actual_piece.color):
-                    i=-8
+                    i=8
                     break
 
             for i in range(1,8):
@@ -575,11 +650,11 @@ class ChessBoard(tk.Canvas):
                 # a piece to the right that CAN be captured has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color != actual_piece.color):
                     add_legal_moves.append((r,i))
-                    i=-1
+                    i=8
                     break
                 # a piece to the right that CANNOT be captured has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color == actual_piece.color):
-                    i=-1
+                    i=8
                     break
 
             for i in range(r,-1,-1):
@@ -607,11 +682,11 @@ class ChessBoard(tk.Canvas):
                 # a piece below that CAN be captured has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color != actual_piece.color):
                     add_legal_moves.append((i,c))
-                    i=-1
+                    i=8
                     break
                 # a piece below that CANNOT be captured has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color == actual_piece.color):
-                    i=-1
+                    i=8
                     break
 
             return add_legal_moves
@@ -849,8 +924,8 @@ class ChessBoard(tk.Canvas):
                     # no piece one space ahead
                     if (key == (r+1, c)): 
                         add_legal_moves.append((r+1, c))
-                    # no piece two spaces ahead and can still do that
-                    if (key == (r+2, c)) and (actual_piece.two_spaces == True): 
+                    # no piece in path of two space jump and can still do two spaces
+                    if (key == (r+1, c)) and (actual_piece.two_spaces == True) and (self.squares[(r+2, c)][1] == None): 
                         add_legal_moves.append((r+2, c))
                     
 
@@ -895,7 +970,7 @@ class ChessBoard(tk.Canvas):
                     if (key == (r-1, c)): 
                         add_legal_moves.append((r-1, c))
                     # no piece two spaces ahead and can still do that
-                    if (key == (r-2, c)) and (actual_piece.two_spaces == True): 
+                    if (key == (r-1, c)) and (actual_piece.two_spaces == True) and (self.squares[(r-2, c)][1] == None):  
                         add_legal_moves.append((r-2, c))
                     
             return add_legal_moves
