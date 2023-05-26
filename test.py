@@ -1,3 +1,9 @@
+#region Test
+a = 1
+b = 2
+print(a+b)
+#endregion
+
 # imports
 import os
 from tkinter import Tk, Canvas, PhotoImage
