@@ -1,10 +1,11 @@
+
 #region Test
 a = 1
 b = 2
 print(a+b)
 #endregion
 
-# imports
+#region imports
 import os
 from tkinter import Tk, Canvas, PhotoImage
 import tkinter as tk
@@ -16,8 +17,9 @@ from pieces import Bishop
 from pieces import King
 from pieces import Queen
 import math
+#endregion
 
-# paths to all the chess pieces
+#region chess piece images
 w_pawn = os.path.join("designs", "white pieces", "white piece pngs", "white_pawn.png")
 w_rook = os.path.join("designs", "white pieces", "white piece pngs", "white_rook.png")
 w_knight = os.path.join("designs", "white pieces", "white piece pngs", "white_knight.png")
@@ -31,6 +33,7 @@ b_knight = os.path.join("designs", "black pieces", "black piece pngs", "black_kn
 b_bishop = os.path.join("designs", "black pieces", "black piece pngs", "black_bishop.png")
 b_queen = os.path.join("designs", "black pieces", "black piece pngs", "black_queen.png")
 b_king = os.path.join("designs", "black pieces", "black piece pngs", "black_king.png")
+#endregion
 
 # classes and functions
 def enter_fullscreen(event=None):
@@ -2252,7 +2255,7 @@ class ChessBoard(tk.Canvas):
             actual_piece.defends = add_defends
             return add_legal_moves
 
-# not classes and functions
+#region start game
 root = tk.Tk()
 root.title("Chess Game")
 root.configure(bg="#242320")
@@ -2293,3 +2296,4 @@ board.place_piece("B", "white", 7, 5, [], [(6,4), (6,6)])
 board.place_piece("Q", "white", 7, 3, [], [(7,2), (6,2), (6,3), (6,4), (7,4)])
 board.place_piece("K", "white", 7, 4, [], [(7,3), (6,3), (6,4), (6,5), (7,5)], moved=False)
 root.mainloop()
+#endregion
