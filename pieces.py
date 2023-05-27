@@ -17,9 +17,10 @@ class Queen(Piece):
         super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
 
 class King(Piece):
-    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, moved):
+    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, moved, border):
         super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
         self.moved = moved
+        self.border = border
     
     def castle(self):
         pass
