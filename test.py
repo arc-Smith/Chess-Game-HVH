@@ -1,10 +1,3 @@
-
-#region Test
-a = 1
-b = 2
-print(a+b)
-#endregion
-
 #region imports
 import os
 from tkinter import Tk, Canvas, PhotoImage
@@ -456,10 +449,10 @@ class ChessBoard(tk.Canvas):
                 if r-i < 0 or c-i < 0:
                     i=2
                     break
-                # enemy piece to the diagonal top left
                 elif (self.squares[(r-i,c-i)][1] != None):
                     add_border.append((r-i,c-i)) 
 
+                    # enemy piece to the diagonal top left
                     if (self.squares[(r-i,c-i)][1].color != actual_piece.color):
                         add_legal_moves.append((r-i,c-i))
                         # make sure king can't move to legal or defended spaces of enemy pieces
@@ -495,6 +488,13 @@ class ChessBoard(tk.Canvas):
                                     if((r-i,c-i) in val[1].legal_moves) or ((r-i,c-i) in val[1].defends) or ((r-i,c-i) in val[1].border):
                                         add_legal_moves.remove((r-i,c-i))
                                         break
+                    # ally piece to the diagonal top left
+                    else:
+                        add_border.append((r-i,c-i))
+
+                        add_defends.append((r-i,c-i))
+                        i=2
+                        break
                 # no piece to the diagonal top left
                 elif (self.squares[(r-i,c-i)][1] == None):
                     add_border.append((r-i,c-i))
@@ -531,23 +531,15 @@ class ChessBoard(tk.Canvas):
                                 if((r-i,c-i) in val[1].legal_moves) or ((r-i,c-i) in val[1].defends) or ((r-i,c-i) in val[1].border):
                                     add_legal_moves.remove((r-i,c-i))
                                     break
-                # ally piece to the diagonal top left
-                else:
-                    add_border.append((r-i,c-i))
-
-                    add_defends.append((r-i,c-i))
-                    i=2
-                    break
-                    
             
             for i in range(1,2):
                 if r+i > 7 or c-i < 0:
                     i=2
                     break
-                # enemy piece to the diagonal bottom left
                 elif (self.squares[(r+i,c-i)][1] != None): 
                     add_border.append((r+i,c-i))
 
+                    # enemy piece to the diagonal bottom left
                     if (self.squares[(r+i,c-i)][1].color != actual_piece.color):
                         add_legal_moves.append((r+i,c-i))
                         # make sure king can't move to legal or attack spaces of opposing pieces
@@ -581,6 +573,13 @@ class ChessBoard(tk.Canvas):
                                     if((r+i,c-i) in val[1].legal_moves) or ((r+i,c-i) in val[1].defends) or ((r+i,c-i) in val[1].border):
                                         add_legal_moves.remove((r+i,c-i))
                                         break
+                    # ally piece to the diagonal bottom left
+                    else:
+                        add_border.append((r+i,c-i))
+
+                        add_defends.append((r+i,c-i))
+                        i=2
+                        break
                 # no piece to the diagonal bottom left
                 elif (self.squares[(r+i,c-i)][1] == None): 
                     add_border.append((r+i,c-i))
@@ -617,22 +616,15 @@ class ChessBoard(tk.Canvas):
                                 if((r+i,c-i) in val[1].legal_moves) or ((r+i,c-i) in val[1].defends) or ((r+i,c-i) in val[1].border):
                                     add_legal_moves.remove((r+i,c-i))
                                     break
-                # ally piece to the diagonal bottom left
-                else:
-                    add_border.append((r+i,c-i))
-
-                    add_defends.append((r+i,c-i))
-                    i=2
-                    break
 
             for i in range(1,2):
                 if r-i < 0 or c+i > 7:
                     i=2
                     break
-                # enemy piece to the diagonal top right
                 elif (self.squares[(r-i,c+i)][1] != None): 
                     add_border.append((r-i,c+i))
 
+                    # enemy piece to the diagonal top right
                     if (self.squares[(r-i,c+i)][1].color != actual_piece.color):
                         add_legal_moves.append((r-i,c+i))
                         # make sure king can't move to legal or attack spaces of opposing pieces
@@ -666,6 +658,13 @@ class ChessBoard(tk.Canvas):
                                     if((r-i,c+i) in val[1].legal_moves) or ((r-i,c+i) in val[1].defends) or ((r-i,c+i) in val[1].border):
                                         add_legal_moves.remove((r-i,c+i))
                                         break
+                    # ally piece to the diagonal top right
+                    else:
+                        add_border.append((r-i,c+i))
+
+                        add_defends.append((r-i,c+i))
+                        i=2
+                        break
                 # no piece to the diagonal top right
                 elif (self.squares[(r-i,c+i)][1] == None): 
                     add_border.append((r-i,c+i))
@@ -702,22 +701,15 @@ class ChessBoard(tk.Canvas):
                                 if((r-i,c+i) in val[1].legal_moves) or ((r-i,c+i) in val[1].defends) or ((r-i,c+i) in val[1].border):
                                     add_legal_moves.remove((r-i,c+i))
                                     break
-                # ally piece to the diagonal top right
-                else:
-                    add_border.append((r-i,c+i))
-
-                    add_defends.append((r-i,c+i))
-                    i=2
-                    break
 
             for i in range(1,2):
                 if r+i > 7 or c+i > 7: 
                     i=2
                     break
-                # enemy piece to the diagonal bottom right
                 elif (self.squares[(r+i,c+i)][1] != None): 
                     add_border.append((r+i,c+i))
 
+                    # enemy piece to the diagonal bottom right
                     if (self.squares[(r+i,c+i)][1].color != actual_piece.color):
                         add_legal_moves.append((r+i,c+i))
                         # make sure king can't move to legal or attack spaces of opposing pieces
@@ -751,6 +743,13 @@ class ChessBoard(tk.Canvas):
                                     if((r+i,c+i) in val[1].legal_moves) or ((r+i,c+i) in val[1].defends) or ((r+i,c+i) in val[1].border):
                                         add_legal_moves.remove((r+i,c+i))
                                         break
+                    # ally piece to the diagonal bottom right
+                    else:
+                        add_border.append((r+i,c+i))
+
+                        add_defends.append((r+i,c+i))
+                        i=2
+                        break
                 # no piece to the diagonal bottom right
                 elif (self.squares[(r+i,c+i)][1] == None): 
                     add_border.append((r+i,c+i))
@@ -787,13 +786,6 @@ class ChessBoard(tk.Canvas):
                                 if((r+i,c+i) in val[1].legal_moves) or ((r+i,c+i) in val[1].defends) or ((r+i,c+i) in val[1].border):
                                     add_legal_moves.remove((r+i,c+i))
                                     break
-                # ally piece to the diagonal bottom right
-                else:
-                    add_border.append((r+i,c+i))
-
-                    add_defends.append((r+i,c+i))
-                    i=2
-                    break
             
             for i in range(c,c-2,-1):
                 if i == c:
@@ -801,10 +793,10 @@ class ChessBoard(tk.Canvas):
                 elif i < 0 or i > 7: 
                     i=c-2
                     break
-                # enemy piece to the left
                 elif (self.squares[(r,i)][1] != None): 
                     add_border.append((r,i))
 
+                    # enemy piece to the left
                     if (self.squares[(r,i)][1].color != actual_piece.color):
                         add_legal_moves.append((r,i))
                         # make sure king can't move to legal or attack spaces of opposing pieces
@@ -838,6 +830,13 @@ class ChessBoard(tk.Canvas):
                                     if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends) or ((r,i) in val[1].border):
                                         add_legal_moves.remove((r,i))
                                         break
+                    # ally piece to the left
+                    else:
+                        add_border.append((r,i))
+
+                        add_defends.append((r,i))
+                        i=c-2
+                        break
                 # no piece to the left
                 elif (self.squares[(r,i)][1] == None): 
                     add_border.append((r,i))
@@ -874,13 +873,6 @@ class ChessBoard(tk.Canvas):
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends) or ((r,i) in val[1].border):
                                     add_legal_moves.remove((r,i))
                                     break
-                # ally piece to the left
-                else:
-                    add_border.append((r,i))
-
-                    add_defends.append((r,i))
-                    i=c-2
-                    break
 
             for i in range(c,c+2):
                 if i == c:
@@ -888,10 +880,10 @@ class ChessBoard(tk.Canvas):
                 elif i < 0 or i > 7: 
                     i=c+2
                     break
-                # enemy piece to the right
                 elif (self.squares[(r,i)][1] != None): 
                     add_border.append((r,i))
 
+                    # enemy piece to the right
                     if (self.squares[(r,i)][1].color != actual_piece.color):
                         add_legal_moves.append((r,i))
                         # make sure king can't move to legal or attack spaces of opposing pieces
@@ -925,6 +917,13 @@ class ChessBoard(tk.Canvas):
                                     if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends) or ((r,i) in val[1].border):
                                         add_legal_moves.remove((r,i))
                                         break
+                    # ally piece to the right
+                    else:
+                        add_border.append((r,i))
+
+                        add_defends.append((r,i))
+                        i=c+2
+                        break
                 # no piece to the right
                 elif (self.squares[(r,i)][1] == None): 
                     add_border.append((r,i))
@@ -961,13 +960,6 @@ class ChessBoard(tk.Canvas):
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends) or ((r,i) in val[1].border):
                                     add_legal_moves.remove((r,i))
                                     break
-                # ally piece to the right
-                else:
-                    add_border.append((r,i))
-
-                    add_defends.append((r,i))
-                    i=c+2
-                    break
 
             for i in range(r,r-2,-1):
                 if i == r:
@@ -975,10 +967,10 @@ class ChessBoard(tk.Canvas):
                 elif i < 0 or i > 7: 
                     i=r-2
                     break
-                # enemy piece above
                 elif (self.squares[(i,c)][1] != None):
                     add_border.append((i,c))
 
+                    # enemy piece above
                     if (self.squares[(i,c)][1].color != actual_piece.color):
                         add_legal_moves.append((i,c))
                         # make sure king can't move to legal or attack spaces of opposing pieces
@@ -1012,6 +1004,13 @@ class ChessBoard(tk.Canvas):
                                     if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends) or ((i,c) in val[1].border):
                                         add_legal_moves.remove((i,c))
                                         break
+                    # ally piece above
+                    else:
+                        add_border.append((i,c))
+
+                        add_defends.append((i,c))
+                        i=r-2
+                        break
                 # no piece above
                 elif (self.squares[(i,c)][1] == None):
                     add_border.append((i,c))
@@ -1048,13 +1047,6 @@ class ChessBoard(tk.Canvas):
                                 if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends) or ((i,c) in val[1].border):
                                     add_legal_moves.remove((i,c))
                                     break
-                # ally piece above
-                else:
-                    add_border.append((i,c))
-
-                    add_defends.append((i,c))
-                    i=r-2
-                    break
 
             for i in range(r,r+2):
                 if i == r:
@@ -1062,10 +1054,10 @@ class ChessBoard(tk.Canvas):
                 elif i < 0 or i > 7: 
                     i=r+2
                     break
-                # enemy piece below
                 elif (self.squares[(i,c)][1] != None): 
                     add_border.append((i,c))
 
+                    # enemy piece below
                     if (self.squares[(i,c)][1].color != actual_piece.color):
                         add_legal_moves.append((i,c))
                         # make sure king can't move to legal or attack spaces of opposing pieces
@@ -1099,6 +1091,13 @@ class ChessBoard(tk.Canvas):
                                     if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends) or ((i,c) in val[1].border):
                                         add_legal_moves.remove((i,c))
                                         break
+                    # ally piece below
+                    else:
+                        add_border.append((i,c))
+
+                        add_defends.append((i,c))
+                        i=r+2
+                        break
                 # no piece below
                 elif (self.squares[(i,c)][1] == None):
                     add_border.append((i,c))
@@ -1135,16 +1134,15 @@ class ChessBoard(tk.Canvas):
                                 if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends) or ((i,c) in val[1].border):
                                     add_legal_moves.remove((i,c))
                                     break
-                # ally piece below
-                else:
-                    add_border.append((i,c))
 
-                    add_defends.append((i,c))
-                    i=r+2
-                    break
+            new_add_border = []
+            for border in add_border:
+                if border not in new_add_border:
+                    new_add_border.append(border)
 
             actual_piece.defends = add_defends
-            actual_piece.border = add_border
+            actual_piece.border = new_add_border
+            print(f"BLACK king with legal moves={add_legal_moves}, defending={add_defends}, and border={new_add_border}")
             return add_legal_moves
 
         if actual_piece.notation == "K": 
@@ -1156,10 +1154,10 @@ class ChessBoard(tk.Canvas):
                 if r-i < 0 or c-i < 0:
                     i=2
                     break
-                # enemy piece to the diagonal top left
                 elif (self.squares[(r-i,c-i)][1] != None):
                     add_border.append((r-i,c-i))
 
+                    # enemy piece to the diagonal top left
                     if (self.squares[(r-i,c-i)][1].color != actual_piece.color):
                         add_legal_moves.append((r-i,c-i))
                         # make sure king can't move to legal or defended spaces of enemy pieces
@@ -1195,6 +1193,15 @@ class ChessBoard(tk.Canvas):
                                     if((r-i,c-i) in val[1].legal_moves) or ((r-i,c-i) in val[1].defends) or ((r-i,c-i) in val[1].border):
                                         add_legal_moves.remove((r-i,c-i))
                                         break
+                    # ally piece to the diagonal top left
+                    else:
+                        # print("ALLY to the diagonal top left")
+
+                        add_border.append((r-i,c-i))
+
+                        add_defends.append((r-i,c-i))
+                        i=2
+                        break
                 # no piece to the diagonal top left
                 elif (self.squares[(r-i,c-i)][1] == None):
                     add_border.append((r-i,c-i))
@@ -1231,23 +1238,16 @@ class ChessBoard(tk.Canvas):
                                 if((r-i,c-i) in val[1].legal_moves) or ((r-i,c-i) in val[1].defends) or ((r-i,c-i) in val[1].border):
                                     add_legal_moves.remove((r-i,c-i))
                                     break
-                # ally piece to the diagonal top left
-                else:
-                    add_border.append((r-i,c-i))
-
-                    add_defends.append((r-i,c-i))
-                    i=2
-                    break
                     
             
             for i in range(1,2):
                 if r+i > 7 or c-i < 0:
                     i=2
                     break
-                # enemy piece to the diagonal bottom left
                 elif (self.squares[(r+i,c-i)][1] != None): 
                     add_border.append((r+i,c-i))
 
+                    # enemy piece to the diagonal bottom left
                     if (self.squares[(r+i,c-i)][1].color != actual_piece.color):
                         add_legal_moves.append((r+i,c-i))
                         # make sure king can't move to legal or attack spaces of opposing pieces
@@ -1281,6 +1281,15 @@ class ChessBoard(tk.Canvas):
                                     if((r+i,c-i) in val[1].legal_moves) or ((r+i,c-i) in val[1].defends) or ((r+i,c-i) in val[1].border):
                                         add_legal_moves.remove((r+i,c-i))
                                         break
+                    # ally piece to the diagonal bottom left
+                    else:
+                        # print("ALLY to the diagonal bottom left")
+
+                        add_border.append((r+i,c-i))
+
+                        add_defends.append((r+i,c-i))
+                        i=2
+                        break
                 # no piece to the diagonal bottom left
                 elif (self.squares[(r+i,c-i)][1] == None): 
                     add_border.append((r+i,c-i))
@@ -1317,22 +1326,15 @@ class ChessBoard(tk.Canvas):
                                 if((r+i,c-i) in val[1].legal_moves) or ((r+i,c-i) in val[1].defends) or ((r+i,c-i) in val[1].border):
                                     add_legal_moves.remove((r+i,c-i))
                                     break
-                # ally piece to the diagonal bottom left
-                else:
-                    add_border.append((r+i,c-i))
-
-                    add_defends.append((r+i,c-i))
-                    i=2
-                    break
 
             for i in range(1,2):
                 if r-i < 0 or c+i > 7:
                     i=2
                     break
-                # enemy piece to the diagonal top right
                 elif (self.squares[(r-i,c+i)][1] != None): 
                     add_border.append((r-i,c+i))
 
+                    # enemy piece to the diagonal top right
                     if (self.squares[(r-i,c+i)][1].color != actual_piece.color):
                         add_legal_moves.append((r-i,c+i))
                         # make sure king can't move to legal or attack spaces of opposing pieces
@@ -1366,6 +1368,15 @@ class ChessBoard(tk.Canvas):
                                     if((r-i,c+i) in val[1].legal_moves) or ((r-i,c+i) in val[1].defends) or ((r-i,c+i) in val[1].border):
                                         add_legal_moves.remove((r-i,c+i))
                                         break
+                    # ally piece to the diagonal top right
+                    else:
+                        # print("ALLY to the diagonal top right")
+
+                        add_border.append((r-i,c+i))
+
+                        add_defends.append((r-i,c+i))
+                        i=2
+                        break
                 # no piece to the diagonal top right
                 elif (self.squares[(r-i,c+i)][1] == None): 
                     add_border.append((r-i,c+i))
@@ -1402,22 +1413,15 @@ class ChessBoard(tk.Canvas):
                                 if((r-i,c+i) in val[1].legal_moves) or ((r-i,c+i) in val[1].defends) or ((r-i,c+i) in val[1].border):
                                     add_legal_moves.remove((r-i,c+i))
                                     break
-                # ally piece to the diagonal top right
-                else:
-                    add_border.append((r-i,c+i))
-
-                    add_defends.append((r-i,c+i))
-                    i=2
-                    break
 
             for i in range(1,2):
                 if r+i > 7 or c+i > 7: 
                     i=2
                     break
-                # enemy piece to the diagonal bottom right
                 elif (self.squares[(r+i,c+i)][1] != None): 
                     add_border.append((r+i,c+i))
 
+                    # enemy piece to the diagonal bottom right
                     if (self.squares[(r+i,c+i)][1].color != actual_piece.color):
                         add_legal_moves.append((r+i,c+i))
                         # make sure king can't move to legal or attack spaces of opposing pieces
@@ -1451,6 +1455,15 @@ class ChessBoard(tk.Canvas):
                                     if((r+i,c+i) in val[1].legal_moves) or ((r+i,c+i) in val[1].defends) or ((r+i,c+i) in val[1].border):
                                         add_legal_moves.remove((r+i,c+i))
                                         break
+                    # ally piece to the diagonal bottom right
+                    else:
+                        # print("ALLY to the diagonal bottom right")
+
+                        add_border.append((r+i,c+i))
+
+                        add_defends.append((r+i,c+i))
+                        i=2
+                        break
                 # no piece to the diagonal bottom right
                 elif (self.squares[(r+i,c+i)][1] == None): 
                     add_border.append((r+i,c+i))
@@ -1487,13 +1500,6 @@ class ChessBoard(tk.Canvas):
                                 if((r+i,c+i) in val[1].legal_moves) or ((r+i,c+i) in val[1].defends) or ((r+i,c+i) in val[1].border):
                                     add_legal_moves.remove((r+i,c+i))
                                     break
-                # ally piece to the diagonal bottom right
-                else:
-                    add_border.append((r+i,c+i))
-
-                    add_defends.append((r+i,c+i))
-                    i=2
-                    break
             
             for i in range(c,c-2,-1):
                 if i == c:
@@ -1501,10 +1507,10 @@ class ChessBoard(tk.Canvas):
                 elif i < 0 or i > 7: 
                     i=c-2
                     break
-                # enemy piece to the left
                 elif (self.squares[(r,i)][1] != None): 
                     add_border.append((r,i))
 
+                    # enemy piece to the left
                     if (self.squares[(r,i)][1].color != actual_piece.color):
                         add_legal_moves.append((r,i))
                         # make sure king can't move to legal or attack spaces of opposing pieces
@@ -1538,6 +1544,15 @@ class ChessBoard(tk.Canvas):
                                     if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends) or ((r,i) in val[1].border):
                                         add_legal_moves.remove((r,i))
                                         break
+                    # ally piece to the left
+                    else:
+                        # print("ALLY to the left")
+
+                        add_border.append((r,i))
+
+                        add_defends.append((r,i))
+                        i=c-2
+                        break
                 # no piece to the left
                 elif (self.squares[(r,i)][1] == None): 
                     add_border.append((r,i))
@@ -1574,13 +1589,6 @@ class ChessBoard(tk.Canvas):
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends) or ((r,i) in val[1].border):
                                     add_legal_moves.remove((r,i))
                                     break
-                # ally piece to the left
-                else:
-                    add_border.append((r,i))
-
-                    add_defends.append((r,i))
-                    i=c-2
-                    break
 
             for i in range(c,c+2):
                 if i == c:
@@ -1588,10 +1596,10 @@ class ChessBoard(tk.Canvas):
                 elif i < 0 or i > 7: 
                     i=c+2
                     break
-                # enemy piece to the right
                 elif (self.squares[(r,i)][1] != None): 
                     add_border.append((r,i))
 
+                    # enemy piece to the right
                     if (self.squares[(r,i)][1].color != actual_piece.color):
                         add_legal_moves.append((r,i))
                         # make sure king can't move to legal or attack spaces of opposing pieces
@@ -1625,6 +1633,15 @@ class ChessBoard(tk.Canvas):
                                     if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends) or ((r,i) in val[1].border):
                                         add_legal_moves.remove((r,i))
                                         break
+                    # ally piece to the right
+                    else:
+                        # print("ALLY to the right")
+
+                        add_border.append((r,i))
+
+                        add_defends.append((r,i))
+                        i=c+2
+                        break
                 # no piece to the right
                 elif (self.squares[(r,i)][1] == None): 
                     add_border.append((r,i))
@@ -1661,13 +1678,6 @@ class ChessBoard(tk.Canvas):
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends) or ((r,i) in val[1].border):
                                     add_legal_moves.remove((r,i))
                                     break
-                # ally piece to the right
-                else:
-                    add_border.append((r,i))
-
-                    add_defends.append((r,i))
-                    i=c+2
-                    break
 
             for i in range(r,r-2,-1):
                 if i == r:
@@ -1675,10 +1685,10 @@ class ChessBoard(tk.Canvas):
                 elif i < 0 or i > 7: 
                     i=r-2
                     break
-                # enemy piece above
                 elif (self.squares[(i,c)][1] != None):
                     add_border.append((i,c))
 
+                    # enemy piece above
                     if (self.squares[(i,c)][1].color != actual_piece.color):
                         add_legal_moves.append((i,c))
                         # make sure king can't move to legal or attack spaces of opposing pieces
@@ -1712,6 +1722,15 @@ class ChessBoard(tk.Canvas):
                                     if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends) or ((i,c) in val[1].border):
                                         add_legal_moves.remove((i,c))
                                         break
+                    # ally piece above
+                    else:
+                        # print("ALLY above")
+
+                        add_border.append((i,c))
+
+                        add_defends.append((i,c))
+                        i=r-2
+                        break
                 # no piece above
                 elif (self.squares[(i,c)][1] == None):
                     add_border.append((i,c))
@@ -1748,13 +1767,6 @@ class ChessBoard(tk.Canvas):
                                 if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends) or ((i,c) in val[1].border):
                                     add_legal_moves.remove((i,c))
                                     break
-                # ally piece above
-                else:
-                    add_border.append((i,c))
-
-                    add_defends.append((i,c))
-                    i=r-2
-                    break
 
             for i in range(r,r+2):
                 if i == r:
@@ -1762,10 +1774,10 @@ class ChessBoard(tk.Canvas):
                 elif i < 0 or i > 7: 
                     i=r+2
                     break
-                # enemy piece below
                 elif (self.squares[(i,c)][1] != None): 
                     add_border.append((i,c))
 
+                    # enemy piece below
                     if (self.squares[(i,c)][1].color != actual_piece.color):
                         add_legal_moves.append((i,c))
                         # make sure king can't move to legal or attack spaces of opposing pieces
@@ -1799,6 +1811,15 @@ class ChessBoard(tk.Canvas):
                                     if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends) or ((i,c) in val[1].border):
                                         add_legal_moves.remove((i,c))
                                         break
+                    # ally piece below
+                    else:
+                        # print("ALLY below")
+
+                        add_border.append((i,c))
+
+                        add_defends.append((i,c))
+                        i=r+2
+                        break
                 # no piece below
                 elif (self.squares[(i,c)][1] == None):
                     add_border.append((i,c))
@@ -1835,16 +1856,14 @@ class ChessBoard(tk.Canvas):
                                 if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends) or ((i,c) in val[1].border):
                                     add_legal_moves.remove((i,c))
                                     break
-                # ally piece below
-                else:
-                    add_border.append((i,c))
 
-                    add_defends.append((i,c))
-                    i=r+2
-                    break
+            new_add_border = []
+            for border in add_border:
+                if border not in new_add_border:
+                    new_add_border.append(border)
 
             actual_piece.defends = add_defends
-            actual_piece.border = add_border
+            actual_piece.border = new_add_border
             return add_legal_moves
         
         if actual_piece.notation == "Q" or actual_piece.notation == "Qb":
