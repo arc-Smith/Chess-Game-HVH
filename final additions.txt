@@ -1,0 +1,8 @@
+King:
+-castle
+-checks
+-checkmate 
+-draws (understand that certain pieces cannot get checkmate, handling stalemate)
+
+Chess Board:
+-flipping board (knowing who's turn it is)
