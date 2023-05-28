@@ -178,11 +178,11 @@ class ChessBoard(tk.Canvas):
 
         # loop to get a legal coordinate selection
         if (move_to not in actual_piece.legal_moves):
-            print("YOU SHALL NOT PASS")
-            print("BAD COORDINATE - " + str(move_to))
-            print("The coordinate is simply invalid")
-            print("Legal moves = "+str(actual_piece.legal_moves))
-            print("\n")
+            # print("YOU SHALL NOT PASS")
+            # print("BAD COORDINATE - " + str(move_to))
+            # print("The coordinate is simply invalid")
+            # print("Legal moves = "+str(actual_piece.legal_moves))
+            # print("\n")
             self.bind("<Button-1>", lambda e: self.move_piece(e, from_square_r, from_square_c, from_square_id, actual_piece))
             return
 
@@ -437,6 +437,22 @@ class ChessBoard(tk.Canvas):
                         val[1].get_en_pass = False
                         val[1].en_pass_count = 0
                         print(f"{val[1].color} pawn at ({val[1].pos_r},{val[1].pos_c}) get_en_pass is now {val[1].get_en_pass}")
+        
+        if self.squares[(4,3)][1] != None:
+            if self.squares[(4,3)][1].color == "black":
+                print("BLACK KING is in position-----------------------------")
+
+                for key, val in self.squares.items():
+                    if val[1] != None:
+                        if val[1].color == "white" and ((4,2) in val[1].legal_moves or (4,2) in val[1].defends):
+                            print(f"I am the WHITE {val[1].notation} at ({val[1].pos_r},{val[1].pos_c}) and I have legal moves={val[1].legal_moves} and defends={val[1].defends}")
+                        elif val[1].color == "black" and ((4,2) in val[1].legal_moves or (4,2) in val[1].defends):
+                            print(f"I am the BLACK {val[1].notation} at ({val[1].pos_r},{val[1].pos_c}) and I have legal moves={val[1].legal_moves} and defends={val[1].defends}")
+                        elif val[1].notation == "K" or val[1].notation == "Kb":
+                            if val[1].color == "black" and ((4,2) in val[1].legal_moves or (4,2) in val[1].defends or (4,2) in val[1].border):
+                                print(f"I am the BLACK {val[1].notation} at ({val[1].pos_r},{val[1].pos_c}) and I have legal moves={val[1].legal_moves}, defends={val[1].defends}, and border={val[1].border}")
+                            elif val[1].color == "white" and ((4,2) in val[1].legal_moves or (4,2) in val[1].defends or (4,2) in val[1].border):
+                                print(f"I am the WHITE {val[1].notation} at ({val[1].pos_r},{val[1].pos_c}) and I have legal moves={val[1].legal_moves}, defends={val[1].defends}, and border={val[1].border}")
 
     # this function will also be used to find pieces that are defended by other pieces and add to the defends array
     def get_legal_moves(self, actual_piece, r, c, **kwargs):
@@ -847,30 +863,41 @@ class ChessBoard(tk.Canvas):
                         if val[1] != None and ((r,i) in add_legal_moves):
                             if val[1].notation == "B":
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends):
+                                    print("LEFT IS NO GOOD BECAUSE OF A BISHOP")
                                     add_legal_moves.remove((r,i))
                                     break
                             if val[1].notation == "R":
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends):
+                                    print("LEFT IS NO GOOD BECAUSE OF A ROOK")
                                     add_legal_moves.remove((r,i))
                                     break
                             if val[1].notation == "P":
                                 # checking the diagonals of the white Pawn
                                 if((r,i) == (val[1].pos_r-1,val[1].pos_c-1)) or ((r,i) in val[1].defends):
+                                    print("LEFT IS NO GOOD BECAUSE OF A PAWN")
+
                                     add_legal_moves.remove((r,i))
                                     break
                                 if ((r,i) == (val[1].pos_r-1,val[1].pos_c+1)) or ((r,i) in val[1].defends):
+                                    print("LEFT IS NO GOOD BECAUSE OF A PAWN")
+
                                     add_legal_moves.remove((r,i))
                                     break
                             if val[1].notation == "Q":
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends):
+                                    print("LEFT IS NO GOOD BECAUSE OF A QUEEN")
                                     add_legal_moves.remove((r,i))
                                     break
                             if val[1].notation == "N":
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends):
+                                    print("LEFT IS NO GOOD BECAUSE OF A KNIGHT")
                                     add_legal_moves.remove((r,i))
                                     break
                             if val[1].notation == "K":  
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends) or ((r,i) in val[1].border):
+                                    print("LEFT IS NO GOOD BECAUSE OF A KING")
+                                    print(f"I removed {(r,i)}")
+                                    print(f"I am the WHITE {val[1].notation} at ({val[1].pos_r},{val[1].pos_c}) and I have legal moves={val[1].legal_moves}, defends={val[1].defends}, and border={val[1].border}")
                                     add_legal_moves.remove((r,i))
                                     break
 
@@ -1142,7 +1169,6 @@ class ChessBoard(tk.Canvas):
 
             actual_piece.defends = add_defends
             actual_piece.border = new_add_border
-            print(f"BLACK king with legal moves={add_legal_moves}, defending={add_defends}, and border={new_add_border}")
             return add_legal_moves
 
         if actual_piece.notation == "K": 
