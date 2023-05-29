@@ -210,6 +210,70 @@ class ChessBoard(tk.Canvas):
             self.update()
             self.clicked = None
 
+            # black king CASTLE queen side
+            if (actual_piece.notation == "Kb") and actual_piece.moved == False:
+                if ((r,c) == (0,2)):
+                    the_rook = self.squares[(0,0)][1]
+
+                    # removing the rook's existence then its image from prior square
+                    self.squares[(0, 0)][1] = None
+                    root.after(0000, self.delete, self.squares[(0, 0)][2])
+                    self.squares[(0, 0)][2] = None
+                
+                    # find the next legal moves for this piece
+                    add_legal_moves = self.get_legal_moves(the_rook, 0, 3)
+
+                    # placing the piece onto a new square with its image
+                    self.place_piece(the_rook.notation, the_rook.color, 0, 3, add_legal_moves, the_rook.defends, moved=True)
+            
+            # black king CASTLE king side
+            if (actual_piece.notation == "Kb") and actual_piece.moved == False:
+                if ((r,c) == (0,6)):
+                    the_rook = self.squares[(0,7)][1]
+
+                    # removing the rook's existence then its image from prior square
+                    self.squares[(0, 7)][1] = None
+                    root.after(0000, self.delete, self.squares[(0, 7)][2])
+                    self.squares[(0, 7)][2] = None
+                
+                    # find the next legal moves for this piece
+                    add_legal_moves = self.get_legal_moves(the_rook, 0, 5)
+
+                    # placing the piece onto a new square with its image
+                    self.place_piece(the_rook.notation, the_rook.color, 0, 5, add_legal_moves, the_rook.defends, moved=True)
+            
+            # white king CASTLE queen side
+            if (actual_piece.notation == "K") and actual_piece.moved == False:
+                if ((r,c) == (7,2)):
+                    the_rook = self.squares[(7,0)][1]
+
+                    # removing the rook's existence then its image from prior square
+                    self.squares[(7, 0)][1] = None
+                    root.after(0000, self.delete, self.squares[(7, 0)][2])
+                    self.squares[(7, 0)][2] = None
+                
+                    # find the next legal moves for this piece
+                    add_legal_moves = self.get_legal_moves(the_rook, 7, 3)
+
+                    # placing the piece onto a new square with its image
+                    self.place_piece(the_rook.notation, the_rook.color, 7, 3, add_legal_moves, the_rook.defends, moved=True)
+            
+            # white king CASTLE king side
+            if (actual_piece.notation == "K") and actual_piece.moved == False:
+                if ((r,c) == (7,6)):
+                    the_rook = self.squares[(7,7)][1]
+
+                    # removing the rook's existence then its image from prior square
+                    self.squares[(7, 7)][1] = None
+                    root.after(0000, self.delete, self.squares[(7, 7)][2])
+                    self.squares[(7, 7)][2] = None
+                
+                    # find the next legal moves for this piece
+                    add_legal_moves = self.get_legal_moves(the_rook, 7, 5)
+
+                    # placing the piece onto a new square with its image
+                    self.place_piece(the_rook.notation, the_rook.color, 7, 5, add_legal_moves, the_rook.defends, moved=True)
+
             # putting the next left click back onto the select_piece function
             self.bind("<Button-1>", self.select_piece)
 
@@ -428,15 +492,15 @@ class ChessBoard(tk.Canvas):
             if val[1] != None:
                 if val[1].notation == "P" or val[1].notation == "Pb":
                     if val[1].do_en_pass == True and val[1].en_pass_count == 1:
-                        print(f"{val[1].color} pawn at ({val[1].pos_r},{val[1].pos_c}) do_en_pass was {val[1].do_en_pass} before")
+                        # print(f"{val[1].color} pawn at ({val[1].pos_r},{val[1].pos_c}) do_en_pass was {val[1].do_en_pass} before")
                         val[1].do_en_pass = False
                         val[1].en_pass_count = 0
-                        print(f"{val[1].color} pawn at ({val[1].pos_r},{val[1].pos_c}) do_en_pass is now {val[1].do_en_pass}")
+                        # print(f"{val[1].color} pawn at ({val[1].pos_r},{val[1].pos_c}) do_en_pass is now {val[1].do_en_pass}")
                     elif val[1].get_en_pass == True and val[1].en_pass_count == 1:
-                        print(f"{val[1].color} pawn at ({val[1].pos_r},{val[1].pos_c}) get_en_pass was {val[1].get_en_pass} before")
+                        # print(f"{val[1].color} pawn at ({val[1].pos_r},{val[1].pos_c}) get_en_pass was {val[1].get_en_pass} before")
                         val[1].get_en_pass = False
                         val[1].en_pass_count = 0
-                        print(f"{val[1].color} pawn at ({val[1].pos_r},{val[1].pos_c}) get_en_pass is now {val[1].get_en_pass}")
+                        # print(f"{val[1].color} pawn at ({val[1].pos_r},{val[1].pos_c}) get_en_pass is now {val[1].get_en_pass}")
         
         # make sure all pieces have their correct legal moves again
             for key, val in self.squares.items():
@@ -449,6 +513,28 @@ class ChessBoard(tk.Canvas):
             add_legal_moves = []
             add_defends = []
             add_border = []
+
+            # CASTLE queen side
+            if (actual_piece.moved == False):
+                if ((self.squares[(0,0)][1] != None)):
+                    if ((self.squares[(0,0)][1].notation == "Rb")):
+                        if ((self.squares[(0,0)][1].moved == False)):
+                            if (self.squares[(0,1)][1] == None) and (self.squares[(0,2)][1] == None) and (self.squares[(0,3)][1] == None):
+                                add_legal_moves.append((0,2))
+            else:
+                if (0,2) in actual_piece.legal_moves:
+                    actual_piece.legal_moves.remove((0,2))
+
+            # CASTLE king side
+            if (actual_piece.moved == False):
+                if ((self.squares[(0,7)][1] != None)):
+                    if ((self.squares[(0,7)][1].notation == "Rb")):
+                        if ((self.squares[(0,7)][1].moved == False)):
+                            if (self.squares[(0,5)][1] == None) and (self.squares[(0,6)][1] == None):
+                                add_legal_moves.append((0,6))
+            else:
+                if (0,6) in actual_piece.legal_moves:
+                    actual_piece.legal_moves.remove((0,6))
             
             for i in range(1,2):
                 if r-i < 0 or c-i < 0:
@@ -1153,6 +1239,28 @@ class ChessBoard(tk.Canvas):
             add_legal_moves = []
             add_defends = []
             add_border = []
+
+            # CASTLE queen side
+            if (actual_piece.moved == False):
+                if ((self.squares[(7,0)][1] != None)):
+                    if ((self.squares[(7,0)][1].notation == "R")):
+                        if ((self.squares[(7,0)][1].moved == False)):
+                            if (self.squares[(7,1)][1] == None) and (self.squares[(7,2)][1] == None) and (self.squares[(7,3)][1] == None):
+                                add_legal_moves.append((7,2))
+            else:
+                if (0,2) in actual_piece.legal_moves:
+                    actual_piece.legal_moves.remove((0,2))
+
+            # CASTLE king side
+            if (actual_piece.moved == False):
+                if ((self.squares[(7,7)][1] != None)):
+                    if ((self.squares[(7,7)][1].notation == "R")):
+                        if ((self.squares[(7,7)][1].moved == False)):
+                            if (self.squares[(7,5)][1] == None) and (self.squares[(7,6)][1] == None):
+                                add_legal_moves.append((7,6))
+            else:
+                if (0,2) in actual_piece.legal_moves:
+                    actual_piece.legal_moves.remove((0,2))
             
             for i in range(1,2):
                 if r-i < 0 or c-i < 0:
