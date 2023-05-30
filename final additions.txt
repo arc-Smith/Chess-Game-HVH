@@ -1,8 +1,29 @@
-King:
--castle
--checks
--checkmate 
--draws (understand that certain pieces cannot get checkmate, handling stalemate)
+Checks:
+-king is underattack by enemy piece after a turn so I must
+1. move the king (making sure it has legal moves)
+2. take the enemy piece (that square is a legal move of the king's ally)
+3. interpose (a square in the legal moves of enemy is in the legal moves of the king's ally)
 
-Chess Board:
--flipping board (knowing who's turn it is)
+Checkmate:
+-king is underattack by enemy piece after a turn and it'll return FALSE for each of the options if it was a check 
+1. move the king (making sure it has legal moves)
+2. take the enemy piece (that square is a legal move of the king's ally)
+3. interpose (a square in the legal moves of enemy is in the legal moves of the king's ally)
+
+Draws:
+[stalemate] 
+no piece can move and there is not a check on the board at that moment (a check is done to see if there are no legal moves for any of the pieces perhaps there's a counter variable for all the legal moves of black / white if it is found to be there are 0 legal moves for the next player's turn then a draw is declared before piece selection)
+
+[insufficient mating material] 
+both sides have any of the following: (having an array of the current pieces on the board if it finds those specific combinations before selection of a piece then a draw is to be declared)
+-lone king
+-king and bishop
+-king and knight
+
+[3-fold repetition] 
+if all other pieces are the same and the king + enemy piece checking it multiple times reach the same position a 2nd then 3rd time then 3-fold check has been found ()
+
+[fifty move rule]
+if no piece has been captured or no pawn has been moved in fifty consecutive moves then a draw is declared (each time a piece that's not a pawn is moved then fifty_move_draw gets +1 and each time a capture is NOT carried out then fifty_move_draw gets +1 on the other hand after each capture fifty_move_draw is set to 0 and after each pawn move fifty_move_draw is set to 0)
+
+Flipping board:

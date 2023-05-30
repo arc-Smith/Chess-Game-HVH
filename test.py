@@ -64,6 +64,7 @@ class ChessBoard(tk.Canvas):
 
         self.turn_based = ["white", "black"]
         self.turns = 0
+        self.check_on_the_board = False
 
     def draw_board(self):
         square_size = self.size // 8 # each square will be 100x100
@@ -506,6 +507,12 @@ class ChessBoard(tk.Canvas):
             for key, val in self.squares.items():
                 if val[1] != None:
                     val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
+        
+        # checking for checks and checkmate
+        # check_or_checkmate()
+    
+    # def check_or_checkmate():
+
 
     # this function will also be used to find pieces that are defended by other pieces and add to the defends array
     def get_legal_moves(self, actual_piece, r, c, **kwargs):
