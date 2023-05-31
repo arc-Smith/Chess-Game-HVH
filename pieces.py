@@ -13,9 +13,10 @@ class Piece:
         self.defends = defends
 
 class Queen(Piece):
-    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, check_pathway):
+    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, check_pathway, pinned):
         super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
         self.check_pathway = check_pathway
+        self.pinned = pinned
 
 class King(Piece):
     def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, moved, border, in_check):
@@ -25,27 +26,31 @@ class King(Piece):
         self.in_check = in_check
 
 class Bishop(Piece):
-    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, check_pathway):
+    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, check_pathway, pinned):
         super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
         self.check_pathway = check_pathway
+        self.pinned = pinned
 
 class Knight(Piece):
-    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends):
+    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, pinned):
         super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
+        self.pinned = pinned
 
 class Rook(Piece):
-    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, moved, check_pathway):
+    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, moved, check_pathway, pinned):
         super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
         self.moved = moved
         self.check_pathway = check_pathway
+        self.pinned = pinned
 
 class Pawn(Piece):
-    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, two_spaces, do_en_pass, get_en_pass, en_pass_count):
+    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, two_spaces, do_en_pass, get_en_pass, en_pass_count, pinned):
         super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
         self.two_spaces = two_spaces
         self.do_en_pass = do_en_pass
         self.get_en_pass = get_en_pass
         self.en_pass_count = en_pass_count
+        self.pinned = pinned
 
     def promote(self):
         promotion_window = tk.Toplevel()
