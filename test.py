@@ -2090,7 +2090,7 @@ class ChessBoard(tk.Canvas):
                 elif (self.squares[(r-i, c+i)][1] != None) and (self.squares[(r-i, c+i)][1].color == actual_piece.color):
                     add_defends.append((r-i, c+i))
                     if self.squares[(r-i, c+i)][1].notation == "K" or self.squares[(r-i, c+i)][1].notation == "Kb":
-                            add_legal_moves.remove((r-i, c+i))
+                            add_defends.remove((r-i, c+i))
                     i=8
                     break
 
