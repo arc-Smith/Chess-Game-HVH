@@ -194,7 +194,22 @@ class ChessBoard(tk.Canvas):
             # also goes back and forth between the white and black pieces
             if self.clicked_piece != None and self.clicked_piece.legal_moves != [] and self.clicked_piece.color == self.turn_based[self.turns % 2]:
                 if self.clicked_piece.legal_moves != None:
-                    if len(self.clicked_piece.legal_moves) >= 1:
+                    if self.clicked_piece.notation != "K" and self.clicked_piece.notation != "Kb":
+                        if self.clicked_piece.pinned != True:
+                            if len(self.clicked_piece.legal_moves) >= 1:
+                                self.turns += 1
+                                self.itemconfigure(square_id, outline='green', width=10)
+                                self.update()
+                                self.clicked = square_id
+
+                                # taking into account the turns that have occurred for any pawns granted en passant
+                                for key, val in self.squares.items():
+                                    if val[1] != None and (val[1].notation == "P" or val[1].notation == "Pb"):
+                                        if val[1].do_en_pass == True or val[1].get_en_pass:
+                                            val[1].en_pass_count += 1 # changing the en_pass_count from 0 to 1 so that it can be set to False in the move_piece function
+
+                                self.bind("<Button-1>", lambda e: self.move_piece(e, r, c, square_id, self.clicked_piece))
+                    elif len(self.clicked_piece.legal_moves) >= 1:
                         self.turns += 1
                         self.itemconfigure(square_id, outline='green', width=10)
                         self.update()
@@ -2108,6 +2123,9 @@ class ChessBoard(tk.Canvas):
                                     pinned_a_piece = True
                                     j=8
                                     break
+                                else:
+                                    j=8
+                                    break
                         if pinned_a_piece:
                             self.squares[(r-i, c-i)][1].pinned = True
                         else:
@@ -2152,6 +2170,9 @@ class ChessBoard(tk.Canvas):
                             elif (self.squares[(r+j, c-j)][1] != None):
                                 if (self.squares[(r+j, c-j)][1].color != actual_piece.color) and (self.squares[(r+j, c-j)][1].notation == "K" or self.squares[(r+j, c-j)][1].notation == "Kb"):
                                     pinned_a_piece = True
+                                    j=8
+                                    break
+                                else:
                                     j=8
                                     break
                         if pinned_a_piece:
@@ -2200,6 +2221,9 @@ class ChessBoard(tk.Canvas):
                                     pinned_a_piece = True
                                     j=8
                                     break
+                                else:
+                                    j=8
+                                    break
                         if pinned_a_piece:
                             self.squares[(r-i, c+i)][1].pinned = True
                         else:
@@ -2246,6 +2270,9 @@ class ChessBoard(tk.Canvas):
                                     pinned_a_piece = True
                                     j=8
                                     break
+                                else:
+                                    j=8
+                                    break
                         if pinned_a_piece:
                             self.squares[(r+i, c+i)][1].pinned = True
                         else:
@@ -2289,7 +2316,10 @@ class ChessBoard(tk.Canvas):
                             elif (self.squares[(r, j)][1] != None):
                                 if (self.squares[(r, j)][1].color != actual_piece.color) and (self.squares[(r, j)][1].notation == "K" or self.squares[(r, j)][1].notation == "Kb"):
                                     pinned_a_piece = True
-                                    j=8
+                                    j=-1
+                                    break
+                                else:
+                                    j=-1
                                     break
                         if pinned_a_piece:
                             self.squares[(r, i)][1].pinned = True
@@ -2334,6 +2364,9 @@ class ChessBoard(tk.Canvas):
                             elif (self.squares[(r, j)][1] != None):
                                 if (self.squares[(r, j)][1].color != actual_piece.color) and (self.squares[(r, j)][1].notation == "K" or self.squares[(r, j)][1].notation == "Kb"):
                                     pinned_a_piece = True
+                                    j=8
+                                    break
+                                else:
                                     j=8
                                     break
                         if pinned_a_piece:
@@ -2381,6 +2414,9 @@ class ChessBoard(tk.Canvas):
                                     pinned_a_piece = True
                                     j=-1
                                     break
+                                else:
+                                    j=-1
+                                    break
                         if pinned_a_piece:
                             self.squares[(i, c)][1].pinned = True
                         else:
@@ -2424,6 +2460,9 @@ class ChessBoard(tk.Canvas):
                             elif (self.squares[(j, c)][1] != None):
                                 if (self.squares[(j, c)][1].color != actual_piece.color) and (self.squares[(j, c)][1].notation == "K" or self.squares[(j, c)][1].notation == "Kb"):
                                     pinned_a_piece = True
+                                    j=8
+                                    break
+                                else:
                                     j=8
                                     break
                         if pinned_a_piece:
@@ -2472,12 +2511,15 @@ class ChessBoard(tk.Canvas):
 
                         pinned_a_piece = False
                         for j in range(i+1,8):
-                            if j > 7:
+                            if r-j < 0 or c-j < 0:
                                 j=8
                                 break
                             elif (self.squares[(r-j, c-j)][1] != None):
                                 if (self.squares[(r-j, c-j)][1].color != actual_piece.color) and (self.squares[(r-j, c-j)][1].notation == "K" or self.squares[(r-j, c-j)][1].notation == "Kb"):
                                     pinned_a_piece = True
+                                    j=8
+                                    break
+                                else:
                                     j=8
                                     break
                         if pinned_a_piece:
@@ -2518,12 +2560,15 @@ class ChessBoard(tk.Canvas):
 
                         pinned_a_piece = False
                         for j in range(i+1,8):
-                            if j > 7:
+                            if r+j > 7 or c-j < 0:
                                 j=8
                                 break
                             elif (self.squares[(r+j, c-j)][1] != None):
                                 if (self.squares[(r+j, c-j)][1].color != actual_piece.color) and (self.squares[(r+j, c-j)][1].notation == "K" or self.squares[(r+j, c-j)][1].notation == "Kb"):
                                     pinned_a_piece = True
+                                    j=8
+                                    break
+                                else:
                                     j=8
                                     break
                         if pinned_a_piece:
@@ -2564,12 +2609,15 @@ class ChessBoard(tk.Canvas):
 
                         pinned_a_piece = False
                         for j in range(i+1,8):
-                            if j > 7:
+                            if r-j < 0 or c+j > 7:
                                 j=8
                                 break
                             elif (self.squares[(r-j, c+j)][1] != None):
                                 if (self.squares[(r-j, c+j)][1].color != actual_piece.color) and (self.squares[(r-j, c+j)][1].notation == "K" or self.squares[(r-j, c+j)][1].notation == "Kb"):
                                     pinned_a_piece = True
+                                    j=8
+                                    break
+                                else:
                                     j=8
                                     break
                         if pinned_a_piece:
@@ -2596,7 +2644,7 @@ class ChessBoard(tk.Canvas):
             add_check_pathway = []
 
             for i in range(1,8):
-                if r+i > 7 or c+i > 7: 
+                if r+i > 7 or c+i > 7:
                     i=8
                     break
                 # no piece to the diagonal bottom right
@@ -2610,12 +2658,15 @@ class ChessBoard(tk.Canvas):
 
                         pinned_a_piece = False
                         for j in range(i+1,8):
-                            if j > 7:
+                            if r+j > 7 or c+j > 7:
                                 j=8
                                 break
                             elif (self.squares[(r+j, c+j)][1] != None):
                                 if (self.squares[(r+j, c+j)][1].color != actual_piece.color) and (self.squares[(r+j, c+j)][1].notation == "K" or self.squares[(r+j, c+j)][1].notation == "Kb"):
                                     pinned_a_piece = True
+                                    j=8
+                                    break
+                                else:
                                     j=8
                                     break
                         if pinned_a_piece:
@@ -2791,6 +2842,25 @@ class ChessBoard(tk.Canvas):
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color != actual_piece.color):
                     if (self.squares[(r, i)][1].notation != "K") and (self.squares[(r, i)][1].notation != "Kb"):
                         add_legal_moves.append((r,i))
+
+                        pinned_a_piece = False
+                        for j in range(i-1,-1,-1):
+                            if j < 0:
+                                j=-1
+                                break
+                            elif (self.squares[(r, j)][1] != None):
+                                if (self.squares[(r, j)][1].color != actual_piece.color) and (self.squares[(r, j)][1].notation == "K" or self.squares[(r, j)][1].notation == "Kb"):
+                                    pinned_a_piece = True
+                                    j=-1
+                                    break
+                                else:
+                                    j=-1
+                                    break
+                        if pinned_a_piece:
+                            self.squares[(r, i)][1].pinned = True
+                        else:
+                            self.squares[(r, i)][1].pinned = False
+
                         i=-1
                         break
                     else:
@@ -2820,6 +2890,25 @@ class ChessBoard(tk.Canvas):
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color != actual_piece.color):
                     if (self.squares[(r, i)][1].notation != "K") and (self.squares[(r, i)][1].notation != "Kb"):
                         add_legal_moves.append((r,i))
+
+                        pinned_a_piece = False
+                        for j in range(i+1,8):
+                            if j > 7:
+                                j=8
+                                break
+                            elif (self.squares[(r, j)][1] != None):
+                                if (self.squares[(r, j)][1].color != actual_piece.color) and (self.squares[(r, j)][1].notation == "K" or self.squares[(r, j)][1].notation == "Kb"):
+                                    pinned_a_piece = True
+                                    j=8
+                                    break
+                                else:
+                                    j=8
+                                    break
+                        if pinned_a_piece:
+                            self.squares[(r, i)][1].pinned = True
+                        else:
+                            self.squares[(r, i)][1].pinned = False
+
                         i=-1
                         break
                     else:
@@ -2849,6 +2938,25 @@ class ChessBoard(tk.Canvas):
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color != actual_piece.color):
                     if (self.squares[(i, c)][1].notation != "K") and (self.squares[(i, c)][1].notation != "Kb"):
                         add_legal_moves.append((i,c))
+
+                        pinned_a_piece = False
+                        for j in range(i-1,-1,-1):
+                            if j < 0:
+                                j=-1
+                                break
+                            elif (self.squares[(j, c)][1] != None):
+                                if (self.squares[(j, c)][1].color != actual_piece.color) and (self.squares[(j, c)][1].notation == "K" or self.squares[(j, c)][1].notation == "Kb"):
+                                    pinned_a_piece = True
+                                    j=-1
+                                    break
+                                else:
+                                    j=-1
+                                    break
+                        if pinned_a_piece:
+                            self.squares[(i, c)][1].pinned = True
+                        else:
+                            self.squares[(i, c)][1].pinned = False
+
                         i=-1
                         break
                     else:
@@ -2878,6 +2986,25 @@ class ChessBoard(tk.Canvas):
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color != actual_piece.color):
                     if (self.squares[(i, c)][1].notation != "K") and (self.squares[(i, c)][1].notation != "Kb"):
                         add_legal_moves.append((i,c))
+
+                        pinned_a_piece = False
+                        for j in range(i+1,8):
+                            if j > 7:
+                                j=8
+                                break
+                            elif (self.squares[(j, c)][1] != None):
+                                if (self.squares[(j, c)][1].color != actual_piece.color) and (self.squares[(j, c)][1].notation == "K" or self.squares[(j, c)][1].notation == "Kb"):
+                                    pinned_a_piece = True
+                                    j=8
+                                    break
+                                else:
+                                    j=8
+                                    break
+                        if pinned_a_piece:
+                            self.squares[(i, c)][1].pinned = True
+                        else:
+                            self.squares[(i, c)][1].pinned = False
+
                         i=-1
                         break
                     else:
