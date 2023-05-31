@@ -29,11 +29,11 @@ b_king = os.path.join("designs", "black pieces", "black piece pngs", "black_king
 #endregion
 
 # classes and functions
-def enter_fullscreen(event=None):
-    root.attributes('-fullscreen', True)
+# def enter_fullscreen(event=None):
+#     root.attributes('-fullscreen', True)
 
-def exit_fullscreen(event=None): 
-    root.attributes("-fullscreen", False)
+# def exit_fullscreen(event=None): 
+#     root.attributes("-fullscreen", False)
 
 class ChessBoard(tk.Canvas):
     def __init__(self, parent, size):
@@ -57,14 +57,16 @@ class ChessBoard(tk.Canvas):
         }
         self.bind("<Button-1>", self.select_piece) # allows for a piece to be selected using left mouse click
 
-        self.clicked_r = None
-        self.clicked_c = None
+        # self.clicked_r = None 
+        # self.clicked_c = None
         self.clicked = None
         self.clicked_piece = None
 
-        self.turn_based = ["white", "black"]
+        self.turn_based = ["white", "black"] # variable used to allow for turn based gameplay from white to black using mod operator and adding 1 to turns variable
         self.turns = 0
-        self.check_on_the_board = False
+
+        self.all_white_legal_moves = 20
+        self.all_black_legal_moves = 20
 
     def draw_board(self):
         square_size = self.size // 8 # each square will be 100x100
@@ -89,6 +91,7 @@ class ChessBoard(tk.Canvas):
         en_pass_count = None
         moved = None
         border = None
+        in_check = None
         for key, val in kwargs.items():
             if key == "two_spaces":
                 two_spaces = val
@@ -102,6 +105,8 @@ class ChessBoard(tk.Canvas):
                 en_pass_count = val
             if key == "border":
                 border = val
+            if key == "in_check":
+                in_check = val
 
         if notation == "P":
             self.squares[(row, col)][1] = Pawn(notation, "white", row, col, legal_moves, defends, two_spaces, do_en_pass, get_en_pass, en_pass_count)
@@ -112,17 +117,39 @@ class ChessBoard(tk.Canvas):
         elif notation == "Rb":
             self.squares[(row, col)][1] = Rook(notation, "black", row, col, legal_moves, defends, moved)
         elif notation == "K":
-            self.squares[(row, col)][1] = King(notation, "white", row, col, legal_moves, defends, moved, border)
+            self.squares[(row, col)][1] = King(notation, "white", row, col, legal_moves, defends, moved, border, in_check)
         elif notation == "Kb":
-            self.squares[(row, col)][1] = King(notation, "black", row, col, legal_moves, defends, moved, border)
+            self.squares[(row, col)][1] = King(notation, "black", row, col, legal_moves, defends, moved, border, in_check)
         else:
             self.squares[(row, col)][1] = Piece(notation, color, row, col, legal_moves, defends)
 
         # giving the square a unique image id to be used when moving pieces or removing pieces
         self.squares[(row, col)][2] = self.create_image(x, y, image=image, anchor="nw")
 
-    def select_piece(self, event):
-        # print("begin the selection")
+    def select_piece(self, event):     
+        # CHECKS / CHECKMATE
+        if self.turn_based[(self.turns) % 2] == "white":
+            the_king = None
+            for piece in squares:
+                if piece.notation == "K":
+                    the_king = piece
+            if the_king.in_check == True:
+
+        else:
+            pass
+
+        # [DRAWS]
+        # stalemate
+        # if self.all_white_legal_moves == 0 and self.turn_based[(self.turns) % 2] == "white":
+            # draw_window = tk.Toplevel()
+            # draw_window.title("Stalemate")
+            # draw_window.geometry("150x75")
+
+            # # window is waiting for a selection to be made and confirmed with the destroying of the window 
+            # ok_button = tk.Button(promotion_window, text="Ok", command=promotion_window.destroy)
+            # ok_button.pack()
+            # print("STALEMATE draw")
+
 
         # finding the selected square
         r = 0
@@ -134,8 +161,8 @@ class ChessBoard(tk.Canvas):
             if (event.y <= row*100 and event.y >= (row-1)*100):
                 r = row-1
 
-        self.clicked_row = r
-        self.clicked_col = c
+        clicked_row = r
+        clicked_col = c
         square_id = self.squares[(r, c)][0]
         self.clicked_piece = self.squares[(r, c)][1]
         
@@ -504,14 +531,15 @@ class ChessBoard(tk.Canvas):
                         # print(f"{val[1].color} pawn at ({val[1].pos_r},{val[1].pos_c}) get_en_pass is now {val[1].get_en_pass}")
         
         # make sure all pieces have their correct legal moves again
+            self.all_white_legal_moves = 0
+            self.all_black_legal_moves = 0
             for key, val in self.squares.items():
                 if val[1] != None:
                     val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
-        
-        # checking for checks and checkmate
-        # check_or_checkmate()
-    
-    # def check_or_checkmate():
+                    if val[1].color == "white":
+                        self.all_white_legal_moves += len(val[1].legal_moves)
+                    else:
+                        self.all_black_legal_moves += len(val[1].legal_moves)
 
 
     # this function will also be used to find pieces that are defended by other pieces and add to the defends array
@@ -2002,6 +2030,8 @@ class ChessBoard(tk.Canvas):
                         add_legal_moves.append((r-i, c-i))
                         i=8
                         break
+                    else:
+                        self.squares[(r-i, c-i)][1].in_check = True
                 # a piece to the diagonal top left that is an ally has been reached
                 elif (self.squares[(r-i, c-i)][1] != None) and (self.squares[(r-i, c-i)][1].color == actual_piece.color):
                     add_defends.append((r-i, c-i))
@@ -2021,6 +2051,8 @@ class ChessBoard(tk.Canvas):
                         add_legal_moves.append((r+i, c-i))
                         i=8
                         break
+                    else:
+                        self.squares[(r+i, c-i)][1].in_check = True
                 # a piece to the diagonal bottom left that is an ally has been reached
                 elif (self.squares[(r+i, c-i)][1] != None) and (self.squares[(r+i, c-i)][1].color == actual_piece.color):
                     add_defends.append((r+i, c-i))
@@ -2040,6 +2072,8 @@ class ChessBoard(tk.Canvas):
                         add_legal_moves.append((r-i, c+i))
                         i=8
                         break
+                    else:
+                        self.squares[(r-i, c+i)][1].in_check = True
                 # a piece to the diagonal top right that is an ally has been reached
                 elif (self.squares[(r-i, c+i)][1] != None) and (self.squares[(r-i, c+i)][1].color == actual_piece.color):
                     add_defends.append((r-i, c+i))
@@ -2059,6 +2093,8 @@ class ChessBoard(tk.Canvas):
                         add_legal_moves.append((r+i, c+i))
                         i=8
                         break
+                    else:
+                        self.squares[(r+i, c+i)][1].in_check = True
                 # a piece to the diagonal bottom right that is an ally has been reached
                 elif (self.squares[(r+i, c+i)][1] != None) and (self.squares[(r+i, c+i)][1].color == actual_piece.color):
                     add_defends.append((r+i, c+i))
@@ -2077,6 +2113,8 @@ class ChessBoard(tk.Canvas):
                         add_legal_moves.append((r,i))
                         i=-1
                         break
+                    else:
+                        self.squares[(r, i)][1].in_check = True
                 # a piece to the left that is an ally has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color == actual_piece.color):
                     add_defends.append((r,i))
@@ -2095,6 +2133,8 @@ class ChessBoard(tk.Canvas):
                         add_legal_moves.append((r,i))
                         i=8
                         break
+                    else:
+                        self.squares[(r, i)][1].in_check = True
                 # a piece to the right that is an ally has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color == actual_piece.color):
                     add_defends.append((r,i))
@@ -2113,6 +2153,8 @@ class ChessBoard(tk.Canvas):
                         add_legal_moves.append((i,c))
                         i=-1
                         break
+                    else:
+                        self.squares[(i, c)][1].in_check = True
                 # a piece above that is an ally has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color == actual_piece.color):
                     add_defends.append((i,c))
@@ -2131,6 +2173,8 @@ class ChessBoard(tk.Canvas):
                         add_legal_moves.append((i,c))
                         i=8
                         break
+                    else:
+                        self.squares[(i, c)][1].in_check = True
                 # a piece below that is an ally has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color == actual_piece.color):
                     add_defends.append((i,c))
@@ -2157,6 +2201,8 @@ class ChessBoard(tk.Canvas):
                         add_legal_moves.append((r-i, c-i))
                         i=8
                         break
+                    else:
+                        self.squares[(r-i, c-i)][1].in_check = True
                 # a piece to the diagonal top left that is an ally has been reached
                 elif (self.squares[(r-i, c-i)][1] != None) and (self.squares[(r-i, c-i)][1].color == actual_piece.color):
                     add_defends.append((r-i, c-i))
@@ -2176,6 +2222,8 @@ class ChessBoard(tk.Canvas):
                         add_legal_moves.append((r+i, c-i))
                         i=8
                         break
+                    else:
+                        self.squares[(r+i, c-i)][1].in_check = True
                 # a piece to the diagonal bottom left that is an ally has been reached
                 elif (self.squares[(r+i, c-i)][1] != None) and (self.squares[(r+i, c-i)][1].color == actual_piece.color):
                     add_defends.append((r+i, c-i))
@@ -2195,6 +2243,8 @@ class ChessBoard(tk.Canvas):
                         add_legal_moves.append((r-i, c+i))
                         i=-8
                         break
+                    else:
+                        self.squares[(r-i, c+i)][1].in_check = True
                 # a piece to the diagonal top right that is an ally has been reached
                 elif (self.squares[(r-i, c+i)][1] != None) and (self.squares[(r-i, c+i)][1].color == actual_piece.color):
                     add_defends.append((r-i, c+i))
@@ -2214,6 +2264,8 @@ class ChessBoard(tk.Canvas):
                         add_legal_moves.append((r+i, c+i))
                         i=8
                         break
+                    else:
+                        self.squares[(r+i, c+i)][1].in_check = True
                 # a piece to the diagonal bottom right that is an ally has been reached
                 elif (self.squares[(r+i, c+i)][1] != None) and (self.squares[(r+i, c+i)][1].color == actual_piece.color):
                     add_defends.append((r+i, c+i))
@@ -2518,7 +2570,7 @@ board.place_piece("Nb", "black", 0, 6, [(2,7), (2,5)], [(1,4)])
 board.place_piece("Bb", "black", 0, 2, [], [(1,1), (1,3)])
 board.place_piece("Bb", "black", 0, 5, [], [(1,4), (1,6)])
 board.place_piece("Qb", "black", 0, 3, [], [(0,2), (1,2), (1,3), (1,4), (0,4)])
-board.place_piece("Kb", "black", 0, 4, [], [(0,3), (1,3), (1,4), (1,5), (0,5)], moved=False, border=[(0,3), (1,3), (1,4), (1,5), (0,5)])
+board.place_piece("Kb", "black", 0, 4, [], [(0,3), (1,3), (1,4), (1,5), (0,5)], moved=False, border=[(0,3), (1,3), (1,4), (1,5), (0,5)], in_check=False)
 
 board.place_piece("P", "white", 6, 0, [(5, 0), (4, 0)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0)
 board.place_piece("P", "white", 6, 1, [(5, 1), (4, 1)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0)
@@ -2535,6 +2587,6 @@ board.place_piece("N", "white", 7, 6, [], [(5,7), (5,5)])
 board.place_piece("B", "white", 7, 2, [], [(6,1), (6,3)])
 board.place_piece("B", "white", 7, 5, [], [(6,4), (6,6)])
 board.place_piece("Q", "white", 7, 3, [], [(7,2), (6,2), (6,3), (6,4), (7,4)])
-board.place_piece("K", "white", 7, 4, [], [(7,3), (6,3), (6,4), (6,5), (7,5)], moved=False, border=[(7,3), (6,3), (6,4), (6,5), (7,5)])
+board.place_piece("K", "white", 7, 4, [], [(7,3), (6,3), (6,4), (6,5), (7,5)], moved=False, border=[(7,3), (6,3), (6,4), (6,5), (7,5)], in_check=False)
 root.mainloop()
 #endregion
