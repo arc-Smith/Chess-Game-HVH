@@ -68,6 +68,10 @@ class ChessBoard(tk.Canvas):
         self.all_white_legal_moves = 20
         self.all_black_legal_moves = 20
 
+        # possible moves for each player after being put in check
+        self.white_possibles = []
+        self.black_possibles = []        
+
     def draw_board(self):
         square_size = self.size // 8 # each square will be 100x100
         colors = ["#eaebc8", "#638545"] # two chosen chess board colors
@@ -92,6 +96,8 @@ class ChessBoard(tk.Canvas):
         moved = None
         border = None
         in_check = None
+        check_pathway = None
+
         for key, val in kwargs.items():
             if key == "two_spaces":
                 two_spaces = val
@@ -107,37 +113,36 @@ class ChessBoard(tk.Canvas):
                 border = val
             if key == "in_check":
                 in_check = val
+            if key == "check_pathway":
+                check_pathway = val
 
         if notation == "P":
             self.squares[(row, col)][1] = Pawn(notation, "white", row, col, legal_moves, defends, two_spaces, do_en_pass, get_en_pass, en_pass_count)
         elif notation == "Pb":
             self.squares[(row, col)][1] = Pawn(notation, "black", row, col, legal_moves, defends, two_spaces, do_en_pass, get_en_pass, en_pass_count)
         elif notation == "R":
-            self.squares[(row, col)][1] = Rook(notation, "white", row, col, legal_moves, defends, moved)
+            self.squares[(row, col)][1] = Rook(notation, "white", row, col, legal_moves, defends, moved, check_pathway)
         elif notation == "Rb":
-            self.squares[(row, col)][1] = Rook(notation, "black", row, col, legal_moves, defends, moved)
+            self.squares[(row, col)][1] = Rook(notation, "black", row, col, legal_moves, defends, moved, check_pathway)
         elif notation == "K":
             self.squares[(row, col)][1] = King(notation, "white", row, col, legal_moves, defends, moved, border, in_check)
         elif notation == "Kb":
             self.squares[(row, col)][1] = King(notation, "black", row, col, legal_moves, defends, moved, border, in_check)
+        elif notation == "B":
+            self.squares[(row, col)][1] = Bishop(notation, "white", row, col, legal_moves, defends, check_pathway)
+        elif notation == "Bb":
+            self.squares[(row, col)][1] = Bishop(notation, "black", row, col, legal_moves, defends, check_pathway)
+        elif notation == "Q":
+            self.squares[(row, col)][1] = Queen(notation, "white", row, col, legal_moves, defends, check_pathway)
+        elif notation == "Qb":
+            self.squares[(row, col)][1] = Queen(notation, "black", row, col, legal_moves, defends, check_pathway)
         else:
             self.squares[(row, col)][1] = Piece(notation, color, row, col, legal_moves, defends)
 
         # giving the square a unique image id to be used when moving pieces or removing pieces
         self.squares[(row, col)][2] = self.create_image(x, y, image=image, anchor="nw")
 
-    def select_piece(self, event):     
-        # CHECKS / CHECKMATE
-        # if self.turn_based[(self.turns) % 2] == "white":
-        #     the_king = None
-        #     for piece in squares:
-        #         if piece.notation == "K":
-        #             the_king = piece
-        #     if the_king.in_check == True:
-
-        # else:
-        #     pass
-
+    def select_piece(self, event):  
         # [DRAWS]
         # stalemate
         # if self.all_white_legal_moves == 0 and self.turn_based[(self.turns) % 2] == "white":
@@ -150,12 +155,12 @@ class ChessBoard(tk.Canvas):
             # ok_button.pack()
             # print("STALEMATE draw")
 
-        for key, val in self.squares.items():
-            if val[1] != None:
-                if val[1].notation == "Kb":
-                    print(f"BLACK king with in_check is currently {val[1].in_check}")
-                elif val[1].notation == "K":
-                    print(f"WHITE king with in_check is currently {val[1].in_check}")
+        # for key, val in self.squares.items():
+        #     if val[1] != None:
+        #         if val[1].notation == "Kb":
+        #             print(f"BLACK king with in_check is currently {val[1].in_check}")
+        #         elif val[1].notation == "K":
+        #             print(f"WHITE king with in_check is currently {val[1].in_check}")
 
         # finding the selected square
         r = 0
@@ -546,6 +551,42 @@ class ChessBoard(tk.Canvas):
                         self.all_white_legal_moves += len(val[1].legal_moves)
                     else:
                         self.all_black_legal_moves += len(val[1].legal_moves)
+        
+        # # CHECKS / CHECKMATE
+        # self.black_possibles = []
+        # self.white_possibles = []
+        # black_check_pos = None
+        # white_check_pos = None
+
+        # # find current position of black and white king who may be in check
+        # for square in self.squares:
+        #     for piece in square[1]:
+        #         if piece.notation == "K":
+        #             white_check_pos = (piece.pos_r,piece.pos_c)
+        #         elif piece.notation == "Kb":
+        #             white_check_pos = (piece.pos_r,piece.pos_c)
+
+        # # add legal moves of king, add legal moves of pieces that can take attacking piece, add interposes of pieces that can go to a legal move
+        # if self.turn_based[(self.turns+1) % 2] == "white":
+        #     for key, val in self.squares.items():
+        #         if val[1] != None:
+        #             if val[1].color == "white":
+        #                 if black_check_pos in val[1].legal_moves: 
+
+
+
+        #             if val[1].notation == "Kb":
+        #                 if val[1].in_check == True:
+        #                     self.black_possibles = val[1].
+        #             elif val[1].
+
+        #     # the_king = None
+        #     # for piece in squares:
+        #     #     if piece.notation == "K":
+        #     #         the_king = piece
+        #     # if the_king.in_check == True:
+        # else:
+        #     pass
         
     # this function will also be used to find pieces that are defended by other pieces, add to the defends array, and add to the border for both kings
     def get_legal_moves(self, actual_piece, r, c, **kwargs):
@@ -2021,6 +2062,7 @@ class ChessBoard(tk.Canvas):
         if actual_piece.notation == "Q" or actual_piece.notation == "Qb":
             add_legal_moves = []
             add_defends = []
+            add_check_pathway = []
             
             for i in range(1,8):
                 if r-i < 0 or c-i < 0:
@@ -2029,6 +2071,7 @@ class ChessBoard(tk.Canvas):
                 # no piece to the diagonal top left
                 elif (self.squares[(r-i, c-i)][1] == None): 
                     add_legal_moves.append((r-i,c-i))
+                    add_check_pathway.append((r-i,c-i))
                 # a piece to the diagonal top left that CAN be captured has been reached
                 elif (self.squares[(r-i, c-i)][1] != None) and (self.squares[(r-i, c-i)][1].color != actual_piece.color):
                     if (self.squares[(r-i, c-i)][1].notation != "K") and (self.squares[(r-i, c-i)][1].notation != "Kb"):
@@ -2036,8 +2079,12 @@ class ChessBoard(tk.Canvas):
                         i=8
                         break
                     else:
+                        add_legal_moves.append((r-i, c-i))
                         self.squares[(r-i, c-i)][1].in_check = True 
                         print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
+                        actual_piece.check_pathway = [pos for pos in add_check_pathway]
+                        i=8
+                        break
                 # a piece to the diagonal top left that is an ally has been reached
                 elif (self.squares[(r-i, c-i)][1] != None) and (self.squares[(r-i, c-i)][1].color == actual_piece.color):
                     add_defends.append((r-i, c-i))
@@ -2045,7 +2092,8 @@ class ChessBoard(tk.Canvas):
                         add_defends.remove((r-i, c-i))
                     i=8
                     break
-            
+            add_check_pathway = []
+
             for i in range(1,8):
                 if r+i > 7 or c-i < 0:
                     i=8
@@ -2053,6 +2101,7 @@ class ChessBoard(tk.Canvas):
                 # no piece to the diagonal bottom left
                 elif (self.squares[(r+i, c-i)][1] == None): 
                     add_legal_moves.append((r+i,c-i))
+                    add_check_pathway.append((r+i,c-i))
                 # a piece to the diagonal bottom left that CAN be captured has been reached
                 elif (self.squares[(r+i, c-i)][1] != None) and (self.squares[(r+i, c-i)][1].color != actual_piece.color):
                     if (self.squares[(r+i, c-i)][1].notation != "K") and (self.squares[(r+i, c-i)][1].notation != "Kb"):
@@ -2060,8 +2109,12 @@ class ChessBoard(tk.Canvas):
                         i=8
                         break
                     else:
+                        add_legal_moves.append((r+i, c-i))
                         self.squares[(r+i, c-i)][1].in_check = True 
                         print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
+                        actual_piece.check_pathway = [pos for pos in add_check_pathway]
+                        i=8
+                        break
                 # a piece to the diagonal bottom left that is an ally has been reached
                 elif (self.squares[(r+i, c-i)][1] != None) and (self.squares[(r+i, c-i)][1].color == actual_piece.color):
                     add_defends.append((r+i, c-i))
@@ -2069,6 +2122,7 @@ class ChessBoard(tk.Canvas):
                         add_defends.remove((r+i, c-i))
                     i=8
                     break
+            add_check_pathway = []
 
             for i in range(1,8):
                 if r-i < 0 or c+i > 7:
@@ -2077,6 +2131,7 @@ class ChessBoard(tk.Canvas):
                 # no piece to the diagonal top right
                 elif (self.squares[(r-i, c+i)][1] == None): 
                     add_legal_moves.append((r-i, c+i))
+                    add_check_pathway.append((r-i, c+i))
                 # a piece to the diagonal top right that CAN be captured has been reached
                 elif (self.squares[(r-i, c+i)][1] != None) and (self.squares[(r-i, c+i)][1].color != actual_piece.color):
                     if (self.squares[(r-i, c+i)][1].notation != "K") and (self.squares[(r-i, c+i)][1].notation != "Kb"):
@@ -2084,8 +2139,12 @@ class ChessBoard(tk.Canvas):
                         i=8
                         break
                     else:
+                        add_legal_moves.append((r-i, c+i))
                         self.squares[(r-i, c+i)][1].in_check = True 
                         print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
+                        actual_piece.check_pathway = [pos for pos in add_check_pathway]
+                        i=8
+                        break
                 # a piece to the diagonal top right that is an ally has been reached
                 elif (self.squares[(r-i, c+i)][1] != None) and (self.squares[(r-i, c+i)][1].color == actual_piece.color):
                     add_defends.append((r-i, c+i))
@@ -2093,6 +2152,7 @@ class ChessBoard(tk.Canvas):
                             add_defends.remove((r-i, c+i))
                     i=8
                     break
+            add_check_pathway = []
 
             for i in range(1,8):
                 if r+i > 7 or c+i > 7: 
@@ -2101,6 +2161,7 @@ class ChessBoard(tk.Canvas):
                 # no piece to the diagonal bottom right
                 elif (self.squares[(r+i, c+i)][1] == None): 
                     add_legal_moves.append((r+i, c+i))
+                    add_check_pathway.append((r+i, c+i))
                 # a piece to the diagonal bottom right that CAN be captured has been reached
                 elif (self.squares[(r+i, c+i)][1] != None) and (self.squares[(r+i, c+i)][1].color != actual_piece.color):
                     if (self.squares[(r+i, c+i)][1].notation != "K") and (self.squares[(r+i, c+i)][1].notation != "Kb"):
@@ -2108,8 +2169,12 @@ class ChessBoard(tk.Canvas):
                         i=8
                         break
                     else:
+                        add_legal_moves.append((r+i, c+i))
                         self.squares[(r+i, c+i)][1].in_check = True 
                         print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
+                        actual_piece.check_pathway = [pos for pos in add_check_pathway]
+                        i=8
+                        break
                 # a piece to the diagonal bottom right that is an ally has been reached
                 elif (self.squares[(r+i, c+i)][1] != None) and (self.squares[(r+i, c+i)][1].color == actual_piece.color):
                     add_defends.append((r+i, c+i))
@@ -2117,6 +2182,7 @@ class ChessBoard(tk.Canvas):
                         add_defends.remove((r+i, c+i))
                     i=8
                     break
+            add_check_pathway = []
             
             for i in range(c,-1,-1):
                 if i == c:
@@ -2124,6 +2190,7 @@ class ChessBoard(tk.Canvas):
                 # no piece to the left
                 if (self.squares[(r, i)][1] == None): 
                     add_legal_moves.append((r,i))
+                    add_check_pathway.append((r,i))
                 # a piece to the left that CAN be captured has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color != actual_piece.color):
                     if (self.squares[(r, i)][1].notation != "K") and (self.squares[(r, i)][1].notation != "Kb"):
@@ -2131,8 +2198,12 @@ class ChessBoard(tk.Canvas):
                         i=-1
                         break
                     else:
+                        add_legal_moves.append((r,i))
                         self.squares[(r, i)][1].in_check = True 
                         print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
+                        actual_piece.check_pathway = [pos for pos in add_check_pathway]
+                        i=-1
+                        break
                 # a piece to the left that is an ally has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color == actual_piece.color):
                     add_defends.append((r,i))
@@ -2140,6 +2211,7 @@ class ChessBoard(tk.Canvas):
                         add_defends.remove((r,i))
                     i=-1
                     break
+            add_check_pathway = []
 
             for i in range(c,8):
                 if i == c:
@@ -2147,6 +2219,7 @@ class ChessBoard(tk.Canvas):
                 # no piece to the right
                 if (self.squares[(r, i)][1] == None): 
                     add_legal_moves.append((r,i))
+                    add_check_pathway.append((r,i))
                 # a piece to the right that CAN be captured has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color != actual_piece.color):
                     if (self.squares[(r, i)][1].notation != "K") and (self.squares[(r, i)][1].notation != "Kb"):
@@ -2154,8 +2227,12 @@ class ChessBoard(tk.Canvas):
                         i=8
                         break
                     else:
+                        add_legal_moves.append((r,i))
                         self.squares[(r, i)][1].in_check = True 
                         print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
+                        actual_piece.check_pathway = [pos for pos in add_check_pathway]
+                        i=8
+                        break
                 # a piece to the right that is an ally has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color == actual_piece.color):
                     add_defends.append((r,i))
@@ -2163,6 +2240,7 @@ class ChessBoard(tk.Canvas):
                         add_defends.remove((r,i))
                     i=8
                     break
+            add_check_pathway = []
 
             for i in range(r,-1,-1):
                 if i == r:
@@ -2170,6 +2248,7 @@ class ChessBoard(tk.Canvas):
                 # no piece above
                 if (self.squares[(i, c)][1] == None): 
                     add_legal_moves.append((i,c))
+                    add_check_pathway.append((i,c))
                 # a piece to above that CAN be captured has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color != actual_piece.color):
                     if (self.squares[(i, c)][1].notation != "K") and (self.squares[(i, c)][1].notation != "Kb"):
@@ -2177,8 +2256,12 @@ class ChessBoard(tk.Canvas):
                         i=-1
                         break
                     else:
+                        add_legal_moves.append((i,c))
                         self.squares[(i, c)][1].in_check = True 
                         print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
+                        actual_piece.check_pathway = [pos for pos in add_check_pathway]
+                        i=-1
+                        break
                 # a piece above that is an ally has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color == actual_piece.color):
                     add_defends.append((i,c))
@@ -2186,6 +2269,7 @@ class ChessBoard(tk.Canvas):
                         add_defends.remove((i,c))
                     i=-1
                     break
+            add_check_pathway = []
 
             for i in range(r,8):
                 if i == r:
@@ -2193,6 +2277,7 @@ class ChessBoard(tk.Canvas):
                 # no piece below
                 if (self.squares[(i, c)][1] == None): 
                     add_legal_moves.append((i,c))
+                    add_check_pathway.append((i,c))
                 # a piece below that CAN be captured has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color != actual_piece.color):
                     if (self.squares[(i, c)][1].notation != "K") and (self.squares[(i, c)][1].notation != "Kb"):
@@ -2200,8 +2285,12 @@ class ChessBoard(tk.Canvas):
                         i=8
                         break
                     else:
+                        add_legal_moves.append((i,c))
                         self.squares[(i, c)][1].in_check = True 
                         print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
+                        actual_piece.check_pathway = [pos for pos in add_check_pathway]
+                        i=8
+                        break
                 # a piece below that is an ally has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color == actual_piece.color):
                     add_defends.append((i,c))
@@ -2209,6 +2298,7 @@ class ChessBoard(tk.Canvas):
                         add_defends.remove((i,c))
                     i=8
                     break
+            add_check_pathway = []
 
             actual_piece.defends = add_defends
             return add_legal_moves
@@ -2216,6 +2306,7 @@ class ChessBoard(tk.Canvas):
         if actual_piece.notation == "B" or actual_piece.notation == "Bb":
             add_legal_moves = []
             add_defends = []
+            add_check_pathway = []
             
             for i in range(1,8):
                 if r-i < 0 or c-i < 0:
@@ -2224,6 +2315,7 @@ class ChessBoard(tk.Canvas):
                 # no piece to the diagonal top left
                 elif (self.squares[(r-i, c-i)][1] == None): 
                     add_legal_moves.append((r-i,c-i))
+                    add_check_pathway.append((r-i,c-i))
                 # a piece to the diagonal top left that CAN be captured has been reached
                 elif (self.squares[(r-i, c-i)][1] != None) and (self.squares[(r-i, c-i)][1].color != actual_piece.color):
                     if (self.squares[(r-i, c-i)][1].notation != "K") and (self.squares[(r-i, c-i)][1].notation != "Kb"):
@@ -2231,8 +2323,12 @@ class ChessBoard(tk.Canvas):
                         i=8
                         break
                     else:
+                        add_legal_moves.append((r-i, c-i))
                         self.squares[(r-i, c-i)][1].in_check = True 
                         print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
+                        actual_piece.check_pathway = [pos for pos in add_check_pathway]
+                        i=8
+                        break
                 # a piece to the diagonal top left that is an ally has been reached
                 elif (self.squares[(r-i, c-i)][1] != None) and (self.squares[(r-i, c-i)][1].color == actual_piece.color):
                     add_defends.append((r-i, c-i))
@@ -2240,6 +2336,7 @@ class ChessBoard(tk.Canvas):
                         add_defends.remove((r-i, c-i))
                     i=8
                     break
+            add_check_pathway = []
             
             for i in range(1,8):
                 if r+i > 7 or c-i < 0:
@@ -2248,6 +2345,7 @@ class ChessBoard(tk.Canvas):
                 # no piece to the diagonal bottom left
                 elif (self.squares[(r+i, c-i)][1] == None): 
                     add_legal_moves.append((r+i,c-i))
+                    add_check_pathway.append((r+i,c-i))
                 # a piece to the diagonal bottom left that CAN be captured has been reached
                 elif (self.squares[(r+i, c-i)][1] != None) and (self.squares[(r+i, c-i)][1].color != actual_piece.color):
                     if (self.squares[(r+i, c-i)][1].notation != "K") and (self.squares[(r+i, c-i)][1].notation != "Kb"):
@@ -2255,8 +2353,12 @@ class ChessBoard(tk.Canvas):
                         i=8
                         break
                     else:
+                        add_legal_moves.append((r+i, c-i))
                         self.squares[(r+i, c-i)][1].in_check = True 
                         print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
+                        actual_piece.check_pathway = [pos for pos in add_check_pathway]
+                        i=8
+                        break
                 # a piece to the diagonal bottom left that is an ally has been reached
                 elif (self.squares[(r+i, c-i)][1] != None) and (self.squares[(r+i, c-i)][1].color == actual_piece.color):
                     add_defends.append((r+i, c-i))
@@ -2264,6 +2366,7 @@ class ChessBoard(tk.Canvas):
                         add_defends.remove((r+i, c-i))
                     i=8
                     break
+            add_check_pathway = []
 
             for i in range(1,8):
                 if r-i < 0 or c+i > 7:
@@ -2272,6 +2375,7 @@ class ChessBoard(tk.Canvas):
                 # no piece to the diagonal top right
                 elif (self.squares[(r-i, c+i)][1] == None): 
                     add_legal_moves.append((r-i, c+i))
+                    add_check_pathway.append((r-i, c+i))
                 # a piece to the diagonal top right that CAN be captured has been reached
                 elif (self.squares[(r-i, c+i)][1] != None) and (self.squares[(r-i, c+i)][1].color != actual_piece.color):
                     if (self.squares[(r-i, c+i)][1].notation != "K") and (self.squares[(r-i, c+i)][1].notation != "Kb"):
@@ -2279,8 +2383,12 @@ class ChessBoard(tk.Canvas):
                         i=-8
                         break
                     else:
+                        add_legal_moves.append((r-i, c+i))
                         self.squares[(r-i, c+i)][1].in_check = True 
                         print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
+                        actual_piece.check_pathway = [pos for pos in add_check_pathway]
+                        i=-8
+                        break
                 # a piece to the diagonal top right that is an ally has been reached
                 elif (self.squares[(r-i, c+i)][1] != None) and (self.squares[(r-i, c+i)][1].color == actual_piece.color):
                     add_defends.append((r-i, c+i))
@@ -2288,6 +2396,7 @@ class ChessBoard(tk.Canvas):
                         add_defends.remove((r-i, c+i))
                     i=-8
                     break
+            add_check_pathway = []
 
             for i in range(1,8):
                 if r+i > 7 or c+i > 7: 
@@ -2296,6 +2405,7 @@ class ChessBoard(tk.Canvas):
                 # no piece to the diagonal bottom right
                 elif (self.squares[(r+i, c+i)][1] == None): 
                     add_legal_moves.append((r+i, c+i))
+                    add_check_pathway.append((r+i, c+i))
                 # a piece to the diagonal bottom right that CAN be captured has been reached
                 elif (self.squares[(r+i, c+i)][1] != None) and (self.squares[(r+i, c+i)][1].color != actual_piece.color):
                     if (self.squares[(r+i, c+i)][1].notation != "K") and (self.squares[(r+i, c+i)][1].notation != "Kb"):
@@ -2303,8 +2413,12 @@ class ChessBoard(tk.Canvas):
                         i=8
                         break
                     else:
+                        add_legal_moves.append((r+i, c+i))
                         self.squares[(r+i, c+i)][1].in_check = True 
                         print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
+                        actual_piece.check_pathway = [pos for pos in add_check_pathway]
+                        i=8
+                        break
                 # a piece to the diagonal bottom right that is an ally has been reached
                 elif (self.squares[(r+i, c+i)][1] != None) and (self.squares[(r+i, c+i)][1].color == actual_piece.color):
                     add_defends.append((r+i, c+i))
@@ -2312,6 +2426,7 @@ class ChessBoard(tk.Canvas):
                         add_defends.remove((r+i, c+i))
                     i=8
                     break
+            add_check_pathway = []
 
             actual_piece.defends = add_defends
             return add_legal_moves
@@ -2450,6 +2565,7 @@ class ChessBoard(tk.Canvas):
         if actual_piece.notation == "R" or actual_piece.notation == "Rb":
             add_legal_moves = []
             add_defends = []
+            add_check_pathway = []
             
             for i in range(c,-1,-1):
                 if i == c:
@@ -2457,6 +2573,7 @@ class ChessBoard(tk.Canvas):
                 # no piece to the left
                 if (self.squares[(r, i)][1] == None): 
                     add_legal_moves.append((r,i))
+                    add_check_pathway.append((r,i))
                 # a piece to the left that CAN be captured has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color != actual_piece.color):
                     if (self.squares[(r, i)][1].notation != "K") and (self.squares[(r, i)][1].notation != "Kb"):
@@ -2464,8 +2581,12 @@ class ChessBoard(tk.Canvas):
                         i=-1
                         break
                     else:
+                        add_legal_moves.append((r,i))
                         self.squares[(r, i)][1].in_check = True 
                         print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
+                        actual_piece.check_pathway = [pos for pos in add_check_pathway]
+                        i=-1
+                        break
                 # a piece to the left that is an ally has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color == actual_piece.color):
                     add_defends.append((r,i))
@@ -2473,6 +2594,7 @@ class ChessBoard(tk.Canvas):
                         add_defends.remove((r,i))
                     i=-1
                     break
+            add_check_pathway = []
 
             for i in range(c,8):
                 if i == c:
@@ -2480,6 +2602,7 @@ class ChessBoard(tk.Canvas):
                 # no piece to the right
                 if (self.squares[(r, i)][1] == None): 
                     add_legal_moves.append((r,i))
+                    add_check_pathway.append((r,i))
                 # a piece to the right that CAN be captured has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color != actual_piece.color):
                     if (self.squares[(r, i)][1].notation != "K") and (self.squares[(r, i)][1].notation != "Kb"):
@@ -2487,8 +2610,12 @@ class ChessBoard(tk.Canvas):
                         i=-1
                         break
                     else:
+                        add_legal_moves.append((r,i))
                         self.squares[(r, i)][1].in_check = True 
                         print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
+                        actual_piece.check_pathway = [pos for pos in add_check_pathway]
+                        i=-1
+                        break
                 # a piece to the right that is an ally has been reached
                 elif (self.squares[(r, i)][1] != None) and (self.squares[(r, i)][1].color == actual_piece.color):
                     add_defends.append((r,i))
@@ -2496,6 +2623,7 @@ class ChessBoard(tk.Canvas):
                         add_defends.remove((r,i))
                     i=-1
                     break
+            add_check_pathway = []
 
             for i in range(r,-1,-1):
                 if i == r:
@@ -2503,6 +2631,7 @@ class ChessBoard(tk.Canvas):
                 # no piece above
                 if (self.squares[(i, c)][1] == None): 
                     add_legal_moves.append((i,c))
+                    add_check_pathway.append((i,c))
                 # a piece to above that CAN be captured has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color != actual_piece.color):
                     if (self.squares[(i, c)][1].notation != "K") and (self.squares[(i, c)][1].notation != "Kb"):
@@ -2510,8 +2639,12 @@ class ChessBoard(tk.Canvas):
                         i=-1
                         break
                     else:
+                        add_legal_moves.append((i,c))
                         self.squares[(i, c)][1].in_check = True 
                         print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
+                        actual_piece.check_pathway = [pos for pos in add_check_pathway]
+                        i=-1
+                        break
                 # a piece above that is an ally has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color == actual_piece.color):
                     add_defends.append((i,c))
@@ -2519,6 +2652,7 @@ class ChessBoard(tk.Canvas):
                         add_defends.remove((i,c))
                     i=-1
                     break
+            add_check_pathway = []
 
             for i in range(r,8):
                 if i == r:
@@ -2526,6 +2660,7 @@ class ChessBoard(tk.Canvas):
                 # no piece below
                 if (self.squares[(i, c)][1] == None): 
                     add_legal_moves.append((i,c))
+                    add_check_pathway.append((i,c))
                 # a piece below that CAN be captured has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color != actual_piece.color):
                     if (self.squares[(i, c)][1].notation != "K") and (self.squares[(i, c)][1].notation != "Kb"):
@@ -2533,8 +2668,12 @@ class ChessBoard(tk.Canvas):
                         i=-1
                         break
                     else:
+                        add_legal_moves.append((i,c))
                         self.squares[(i, c)][1].in_check = True 
                         print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
+                        actual_piece.check_pathway = [pos for pos in add_check_pathway]
+                        i=-1
+                        break
                 # a piece below that is an ally has been reached
                 elif (self.squares[(i, c)][1] != None) and (self.squares[(i, c)][1].color == actual_piece.color):
                     add_defends.append((i,c))
@@ -2542,6 +2681,7 @@ class ChessBoard(tk.Canvas):
                         add_defends.remove((i,c))
                     i=-1
                     break
+            add_check_pathway = []
 
             actual_piece.defends = add_defends
             return add_legal_moves
@@ -2556,12 +2696,14 @@ class ChessBoard(tk.Canvas):
                     if (val[1].pos_r == r+1) and (val[1].pos_c == c-1) and ((val[1].color != actual_piece.color)) and (val[1].pos_r>=0 and val[1].pos_r<=7) and (val[1].pos_c>=0 and val[1].pos_c<=7) and (val[1].notation != "K" and val[1].notation != "Kb"):
                         add_legal_moves.append((val[1].pos_r, val[1].pos_c))
                     elif (val[1].pos_r == r+1) and (val[1].pos_c == c-1) and ((val[1].color != actual_piece.color)) and (val[1].pos_r>=0 and val[1].pos_r<=7) and (val[1].pos_c>=0 and val[1].pos_c<=7) and (val[1].notation == "K" or val[1].notation == "Kb"):
+                        add_legal_moves.append((val[1].pos_r, val[1].pos_c))
                         val[1].in_check = True 
                         print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
                     # diagonal right has an enemy
                     if (val[1].pos_r == r+1) and (val[1].pos_c == c+1) and ((val[1].color != actual_piece.color)) and (val[1].pos_r>=0 and val[1].pos_r<=7) and (val[1].pos_c>=0 and val[1].pos_c<=7) and (val[1].notation != "K" and val[1].notation != "Kb"):
                         add_legal_moves.append((val[1].pos_r, val[1].pos_c))
                     elif (val[1].pos_r == r+1) and (val[1].pos_c == c+1) and ((val[1].color != actual_piece.color)) and (val[1].pos_r>=0 and val[1].pos_r<=7) and (val[1].pos_c>=0 and val[1].pos_c<=7) and (val[1].notation == "K" or val[1].notation == "Kb"):
+                        add_legal_moves.append((val[1].pos_r, val[1].pos_c))
                         val[1].in_check = True 
                         print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
 
@@ -2612,12 +2754,14 @@ class ChessBoard(tk.Canvas):
                     if (val[1].pos_r == r-1) and (val[1].pos_c == c-1) and ((val[1].color != actual_piece.color)) and (val[1].pos_r>=0 and val[1].pos_r<=7) and (val[1].pos_c>=0 and val[1].pos_c<=7) and (val[1].notation != "K" and val[1].notation != "Kb"):
                         add_legal_moves.append((val[1].pos_r, val[1].pos_c))
                     elif (val[1].pos_r == r-1) and (val[1].pos_c == c-1) and ((val[1].color != actual_piece.color)) and (val[1].pos_r>=0 and val[1].pos_r<=7) and (val[1].pos_c>=0 and val[1].pos_c<=7) and (val[1].notation == "K" or val[1].notation == "Kb"):
+                        add_legal_moves.append((val[1].pos_r, val[1].pos_c))
                         val[1].in_check = True 
                         print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
                     # diagonal right has an enemy
                     if (val[1].pos_r == r-1) and (val[1].pos_c == c+1) and ((val[1].color != actual_piece.color)) and (val[1].pos_r>=0 and val[1].pos_r<=7) and (val[1].pos_c>=0 and val[1].pos_c<=7) and (val[1].notation != "K" and val[1].notation != "Kb"):
                         add_legal_moves.append((val[1].pos_r, val[1].pos_c))
                     elif (val[1].pos_r == r-1) and (val[1].pos_c == c+1) and ((val[1].color != actual_piece.color)) and (val[1].pos_r>=0 and val[1].pos_r<=7) and (val[1].pos_c>=0 and val[1].pos_c<=7) and (val[1].notation == "K" or val[1].notation == "Kb"):
+                        add_legal_moves.append((val[1].pos_r, val[1].pos_c))
                         val[1].in_check = True 
                         print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
 
@@ -2673,13 +2817,13 @@ board.place_piece("Pb", "black", 1, 4, [(2,4), (3,4)], [], two_spaces=True, do_e
 board.place_piece("Pb", "black", 1, 5, [(2,5), (3,5)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0)
 board.place_piece("Pb", "black", 1, 6, [(2,6), (3,6)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0)
 board.place_piece("Pb", "black", 1, 7, [(2,7), (3,7)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0)
-board.place_piece("Rb", "black", 0, 0, [], [(1,0), (0,1)], moved=False)
-board.place_piece("Rb", "black", 0, 7, [], [(1,7), (0,6)], moved=False)
+board.place_piece("Rb", "black", 0, 0, [], [(1,0), (0,1)], moved=False, check_pathway=[])
+board.place_piece("Rb", "black", 0, 7, [], [(1,7), (0,6)], moved=False, check_pathway=[])
 board.place_piece("Nb", "black", 0, 1, [(2,0), (2,2)], [(1,3)])
 board.place_piece("Nb", "black", 0, 6, [(2,7), (2,5)], [(1,4)])
-board.place_piece("Bb", "black", 0, 2, [], [(1,1), (1,3)])
-board.place_piece("Bb", "black", 0, 5, [], [(1,4), (1,6)])
-board.place_piece("Qb", "black", 0, 3, [], [(0,2), (1,2), (1,3), (1,4), (0,4)])
+board.place_piece("Bb", "black", 0, 2, [], [(1,1), (1,3)], check_pathway=[])
+board.place_piece("Bb", "black", 0, 5, [], [(1,4), (1,6)], check_pathway=[])
+board.place_piece("Qb", "black", 0, 3, [], [(0,2), (1,2), (1,3), (1,4), (0,4)], check_pathway=[])
 board.place_piece("Kb", "black", 0, 4, [], [(0,3), (1,3), (1,4), (1,5), (0,5)], moved=False, border=[(0,3), (1,3), (1,4), (1,5), (0,5)], in_check=False)
 
 board.place_piece("P", "white", 6, 0, [(5, 0), (4, 0)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0)
@@ -2690,13 +2834,13 @@ board.place_piece("P", "white", 6, 4, [(5, 4), (4, 4)], [], two_spaces=True, do_
 board.place_piece("P", "white", 6, 5, [(5, 5), (4, 5)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0)
 board.place_piece("P", "white", 6, 6, [(5, 6), (4, 6)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0)
 board.place_piece("P", "white", 6, 7, [(5, 7), (4, 7)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0)
-board.place_piece("R", "white", 7, 0, [], [(6,0), (7,1)], moved=False)
-board.place_piece("R", "white", 7, 7, [], [(6,7), (7,6)], moved=False)
+board.place_piece("R", "white", 7, 0, [], [(6,0), (7,1)], moved=False, check_pathway=[])
+board.place_piece("R", "white", 7, 7, [], [(6,7), (7,6)], moved=False, check_pathway=[])
 board.place_piece("N", "white", 7, 1, [], [(5,0),(5,2)])
 board.place_piece("N", "white", 7, 6, [], [(5,7), (5,5)])
-board.place_piece("B", "white", 7, 2, [], [(6,1), (6,3)])
-board.place_piece("B", "white", 7, 5, [], [(6,4), (6,6)])
-board.place_piece("Q", "white", 7, 3, [], [(7,2), (6,2), (6,3), (6,4), (7,4)])
+board.place_piece("B", "white", 7, 2, [], [(6,1), (6,3)], check_pathway=[])
+board.place_piece("B", "white", 7, 5, [], [(6,4), (6,6)], check_pathway=[])
+board.place_piece("Q", "white", 7, 3, [], [(7,2), (6,2), (6,3), (6,4), (7,4)], check_pathway=[])
 board.place_piece("K", "white", 7, 4, [], [(7,3), (6,3), (6,4), (6,5), (7,5)], moved=False, border=[(7,3), (6,3), (6,4), (6,5), (7,5)], in_check=False)
 root.mainloop()
 #endregion
