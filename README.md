@@ -19,7 +19,7 @@ This chess game project is developed as part of an honors project under the supe
 - Graphical user interface (GUI) with pixel designs for the chess pieces
 - Mouse interaction from selecting and moving pieces
 - Validates moves and enforces the rules of chess
-- Tracks game state, including checkmate and stalemate conditions
+- Tracks game state
 - Supports two human players
 
 ## Credits
