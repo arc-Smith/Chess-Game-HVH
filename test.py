@@ -70,7 +70,9 @@ class ChessBoard(tk.Canvas):
 
         # possible moves for each player after being put in check
         self.white_possibles = {}
-        self.black_possibles = {}        
+        self.black_possibles = {}   
+
+        self.check_on_the_board = False     
 
     def draw_board(self):
         square_size = self.size // 8 # each square will be 100x100
@@ -182,6 +184,14 @@ class ChessBoard(tk.Canvas):
             if (event.y <= row*100 and event.y >= (row-1)*100):
                 r = row-1
 
+        # if check is on the board then something must be done pertaining to it
+        if self.check_on_the_board and self.turn_based[(self.turns) % 2] == "white":
+            if (r,c) not in self.white_possibles:
+                self.bind("<Button-1>", self.select_piece)
+        elif self.check_on_the_board and self.turn_based[(self.turns) % 2] == "black":
+            if (r,c) not in self.black_possibles:
+                self.bind("<Button-1>", self.select_piece)
+
         clicked_row = r
         clicked_col = c
         square_id = self.squares[(r, c)][0]
@@ -198,7 +208,13 @@ class ChessBoard(tk.Canvas):
             if self.clicked_piece != None and self.clicked_piece.legal_moves != [] and self.clicked_piece.color == self.turn_based[self.turns % 2]:
                 if self.clicked_piece.legal_moves != None:
                     if self.clicked_piece.notation != "K" and self.clicked_piece.notation != "Kb":
-                        if self.clicked_piece.pinned != True:
+                        if self.clicked_piece.pinned == True:
+                            legal_moves_of_pinned_piece = []
+                            for legal in self.clicked_piece.legal_moves:
+                                if legal in self.clicked_piece.pin_pathway:
+                                    legal_moves_of_pinned_piece.append(legal)
+                            self.clicked_piece.legal_moves = legal_moves_of_pinned_piece
+
                             if len(self.clicked_piece.legal_moves) >= 1:
                                 self.turns += 1
                                 self.itemconfigure(square_id, outline='green', width=10)
@@ -212,19 +228,33 @@ class ChessBoard(tk.Canvas):
                                             val[1].en_pass_count += 1 # changing the en_pass_count from 0 to 1 so that it can be set to False in the move_piece function
 
                                 self.bind("<Button-1>", lambda e: self.move_piece(e, r, c, square_id, self.clicked_piece))
+                        elif len(self.clicked_piece.legal_moves) >= 1:
+                            self.turns += 1
+                            self.itemconfigure(square_id, outline='green', width=10)
+                            self.update()
+                            self.clicked = square_id
+
+                            # taking into account the turns that have occurred for any pawns granted en passant
+                            for key, val in self.squares.items():
+                                if val[1] != None and (val[1].notation == "P" or val[1].notation == "Pb"):
+                                    if val[1].do_en_pass == True or val[1].get_en_pass:
+                                        val[1].en_pass_count += 1 # changing the en_pass_count from 0 to 1 so that it can be set to False in the move_piece function
+
+                            self.bind("<Button-1>", lambda e: self.move_piece(e, r, c, square_id, self.clicked_piece))
                     elif len(self.clicked_piece.legal_moves) >= 1:
-                        self.turns += 1
-                        self.itemconfigure(square_id, outline='green', width=10)
-                        self.update()
-                        self.clicked = square_id
+                            self.turns += 1
+                            self.itemconfigure(square_id, outline='green', width=10)
+                            self.update()
+                            self.clicked = square_id
 
-                        # taking into account the turns that have occurred for any pawns granted en passant
-                        for key, val in self.squares.items():
-                            if val[1] != None and (val[1].notation == "P" or val[1].notation == "Pb"):
-                                if val[1].do_en_pass == True or val[1].get_en_pass:
-                                    val[1].en_pass_count += 1 # changing the en_pass_count from 0 to 1 so that it can be set to False in the move_piece function
+                            # taking into account the turns that have occurred for any pawns granted en passant
+                            for key, val in self.squares.items():
+                                if val[1] != None and (val[1].notation == "P" or val[1].notation == "Pb"):
+                                    if val[1].do_en_pass == True or val[1].get_en_pass:
+                                        val[1].en_pass_count += 1 # changing the en_pass_count from 0 to 1 so that it can be set to False in the move_piece function
 
-                        self.bind("<Button-1>", lambda e: self.move_piece(e, r, c, square_id, self.clicked_piece))
+                            self.bind("<Button-1>", lambda e: self.move_piece(e, r, c, square_id, self.clicked_piece))
+
     
     def move_piece(self, event, from_square_r, from_square_c, from_square_id, actual_piece):        
         # finding the row and col of the next selected square
@@ -598,6 +628,8 @@ class ChessBoard(tk.Canvas):
         
         # if there's a check on the board
         if black_check_pos != None or white_check_pos != None:
+            self.check_on_the_board = True
+
             if self.turn_based[(self.turns+1) % 2] == "white": # if white has made the most recent move and possible gave check
                 for key, val in self.squares.items():
                     if val[1] != None:
@@ -620,12 +652,37 @@ class ChessBoard(tk.Canvas):
                                 self.black_possibles[black_check_pos] = val[1].legal_moves
                             elif (checker.pos_r,checker.pos_c) in val[1].legal_moves: # an ally piece takes the piece that's checked the king
                                 self.black_possibles[(val[1].pos_r,val[1].pos_c)] = (checker.pos_r,checker.pos_c)
-                            elif checker.notation == "Q" or checker.notation == "B" or checker.notation == "R": # interpose
+                            elif checker.notation == "Qb" or checker.notation == "Bb" or checker.notation == "Rb": # interpose
                                 for legal in val[1].legal_moves:
                                     if legal in checker.check_pathway:
                                         self.black_possibles[(val[1].pos_r,val[1].pos_c)] = legal
-                    for key, val in self.black_possibles.items():
-                        print(f"{key} with values {val} to escape")
+            
+            elif self.turn_based[(self.turns+1) % 2] == "black": # if white has made the most recent move and possible gave check
+                for key, val in self.squares.items():
+                    if val[1] != None:
+                        # finding out what piece(s) has/have king under attack 
+                        if val[1].color == "black":
+                            if white_check_pos in val[1].legal_moves:
+                                checker_amount += 1
+                                checker = val[1]
+                
+                if checker_amount > 1:
+                    for key, val in self.squares.items():
+                        if val[1] != None:
+                            # if there is more than 1 piece checking the king then the king must move
+                            if val[1].notation == "K":
+                                self.white_possibles[white_check_pos] = val[1].legal_moves
+                elif checker_amount == 1:
+                    for key, val in self.squares.items():
+                        if val[1] != None:
+                            if val[1].notation == "K": # king moves to escape chess
+                                self.white_possibles[white_check_pos] = val[1].legal_moves
+                            elif (checker.pos_r,checker.pos_c) in val[1].legal_moves: # an ally piece takes the piece that's checked the king
+                                self.white_possibles[(val[1].pos_r,val[1].pos_c)] = (checker.pos_r,checker.pos_c)
+                            elif checker.notation == "Q" or checker.notation == "B" or checker.notation == "R": # interpose
+                                for legal in val[1].legal_moves:
+                                    if legal in checker.check_pathway:
+                                        self.white_possibles[(val[1].pos_r,val[1].pos_c)] = legal
         
     # this function will also be used to find pieces that are defended by other pieces, add to the defends array, and add to the border for both kings
     def get_legal_moves(self, actual_piece, r, c, **kwargs):
