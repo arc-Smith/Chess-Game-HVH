@@ -98,6 +98,7 @@ class ChessBoard(tk.Canvas):
         in_check = None
         check_pathway = None
         pinned = None
+        pin_pathway = None
 
         for key, val in kwargs.items():
             if key == "two_spaces":
@@ -118,27 +119,29 @@ class ChessBoard(tk.Canvas):
                 check_pathway = val
             if key == "pinned":
                 pinned = val
+            if key == "pin_pathway":
+                pin_pathway = val
 
         if notation == "P":
-            self.squares[(row, col)][1] = Pawn(notation, "white", row, col, legal_moves, defends, two_spaces, do_en_pass, get_en_pass, en_pass_count, pinned)
+            self.squares[(row, col)][1] = Pawn(notation, "white", row, col, legal_moves, defends, two_spaces, do_en_pass, get_en_pass, en_pass_count, pinned, pin_pathway)
         elif notation == "Pb":
-            self.squares[(row, col)][1] = Pawn(notation, "black", row, col, legal_moves, defends, two_spaces, do_en_pass, get_en_pass, en_pass_count, pinned)
+            self.squares[(row, col)][1] = Pawn(notation, "black", row, col, legal_moves, defends, two_spaces, do_en_pass, get_en_pass, en_pass_count, pinned, pin_pathway)
         elif notation == "R":
-            self.squares[(row, col)][1] = Rook(notation, "white", row, col, legal_moves, defends, moved, check_pathway, pinned)
+            self.squares[(row, col)][1] = Rook(notation, "white", row, col, legal_moves, defends, moved, check_pathway, pinned, pin_pathway)
         elif notation == "Rb":
-            self.squares[(row, col)][1] = Rook(notation, "black", row, col, legal_moves, defends, moved, check_pathway, pinned)
+            self.squares[(row, col)][1] = Rook(notation, "black", row, col, legal_moves, defends, moved, check_pathway, pinned, pin_pathway)
         elif notation == "K":
             self.squares[(row, col)][1] = King(notation, "white", row, col, legal_moves, defends, moved, border, in_check)
         elif notation == "Kb":
             self.squares[(row, col)][1] = King(notation, "black", row, col, legal_moves, defends, moved, border, in_check)
         elif notation == "B":
-            self.squares[(row, col)][1] = Bishop(notation, "white", row, col, legal_moves, defends, check_pathway, pinned)
+            self.squares[(row, col)][1] = Bishop(notation, "white", row, col, legal_moves, defends, check_pathway, pinned, pin_pathway)
         elif notation == "Bb":
-            self.squares[(row, col)][1] = Bishop(notation, "black", row, col, legal_moves, defends, check_pathway, pinned)
+            self.squares[(row, col)][1] = Bishop(notation, "black", row, col, legal_moves, defends, check_pathway, pinned, pin_pathway)
         elif notation == "Q":
-            self.squares[(row, col)][1] = Queen(notation, "white", row, col, legal_moves, defends, check_pathway, pinned)
+            self.squares[(row, col)][1] = Queen(notation, "white", row, col, legal_moves, defends, check_pathway, pinned, pin_pathway)
         elif notation == "Qb":
-            self.squares[(row, col)][1] = Queen(notation, "black", row, col, legal_moves, defends, check_pathway, pinned)
+            self.squares[(row, col)][1] = Queen(notation, "black", row, col, legal_moves, defends, check_pathway, pinned, pin_pathway)
         elif notation == "N":
             self.squares[(row, col)][1] = Knight(notation, "white", row, col, legal_moves, defends, pinned)
         elif notation == "Nb":
@@ -607,7 +610,7 @@ class ChessBoard(tk.Canvas):
                 if checker_amount > 1:
                     for key, val in self.squares.items():
                         if val[1] != None:
-                            # if it is more than 1 piece checking the king then the king must move
+                            # if there is more than 1 piece checking the king then the king must move
                             if val[1].notation == "Kb":
                                 self.black_possibles[black_check_pos] = val[1].legal_moves
                 elif checker_amount == 1:
@@ -2099,13 +2102,14 @@ class ChessBoard(tk.Canvas):
             add_legal_moves = []
             add_defends = []
             add_check_pathway = []
+            add_pin_pathway = []
             
             for i in range(1,8):
                 if r-i < 0 or c-i < 0:
                     i=8
                     break
                 # no piece to the diagonal top left
-                elif (self.squares[(r-i, c-i)][1] == None): 
+                elif (self.squares[(r-i, c-i)][1] == None):
                     add_legal_moves.append((r-i,c-i))
                     add_check_pathway.append((r-i,c-i))
                 # a piece to the diagonal top left that CAN be captured has been reached
@@ -2126,11 +2130,15 @@ class ChessBoard(tk.Canvas):
                                 else:
                                     j=8
                                     break
+                            else:
+                                add_pin_pathway.append((r-j, c-j))
                         if pinned_a_piece:
                             self.squares[(r-i, c-i)][1].pinned = True
+                            add_pin_pathway.append(add_check_pathway)
+                            self.squares[(r-i, c-i)][1].pin_pathway = add_pin_pathway
                         else:
                             self.squares[(r-i, c-i)][1].pinned = False
-                        
+
                         i=8
                         break
                     else:
@@ -2175,8 +2183,12 @@ class ChessBoard(tk.Canvas):
                                 else:
                                     j=8
                                     break
+                            else:
+                                add_pin_pathway.append((r+j, c-j))
                         if pinned_a_piece:
                             self.squares[(r+i, c-i)][1].pinned = True
+                            add_pin_pathway.append(add_check_pathway)
+                            self.squares[(r+i, c-i)][1].pin_pathway = add_pin_pathway
                         else:
                             self.squares[(r+i, c-i)][1].pinned = False
                         
@@ -2224,8 +2236,12 @@ class ChessBoard(tk.Canvas):
                                 else:
                                     j=8
                                     break
+                            else:
+                                add_pin_pathway.append((r-j, c+j))
                         if pinned_a_piece:
                             self.squares[(r-i, c+i)][1].pinned = True
+                            add_pin_pathway.append(add_check_pathway)
+                            self.squares[(r-i, c+i)][1].pin_pathway = add_pin_pathway
                         else:
                             self.squares[(r-i, c+i)][1].pinned = False
 
@@ -2273,8 +2289,12 @@ class ChessBoard(tk.Canvas):
                                 else:
                                     j=8
                                     break
+                            else:
+                                add_pin_pathway.append((r+j, c+j))
                         if pinned_a_piece:
                             self.squares[(r+i, c+i)][1].pinned = True
+                            add_pin_pathway.append(add_check_pathway)
+                            self.squares[(r+i, c+i)][1].pin_pathway = add_pin_pathway
                         else:
                             self.squares[(r+i, c+i)][1].pinned = False
                         
@@ -2321,8 +2341,12 @@ class ChessBoard(tk.Canvas):
                                 else:
                                     j=-1
                                     break
+                            else:
+                                add_pin_pathway.append((r, j))
                         if pinned_a_piece:
                             self.squares[(r, i)][1].pinned = True
+                            add_pin_pathway.append(add_check_pathway)
+                            self.squares[(r, i)][1].pin_pathway = add_pin_pathway
                         else:
                             self.squares[(r, i)][1].pinned = False
 
@@ -2369,8 +2393,12 @@ class ChessBoard(tk.Canvas):
                                 else:
                                     j=8
                                     break
+                            else:
+                                add_pin_pathway.append((r, j))
                         if pinned_a_piece:
                             self.squares[(r, i)][1].pinned = True
+                            add_pin_pathway.append(add_check_pathway)
+                            self.squares[(r, i)][1].pin_pathway = add_pin_pathway
                         else:
                             self.squares[(r, i)][1].pinned = False
 
@@ -2417,8 +2445,12 @@ class ChessBoard(tk.Canvas):
                                 else:
                                     j=-1
                                     break
+                            else:
+                                add_pin_pathway.append((j, c))
                         if pinned_a_piece:
                             self.squares[(i, c)][1].pinned = True
+                            add_pin_pathway.append(add_check_pathway)
+                            self.squares[(i, c)][1].pin_pathway = add_pin_pathway
                         else:
                             self.squares[(i, c)][1].pinned = False
 
@@ -2465,8 +2497,12 @@ class ChessBoard(tk.Canvas):
                                 else:
                                     j=8
                                     break
+                            else:
+                                add_pin_pathway.append((j, c))
                         if pinned_a_piece:
                             self.squares[(i, c)][1].pinned = True
+                            add_pin_pathway.append(add_check_pathway)
+                            self.squares[(i, c)][1].pin_pathway = add_pin_pathway
                         else:
                             self.squares[(i, c)][1].pinned = False
 
@@ -2522,8 +2558,12 @@ class ChessBoard(tk.Canvas):
                                 else:
                                     j=8
                                     break
+                            else:
+                                add_pin_pathway.append((r-j, c-j))
                         if pinned_a_piece:
                             self.squares[(r-i, c-i)][1].pinned = True
+                            add_pin_pathway.append(add_check_pathway)
+                            self.squares[(r-i, c-i)][1].pin_pathway = add_pin_pathway
                         else:
                             self.squares[(r-i, c-i)][1].pinned = False
 
@@ -2571,8 +2611,12 @@ class ChessBoard(tk.Canvas):
                                 else:
                                     j=8
                                     break
+                            else:
+                                add_pin_pathway.append((r+j, c-j))
                         if pinned_a_piece:
                             self.squares[(r+i, c-i)][1].pinned = True
+                            add_pin_pathway.append(add_check_pathway)
+                            self.squares[(r+i, c-i)][1].pin_pathway = add_pin_pathway
                         else:
                             self.squares[(r+i, c-i)][1].pinned = False
 
@@ -2620,8 +2664,12 @@ class ChessBoard(tk.Canvas):
                                 else:
                                     j=8
                                     break
+                            else:
+                                add_pin_pathway.append((r-j, c+j))
                         if pinned_a_piece:
                             self.squares[(r-i, c+i)][1].pinned = True
+                            add_pin_pathway.append(add_check_pathway)
+                            self.squares[(r-i, c+i)][1].pin_pathway = add_pin_pathway
                         else:
                             self.squares[(r-i, c+i)][1].pinned = False
 
@@ -2669,8 +2717,12 @@ class ChessBoard(tk.Canvas):
                                 else:
                                     j=8
                                     break
+                            else:
+                                add_pin_pathway.append((r+j, c+j))
                         if pinned_a_piece:
                             self.squares[(r+i, c+i)][1].pinned = True
+                            add_pin_pathway.append(add_check_pathway)
+                            self.squares[(r+i, c+i)][1].pin_pathway = add_pin_pathway
                         else:
                             self.squares[(r+i, c+i)][1].pinned = False
 
@@ -2767,7 +2819,7 @@ class ChessBoard(tk.Canvas):
                             print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
 
                     else:
-                         # top left is ally
+                        # top left is ally
                         if (val[1].pos_r == r-2) and (val[1].pos_c == c-1) and (val[1].notation != "K" and val[1].notation != "Kb"):
                             add_defends.append((val[1].pos_r, val[1].pos_c))
                         # top right is ally
@@ -2856,8 +2908,12 @@ class ChessBoard(tk.Canvas):
                                 else:
                                     j=-1
                                     break
+                            else:
+                                add_pin_pathway.append((r, j))
                         if pinned_a_piece:
                             self.squares[(r, i)][1].pinned = True
+                            add_pin_pathway.append(add_check_pathway)
+                            self.squares[(r, i)][1].pin_pathway = add_pin_pathway
                         else:
                             self.squares[(r, i)][1].pinned = False
 
@@ -2904,8 +2960,12 @@ class ChessBoard(tk.Canvas):
                                 else:
                                     j=8
                                     break
+                            else:
+                                add_pin_pathway.append((r, j))
                         if pinned_a_piece:
                             self.squares[(r, i)][1].pinned = True
+                            add_pin_pathway.append(add_check_pathway)
+                            self.squares[(r, i)][1].pin_pathway = add_pin_pathway
                         else:
                             self.squares[(r, i)][1].pinned = False
 
@@ -2952,8 +3012,12 @@ class ChessBoard(tk.Canvas):
                                 else:
                                     j=-1
                                     break
+                            else:
+                                add_pin_pathway.append((j, c))
                         if pinned_a_piece:
                             self.squares[(i, c)][1].pinned = True
+                            add_pin_pathway.append(add_check_pathway)
+                            self.squares[(i, c)][1].pin_pathway = add_pin_pathway
                         else:
                             self.squares[(i, c)][1].pinned = False
 
@@ -3000,8 +3064,12 @@ class ChessBoard(tk.Canvas):
                                 else:
                                     j=8
                                     break
+                            else:
+                                add_pin_pathway.append((j, c))
                         if pinned_a_piece:
                             self.squares[(i, c)][1].pinned = True
+                            add_pin_pathway.append(add_check_pathway)
+                            self.squares[(i, c)][1].pin_pathway = add_pin_pathway
                         else:
                             self.squares[(i, c)][1].pinned = False
 
@@ -3149,38 +3217,38 @@ root.configure(bg="#242320")
 board = ChessBoard(root, size=800)
 board.pack()
 board.draw_board()
-board.place_piece("Pb", "black", 1, 0, [(2,0), (3,0)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False)
-board.place_piece("Pb", "black", 1, 1, [(2,1), (3,1)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False)
-board.place_piece("Pb", "black", 1, 2, [(2,2), (3,2)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False)
-board.place_piece("Pb", "black", 1, 3, [(2,3), (3,3)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False)
-board.place_piece("Pb", "black", 1, 4, [(2,4), (3,4)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False)
-board.place_piece("Pb", "black", 1, 5, [(2,5), (3,5)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False)
-board.place_piece("Pb", "black", 1, 6, [(2,6), (3,6)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False)
-board.place_piece("Pb", "black", 1, 7, [(2,7), (3,7)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False)
-board.place_piece("Rb", "black", 0, 0, [], [(1,0), (0,1)], moved=False, check_pathway=[], pinned=False)
-board.place_piece("Rb", "black", 0, 7, [], [(1,7), (0,6)], moved=False, check_pathway=[], pinned=False)
+board.place_piece("Pb", "black", 1, 0, [(2,0), (3,0)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False, pin_pathway=[])
+board.place_piece("Pb", "black", 1, 1, [(2,1), (3,1)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False, pin_pathway=[])
+board.place_piece("Pb", "black", 1, 2, [(2,2), (3,2)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False, pin_pathway=[])
+board.place_piece("Pb", "black", 1, 3, [(2,3), (3,3)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False, pin_pathway=[])
+board.place_piece("Pb", "black", 1, 4, [(2,4), (3,4)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False, pin_pathway=[])
+board.place_piece("Pb", "black", 1, 5, [(2,5), (3,5)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False, pin_pathway=[])
+board.place_piece("Pb", "black", 1, 6, [(2,6), (3,6)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False, pin_pathway=[])
+board.place_piece("Pb", "black", 1, 7, [(2,7), (3,7)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False, pin_pathway=[])
+board.place_piece("Rb", "black", 0, 0, [], [(1,0), (0,1)], moved=False, check_pathway=[], pinned=False, pin_pathway=[])
+board.place_piece("Rb", "black", 0, 7, [], [(1,7), (0,6)], moved=False, check_pathway=[], pinned=False, pin_pathway=[])
 board.place_piece("Nb", "black", 0, 1, [(2,0), (2,2)], [(1,3)], pinned=False)
 board.place_piece("Nb", "black", 0, 6, [(2,7), (2,5)], [(1,4)], pinned=False)
-board.place_piece("Bb", "black", 0, 2, [], [(1,1), (1,3)], check_pathway=[], pinned=False)
-board.place_piece("Bb", "black", 0, 5, [], [(1,4), (1,6)], check_pathway=[], pinned=False)
-board.place_piece("Qb", "black", 0, 3, [], [(0,2), (1,2), (1,3), (1,4), (0,4)], check_pathway=[], pinned=False)
+board.place_piece("Bb", "black", 0, 2, [], [(1,1), (1,3)], check_pathway=[], pinned=False, pin_pathway=[])
+board.place_piece("Bb", "black", 0, 5, [], [(1,4), (1,6)], check_pathway=[], pinned=False, pin_pathway=[])
+board.place_piece("Qb", "black", 0, 3, [], [(0,2), (1,2), (1,3), (1,4), (0,4)], check_pathway=[], pinned=False, pin_pathway=[])
 board.place_piece("Kb", "black", 0, 4, [], [(0,3), (1,3), (1,4), (1,5), (0,5)], moved=False, border=[(0,3), (1,3), (1,4), (1,5), (0,5)], in_check=False)
 
-board.place_piece("P", "white", 6, 0, [(5, 0), (4, 0)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False)
-board.place_piece("P", "white", 6, 1, [(5, 1), (4, 1)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False)
-board.place_piece("P", "white", 6, 2, [(5, 2), (4, 2)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False)
-board.place_piece("P", "white", 6, 3, [(5, 3), (4, 3)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False)
-board.place_piece("P", "white", 6, 4, [(5, 4), (4, 4)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False)
-board.place_piece("P", "white", 6, 5, [(5, 5), (4, 5)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False)
-board.place_piece("P", "white", 6, 6, [(5, 6), (4, 6)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False)
-board.place_piece("P", "white", 6, 7, [(5, 7), (4, 7)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False)
-board.place_piece("R", "white", 7, 0, [], [(6,0), (7,1)], moved=False, check_pathway=[], pinned=False)
-board.place_piece("R", "white", 7, 7, [], [(6,7), (7,6)], moved=False, check_pathway=[], pinned=False)
+board.place_piece("P", "white", 6, 0, [(5, 0), (4, 0)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False, pin_pathway=[])
+board.place_piece("P", "white", 6, 1, [(5, 1), (4, 1)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False, pin_pathway=[])
+board.place_piece("P", "white", 6, 2, [(5, 2), (4, 2)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False, pin_pathway=[])
+board.place_piece("P", "white", 6, 3, [(5, 3), (4, 3)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False, pin_pathway=[])
+board.place_piece("P", "white", 6, 4, [(5, 4), (4, 4)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False, pin_pathway=[])
+board.place_piece("P", "white", 6, 5, [(5, 5), (4, 5)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False, pin_pathway=[])
+board.place_piece("P", "white", 6, 6, [(5, 6), (4, 6)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False, pin_pathway=[])
+board.place_piece("P", "white", 6, 7, [(5, 7), (4, 7)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False, pin_pathway=[])
+board.place_piece("R", "white", 7, 0, [], [(6,0), (7,1)], moved=False, check_pathway=[], pinned=False, pin_pathway=[])
+board.place_piece("R", "white", 7, 7, [], [(6,7), (7,6)], moved=False, check_pathway=[], pinned=False, pin_pathway=[])
 board.place_piece("N", "white", 7, 1, [], [(5,0),(5,2)], pinned=False)
 board.place_piece("N", "white", 7, 6, [], [(5,7), (5,5)], pinned=False)
-board.place_piece("B", "white", 7, 2, [], [(6,1), (6,3)], check_pathway=[], pinned=False)
-board.place_piece("B", "white", 7, 5, [], [(6,4), (6,6)], check_pathway=[], pinned=False)
-board.place_piece("Q", "white", 7, 3, [], [(7,2), (6,2), (6,3), (6,4), (7,4)], check_pathway=[], pinned=False)
+board.place_piece("B", "white", 7, 2, [], [(6,1), (6,3)], check_pathway=[], pinned=False, pin_pathway=[])
+board.place_piece("B", "white", 7, 5, [], [(6,4), (6,6)], check_pathway=[], pinned=False, pin_pathway=[])
+board.place_piece("Q", "white", 7, 3, [], [(7,2), (6,2), (6,3), (6,4), (7,4)], check_pathway=[], pinned=False, pin_pathway=[])
 board.place_piece("K", "white", 7, 4, [], [(7,3), (6,3), (6,4), (6,5), (7,5)], moved=False, border=[(7,3), (6,3), (6,4), (6,5), (7,5)], in_check=False)
 root.mainloop()
 #endregion

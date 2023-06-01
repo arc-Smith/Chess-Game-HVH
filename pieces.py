@@ -13,7 +13,7 @@ class Piece:
         self.defends = defends
 
 class Queen(Piece):
-    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, check_pathway, pinned):
+    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, check_pathway, pinned, pin_pathway):
         super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
         self.check_pathway = check_pathway
         self.pinned = pinned
@@ -26,7 +26,7 @@ class King(Piece):
         self.in_check = in_check
 
 class Bishop(Piece):
-    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, check_pathway, pinned):
+    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, check_pathway, pinned, pin_pathway):
         super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
         self.check_pathway = check_pathway
         self.pinned = pinned
@@ -37,14 +37,14 @@ class Knight(Piece):
         self.pinned = pinned
 
 class Rook(Piece):
-    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, moved, check_pathway, pinned):
+    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, moved, check_pathway, pinned, pin_pathway):
         super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
         self.moved = moved
         self.check_pathway = check_pathway
         self.pinned = pinned
 
 class Pawn(Piece):
-    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, two_spaces, do_en_pass, get_en_pass, en_pass_count, pinned):
+    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, two_spaces, do_en_pass, get_en_pass, en_pass_count, pinned, pin_pathway):
         super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
         self.two_spaces = two_spaces
         self.do_en_pass = do_en_pass
