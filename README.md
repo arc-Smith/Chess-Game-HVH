@@ -18,7 +18,7 @@ This chess game project is developed as part of an honors project under the supe
 ## Features
 - Graphical user interface (GUI) with pixel designs for the chess pieces
 - Mouse interaction from selecting and moving pieces
-- Validates moves and enforces the rules of chess
+- Validates moves and enforces various rules of chess
 - Tracks game state
 - Supports two human players
 
