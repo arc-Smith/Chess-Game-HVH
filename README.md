@@ -1,5 +1,5 @@
 # Overview & Timeline
-The is a chess game implemented using **Python** and Tkinter (standard GUI package). This chess game features pixel designs for the pieces made using the pixel design application Aseprite. The game provides a graphical user interface (GUI) that allows players to move the pieces by clicking on them with the mouse.
+This a chess game implemented using **Python** and Tkinter (standard GUI package). This chess game features pixel designs for the pieces made using the pixel design application Aseprite. The game provides a graphical user interface (GUI) that allows players to move the pieces by clicking on them with the mouse.
 
 This chess game is to be developed between the Spring 2023 semester and the Fall 2023 semester.
 
@@ -22,7 +22,6 @@ This chess game project is developed as part of an honors project under the supe
 - Mouse interaction from selecting and moving pieces
 - Validates moves and enforces various rules of chess
 - Tracks game state
-- Supports two human players
 
 ## Credits
 This game project is an honors project developed under the supervision of Professor Miriam Briskman. It is created and maintained by Ahmai Chaney-Smith(https://github.com/arc-Smith).
