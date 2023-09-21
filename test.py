@@ -84,7 +84,7 @@ class ChessBoard(tk.Canvas):
                 x1, y1 = col * square_size, row * square_size 
                 x2, y2 = x1 + square_size, y1 + square_size
                 square = self.create_rectangle(x1, y1, x2, y2, fill=color, outline=color) # returns unique id for each square
-                self.squares[(row, col)] = [square, None, None] # unique id entered into squares dictionary without a piece or image of a piece
+                self.squares[(row, col)] = [square, None, None, color] # unique id entered into squares dictionary without a piece or image of a piece
 
     def place_piece(self, notation, color, row, col, legal_moves, defends, **kwargs):
         x, y = col * self.size // 8, row * self.size // 8
@@ -198,39 +198,26 @@ class ChessBoard(tk.Canvas):
         self.clicked_piece = self.squares[(r, c)][1]
         
         # if a square was selected already and the new square has a piece - not sure anymore what purpose is here
-        if self.clicked != None and self.squares[(r, c)][1] != None:
-            self.itemconfigure(self.clicked, outline=None, width=0)
-            self.update()
-            self.clicked = None
-        else:
+        # if self.clicked != None and self.squares[(r, c)][1] != None:
+        #     self.itemconfigure(self.clicked, fill=self.squares[(r, c)][3], outline=self.squares[(r, c)][3], width=0)
+        #     self.update()
+        #     self.clicked = None
+        # else:
             # making sure only one square that has a piece and legal moves can be selected at a time
             # also goes back and forth between the white and black pieces
-            if self.clicked_piece != None and self.clicked_piece.legal_moves != [] and self.clicked_piece.color == self.turn_based[self.turns % 2]:
-                if self.clicked_piece.legal_moves != None:
-                    if self.clicked_piece.notation != "K" and self.clicked_piece.notation != "Kb":
-                        if self.clicked_piece.pinned == True:
-                            legal_moves_of_pinned_piece = []
-                            for legal in self.clicked_piece.legal_moves:
-                                if legal in self.clicked_piece.pin_pathway:
-                                    legal_moves_of_pinned_piece.append(legal)
-                            self.clicked_piece.legal_moves = legal_moves_of_pinned_piece
+        if self.clicked_piece != None and self.clicked_piece.legal_moves != [] and self.clicked_piece.color == self.turn_based[self.turns % 2]:
+            if self.clicked_piece.legal_moves != None:
+                if self.clicked_piece.notation != "K" and self.clicked_piece.notation != "Kb":
+                    if self.clicked_piece.pinned == True:
+                        legal_moves_of_pinned_piece = []
+                        for legal in self.clicked_piece.legal_moves:
+                            if legal in self.clicked_piece.pin_pathway:
+                                legal_moves_of_pinned_piece.append(legal)
+                        self.clicked_piece.legal_moves = legal_moves_of_pinned_piece
 
-                            if len(self.clicked_piece.legal_moves) >= 1:
-                                self.turns += 1
-                                self.itemconfigure(square_id, outline='green', width=10)
-                                self.update()
-                                self.clicked = square_id
-
-                                # taking into account the turns that have occurred for any pawns granted en passant
-                                for key, val in self.squares.items():
-                                    if val[1] != None and (val[1].notation == "P" or val[1].notation == "Pb"):
-                                        if val[1].do_en_pass == True or val[1].get_en_pass:
-                                            val[1].en_pass_count += 1 # changing the en_pass_count from 0 to 1 so that it can be set to False in the move_piece function
-
-                                self.bind("<Button-1>", lambda e: self.move_piece(e, r, c, square_id, self.clicked_piece))
-                        elif len(self.clicked_piece.legal_moves) >= 1:
+                        if len(self.clicked_piece.legal_moves) >= 1:
                             self.turns += 1
-                            self.itemconfigure(square_id, outline='green', width=10)
+                            self.itemconfigure(square_id, fill="#DC143C", outline="#DC143C", width=10)
                             self.update()
                             self.clicked = square_id
 
@@ -242,18 +229,31 @@ class ChessBoard(tk.Canvas):
 
                             self.bind("<Button-1>", lambda e: self.move_piece(e, r, c, square_id, self.clicked_piece))
                     elif len(self.clicked_piece.legal_moves) >= 1:
-                            self.turns += 1
-                            self.itemconfigure(square_id, outline='green', width=10)
-                            self.update()
-                            self.clicked = square_id
+                        self.turns += 1
+                        self.itemconfigure(square_id, fill="#DC143C", outline="#DC143C", width=10)
+                        self.update()
+                        self.clicked = square_id
 
-                            # taking into account the turns that have occurred for any pawns granted en passant
-                            for key, val in self.squares.items():
-                                if val[1] != None and (val[1].notation == "P" or val[1].notation == "Pb"):
-                                    if val[1].do_en_pass == True or val[1].get_en_pass:
-                                        val[1].en_pass_count += 1 # changing the en_pass_count from 0 to 1 so that it can be set to False in the move_piece function
+                        # taking into account the turns that have occurred for any pawns granted en passant
+                        for key, val in self.squares.items():
+                            if val[1] != None and (val[1].notation == "P" or val[1].notation == "Pb"):
+                                if val[1].do_en_pass == True or val[1].get_en_pass:
+                                    val[1].en_pass_count += 1 # changing the en_pass_count from 0 to 1 so that it can be set to False in the move_piece function
 
-                            self.bind("<Button-1>", lambda e: self.move_piece(e, r, c, square_id, self.clicked_piece))
+                        self.bind("<Button-1>", lambda e: self.move_piece(e, r, c, square_id, self.clicked_piece))
+                elif len(self.clicked_piece.legal_moves) >= 1:
+                        self.turns += 1
+                        self.itemconfigure(square_id, fill="#DC143C", outline="#DC143C", width=10)
+                        self.update()
+                        self.clicked = square_id
+
+                        # taking into account the turns that have occurred for any pawns granted en passant
+                        for key, val in self.squares.items():
+                            if val[1] != None and (val[1].notation == "P" or val[1].notation == "Pb"):
+                                if val[1].do_en_pass == True or val[1].get_en_pass:
+                                    val[1].en_pass_count += 1 # changing the en_pass_count from 0 to 1 so that it can be set to False in the move_piece function
+
+                        self.bind("<Button-1>", lambda e: self.move_piece(e, r, c, square_id, self.clicked_piece))
 
     
     def move_piece(self, event, from_square_r, from_square_c, from_square_id, actual_piece):        
@@ -300,7 +300,7 @@ class ChessBoard(tk.Canvas):
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, actual_piece.defends, moved=True, border=actual_piece.border)
 
             # DESELECTION / no more outline
-            self.itemconfigure(self.clicked, outline=None, width=0)
+            self.itemconfigure(self.clicked, fill=self.squares[(from_square_r, from_square_c)][3], outline=self.squares[(from_square_r, from_square_c)][3], width=0)
             self.update()
             self.clicked = None
 
@@ -396,7 +396,7 @@ class ChessBoard(tk.Canvas):
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, actual_piece.defends)
 
             # DESELECTION / no more outline
-            self.itemconfigure(self.clicked, outline=None, width=0)
+            self.itemconfigure(self.clicked, fill=self.squares[(from_square_r, from_square_c)][3], outline=sself.squares[(from_square_r, from_square_c)][3], width=0)
             self.update()
             self.clicked = None
 
@@ -428,7 +428,7 @@ class ChessBoard(tk.Canvas):
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, actual_piece.defends)
 
             # DESELECTION / no more outline
-            self.itemconfigure(self.clicked, outline=None, width=0)
+            self.itemconfigure(self.clicked, fill=self.squares[(from_square_r, from_square_c)][3], outline=self.squares[(from_square_r, from_square_c)][3], width=0)
             self.update()
             self.clicked = None
 
@@ -460,7 +460,7 @@ class ChessBoard(tk.Canvas):
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, actual_piece.defends)
 
             # DESELECTION / no more outline
-            self.itemconfigure(self.clicked, outline=None, width=0)
+            self.itemconfigure(self.clicked, fill=self.squares[(from_square_r, from_square_c)][3], outline=self.squares[(from_square_r, from_square_c)][3], width=0)
             self.update()
             self.clicked = None
 
@@ -492,7 +492,7 @@ class ChessBoard(tk.Canvas):
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, actual_piece.defends, moved=True)
 
             # DESELECTION / no more outline
-            self.itemconfigure(self.clicked, outline=None, width=0)
+            self.itemconfigure(self.clicked, fill=self.squares[(from_square_r, from_square_c)][3], outline=self.squares[(from_square_r, from_square_c)][3], width=0)
             self.update()
             self.clicked = None
 
@@ -569,7 +569,7 @@ class ChessBoard(tk.Canvas):
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, actual_piece.defends, two_spaces=False, do_en_pass=actual_piece.do_en_pass, get_en_pass=actual_piece.get_en_pass, en_pass_count=actual_piece.en_pass_count)
 
             # DESELECTION / no more outline
-            self.itemconfigure(self.clicked, outline=None, width=0)
+            self.itemconfigure(self.clicked, fill=self.squares[(from_square_r, from_square_c)][3], outline=self.squares[(from_square_r, from_square_c)][3], width=0)
             self.update()
             self.clicked = None
 
