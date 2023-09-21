@@ -2588,6 +2588,7 @@ class ChessBoard(tk.Canvas):
             add_legal_moves = []
             add_defends = []
             add_check_pathway = []
+            add_pin_pathway = []
             
             for i in range(1,8):
                 if r-i < 0 or c-i < 0:
@@ -2939,6 +2940,7 @@ class ChessBoard(tk.Canvas):
             add_legal_moves = []
             add_defends = []
             add_check_pathway = []
+            add_pin_pathway = []
             
             for i in range(c,-1,-1):
                 if i == c:
