@@ -396,7 +396,7 @@ class ChessBoard(tk.Canvas):
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, actual_piece.defends)
 
             # DESELECTION / no more outline
-            self.itemconfigure(self.clicked, fill=self.squares[(from_square_r, from_square_c)][3], outline=sself.squares[(from_square_r, from_square_c)][3], width=0)
+            self.itemconfigure(self.clicked, fill=self.squares[(from_square_r, from_square_c)][3], outline=self.squares[(from_square_r, from_square_c)][3], width=0)
             self.update()
             self.clicked = None
 
@@ -597,15 +597,15 @@ class ChessBoard(tk.Canvas):
                         # print(f"{val[1].color} pawn at ({val[1].pos_r},{val[1].pos_c}) get_en_pass is now {val[1].get_en_pass}")
         
         # make sure all pieces have their correct legal moves again
-            self.all_white_legal_moves = 0
-            self.all_black_legal_moves = 0
-            for key, val in self.squares.items():
-                if val[1] != None:
-                    val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
-                    if val[1].color == "white":
-                        self.all_white_legal_moves += len(val[1].legal_moves)
-                    else:
-                        self.all_black_legal_moves += len(val[1].legal_moves)
+        self.all_white_legal_moves = 0
+        self.all_black_legal_moves = 0
+        for key, val in self.squares.items():
+            if val[1] != None:
+                val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
+                if val[1].color == "white":
+                    self.all_white_legal_moves += len(val[1].legal_moves)
+                else:
+                    self.all_black_legal_moves += len(val[1].legal_moves)
         
         # CHECKS / CHECKMATE
         self.black_possibles = {}
@@ -622,9 +622,11 @@ class ChessBoard(tk.Canvas):
                 if val[1].notation == "K":
                     if val[1].in_check == True:
                         white_check_pos = (val[1].pos_r,val[1].pos_c)
+                        print('WHITE IS IN CHECK')
                 elif val[1].notation == "Kb":
                     if val[1].in_check == True:
                         black_check_pos = (val[1].pos_r,val[1].pos_c)
+                        print('BLACK IS IN CHECK')
         
         # if there's a check on the board
         if black_check_pos != None or white_check_pos != None:
@@ -633,7 +635,7 @@ class ChessBoard(tk.Canvas):
             if self.turn_based[(self.turns+1) % 2] == "white": # if white has made the most recent move and possible gave check
                 for key, val in self.squares.items():
                     if val[1] != None:
-                        # finding out what piece(s) has/have king under attack 
+                        # finding out what piece(s) has/have the king under attack 
                         if val[1].color == "white":
                             if black_check_pos in val[1].legal_moves:
                                 checker_amount += 1
@@ -2954,6 +2956,8 @@ class ChessBoard(tk.Canvas):
                     if (self.squares[(r, i)][1].notation != "K") and (self.squares[(r, i)][1].notation != "Kb"):
                         add_legal_moves.append((r,i))
 
+                        unpins = [] # an array of actual pieces that will have their pinned attribute set to False
+                        self.squares[(r, i)][1].pinned = False
                         pinned_a_piece = False
                         for j in range(i-1,-1,-1):
                             if j < 0:
@@ -2965,6 +2969,7 @@ class ChessBoard(tk.Canvas):
                                     j=-1
                                     break
                                 else:
+                                    unpins.append(self.squares[(r, j)][1]) # appending the 2nd enemy piece since it shouldn't be pinned anymore
                                     j=-1
                                     break
                             else:
@@ -2974,6 +2979,10 @@ class ChessBoard(tk.Canvas):
                             add_pin_pathway.append(add_check_pathway)
                             self.squares[(r, i)][1].pin_pathway = add_pin_pathway
                         else:
+                            for piece in unpins:
+                                print('Piece Being Unpinned:',piece.notation)
+                                piece.pinned = False
+                                piece.legal_moves = self.get_legal_moves(piece, piece.pos_r, piece.pos_c)
                             self.squares[(r, i)][1].pinned = False
 
                         i=-1
@@ -3058,6 +3067,8 @@ class ChessBoard(tk.Canvas):
                     if (self.squares[(i, c)][1].notation != "K") and (self.squares[(i, c)][1].notation != "Kb"):
                         add_legal_moves.append((i,c))
 
+                        unpins = [] # an array of actual pieces that will have their pinned attribute set to False
+                        self.squares[(i, c)][1].pinned = False
                         pinned_a_piece = False
                         for j in range(i-1,-1,-1):
                             if j < 0:
@@ -3069,6 +3080,7 @@ class ChessBoard(tk.Canvas):
                                     j=-1
                                     break
                                 else:
+                                    unpins.append(self.squares[(j, c)][1]) # appending the 2nd enemy piece since it shouldn't be pinned anymore
                                     j=-1
                                     break
                             else:
@@ -3078,6 +3090,10 @@ class ChessBoard(tk.Canvas):
                             add_pin_pathway.append(add_check_pathway)
                             self.squares[(i, c)][1].pin_pathway = add_pin_pathway
                         else:
+                            for piece in unpins:
+                                print('Piece Being Unpinned:', piece.notation)
+                                piece.pinned = False
+                                piece.legal_moves = self.get_legal_moves(piece, piece.pos_r, piece.pos_c)
                             self.squares[(i, c)][1].pinned = False
 
                         i=-1
