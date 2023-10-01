@@ -28,14 +28,8 @@ b_queen = os.path.join("designs", "black pieces", "black piece pngs", "black_que
 b_king = os.path.join("designs", "black pieces", "black piece pngs", "black_king.png")
 #endregion
 
-# classes and functions
-# def enter_fullscreen(event=None):
-#     root.attributes('-fullscreen', True)
-
-# def exit_fullscreen(event=None): 
-#     root.attributes("-fullscreen", False)
-
 class ChessBoard(tk.Canvas):
+
     def __init__(self, parent, size):
         super().__init__(parent, width=size, height=size)
         self.size = size
@@ -62,6 +56,9 @@ class ChessBoard(tk.Canvas):
         self.clicked = None
         self.clicked_piece = None
 
+        self.newClicked = None
+        self.new_clicked_piece = None
+
         self.turn_based = ["white", "black"] # variable used to allow for turn based gameplay from white to black using mod operator and adding 1 to turns variable
         self.turns = 0
 
@@ -72,11 +69,18 @@ class ChessBoard(tk.Canvas):
         self.white_possibles = {}
         self.black_possibles = {}   
 
-        self.check_on_the_board = False     
+        self.check_on_the_board = False
 
-    def draw_board(self):
+        # highlighting so it's clear whose turn it is
+        self.greenHighlight = "#C9CC3F"	
+        self.whiteHighlight = "#FFFAA0"
+        self.fromTo = []
+
+    def create_board(self):
         square_size = self.size // 8 # each square will be 100x100
-        colors = ["#eaebc8", "#638545"] # two chosen chess board colors
+        white = "#eaebc8"
+        green = "#638545"
+        colors = [white, green] # two chosen chess board colors
 
         for row in range(8):
             for col in range(8):
@@ -155,6 +159,8 @@ class ChessBoard(tk.Canvas):
         self.squares[(row, col)][2] = self.create_image(x, y, image=image, anchor="nw")
 
     def select_piece(self, event):  
+
+        #region draw condition
         # [DRAWS]
         # stalemate
         # if self.all_white_legal_moves == 0 and self.turn_based[(self.turns) % 2] == "white":
@@ -173,6 +179,7 @@ class ChessBoard(tk.Canvas):
         #             print(f"BLACK king with in_check is currently {val[1].in_check}")
         #         elif val[1].notation == "K":
         #             print(f"WHITE king with in_check is currently {val[1].in_check}")
+        #endregion
 
         # finding the selected square
         r = 0
@@ -196,7 +203,7 @@ class ChessBoard(tk.Canvas):
         clicked_col = c
         square_id = self.squares[(r, c)][0]
         self.clicked_piece = self.squares[(r, c)][1]
-        
+
         # if a square was selected already and the new square has a piece - not sure anymore what purpose is here
         # if self.clicked != None and self.squares[(r, c)][1] != None:
         #     self.itemconfigure(self.clicked, fill=self.squares[(r, c)][3], outline=self.squares[(r, c)][3], width=0)
@@ -216,8 +223,9 @@ class ChessBoard(tk.Canvas):
                         self.clicked_piece.legal_moves = legal_moves_of_pinned_piece
 
                         if len(self.clicked_piece.legal_moves) >= 1:
+                            highlight = self.whiteHighlight if self.squares[(clicked_row, clicked_col)][3] == "#eaebc8" else self.greenHighlight
                             self.turns += 1
-                            self.itemconfigure(square_id, fill="#DC143C", outline="#DC143C", width=10)
+                            self.itemconfigure(square_id, fill=highlight, outline=highlight, width=0)
                             self.update()
                             self.clicked = square_id
 
@@ -229,8 +237,9 @@ class ChessBoard(tk.Canvas):
 
                             self.bind("<Button-1>", lambda e: self.move_piece(e, r, c, square_id, self.clicked_piece))
                     elif len(self.clicked_piece.legal_moves) >= 1:
+                        highlight = self.whiteHighlight if self.squares[(clicked_row, clicked_col)][3] == "#eaebc8" else self.greenHighlight
                         self.turns += 1
-                        self.itemconfigure(square_id, fill="#DC143C", outline="#DC143C", width=10)
+                        self.itemconfigure(square_id, fill=highlight, outline=highlight, width=0)
                         self.update()
                         self.clicked = square_id
 
@@ -242,8 +251,9 @@ class ChessBoard(tk.Canvas):
 
                         self.bind("<Button-1>", lambda e: self.move_piece(e, r, c, square_id, self.clicked_piece))
                 elif len(self.clicked_piece.legal_moves) >= 1:
+                        highlight = self.whiteHighlight if self.squares[(clicked_row, clicked_col)][3] == "#eaebc8" else self.greenHighlight
                         self.turns += 1
-                        self.itemconfigure(square_id, fill="#DC143C", outline="#DC143C", width=10)
+                        self.itemconfigure(square_id, fill=highlight, outline=highlight, width=0)
                         self.update()
                         self.clicked = square_id
 
@@ -254,7 +264,6 @@ class ChessBoard(tk.Canvas):
                                     val[1].en_pass_count += 1 # changing the en_pass_count from 0 to 1 so that it can be set to False in the move_piece function
 
                         self.bind("<Button-1>", lambda e: self.move_piece(e, r, c, square_id, self.clicked_piece))
-
     
     def move_piece(self, event, from_square_r, from_square_c, from_square_id, actual_piece):        
         # finding the row and col of the next selected square
@@ -280,6 +289,7 @@ class ChessBoard(tk.Canvas):
             self.bind("<Button-1>", lambda e: self.move_piece(e, from_square_r, from_square_c, from_square_id, actual_piece))
             return
 
+        #region KING move piece
         if actual_piece.notation == "K" or actual_piece.notation == "Kb":
             # removing the piece's existence then its image from prior square
             self.squares[(from_square_r, from_square_c)][1] = None
@@ -300,9 +310,27 @@ class ChessBoard(tk.Canvas):
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, actual_piece.defends, moved=True, border=actual_piece.border)
 
             # DESELECTION / no more outline
-            self.itemconfigure(self.clicked, fill=self.squares[(from_square_r, from_square_c)][3], outline=self.squares[(from_square_r, from_square_c)][3], width=0)
+            # self.itemconfigure(self.clicked, fill=self.squares[(from_square_r, from_square_c)][3], outline=self.squares[(from_square_r, from_square_c)][3], width=0)
+            # self.update()
+            # self.clicked = None
+
+            # HIGHLIGHT / highlight past position
+            highlight = self.whiteHighlight if self.squares[(from_square_r, from_square_c)][3] == "#eaebc8" else self.greenHighlight
+            self.itemconfigure(self.clicked, fill=highlight, outline=highlight, width=0)
             self.update()
             self.clicked = None
+            self.fromTo.append([from_square_r, from_square_c])
+
+            # Removing enemy piece highlight
+            self.highlighting()
+
+            # HIGHLIGHT / highlight new position
+            self.newClicked = self.squares[(r, c)][0]
+            highlight = self.whiteHighlight if self.squares[(r, c)][3] == "#eaebc8" else self.greenHighlight
+            self.itemconfigure(self.newClicked, fill=highlight, outline=highlight, width=0)
+            self.update()
+            self.newClicked = None
+            self.fromTo.append([r, c])
 
             # black king CASTLE queen side
             if (actual_piece.notation == "Kb") and actual_piece.moved == False:
@@ -375,7 +403,9 @@ class ChessBoard(tk.Canvas):
             for key, val in self.squares.items():
                 if val[1] != None:
                     val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
+        #endregion
 
+        #region QUEEN move piece
         if actual_piece.notation == "Q" or actual_piece.notation == "Qb":
             # removing the piece's existence then its image from prior square
             self.squares[(from_square_r, from_square_c)][1] = None
@@ -396,9 +426,27 @@ class ChessBoard(tk.Canvas):
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, actual_piece.defends)
 
             # DESELECTION / no more outline
-            self.itemconfigure(self.clicked, fill=self.squares[(from_square_r, from_square_c)][3], outline=self.squares[(from_square_r, from_square_c)][3], width=0)
+            # self.itemconfigure(self.clicked, fill=self.squares[(from_square_r, from_square_c)][3], outline=self.squares[(from_square_r, from_square_c)][3], width=0)
+            # self.update()
+            # self.clicked = None
+
+            # HIGHLIGHT / highlight past position
+            highlight = self.whiteHighlight if self.squares[(from_square_r, from_square_c)][3] == "#eaebc8" else self.greenHighlight
+            self.itemconfigure(self.clicked, fill=highlight, outline=highlight, width=0)
             self.update()
             self.clicked = None
+            self.fromTo.append([from_square_r, from_square_c])
+
+            # Removing enemy piece highlight
+            self.highlighting()
+
+            # HIGHLIGHT / highlight new position
+            self.newClicked = self.squares[(r, c)][0]
+            highlight = self.whiteHighlight if self.squares[(r, c)][3] == "#eaebc8" else self.greenHighlight
+            self.itemconfigure(self.newClicked, fill=highlight, outline=highlight, width=0)
+            self.update()
+            self.newClicked = None
+            self.fromTo.append([r, c])
 
             # putting the next left click back onto the select_piece function
             self.bind("<Button-1>", self.select_piece)
@@ -407,7 +455,9 @@ class ChessBoard(tk.Canvas):
             for key, val in self.squares.items():
                 if val[1] != None:
                     val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
-        
+        #endregion
+
+        #region BISHOP move piece
         if actual_piece.notation == "B" or actual_piece.notation == "Bb":
             # removing the piece's existence then its image from prior square
             self.squares[(from_square_r, from_square_c)][1] = None
@@ -428,9 +478,27 @@ class ChessBoard(tk.Canvas):
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, actual_piece.defends)
 
             # DESELECTION / no more outline
-            self.itemconfigure(self.clicked, fill=self.squares[(from_square_r, from_square_c)][3], outline=self.squares[(from_square_r, from_square_c)][3], width=0)
+            # self.itemconfigure(self.clicked, fill=self.squares[(from_square_r, from_square_c)][3], outline=self.squares[(from_square_r, from_square_c)][3], width=0)
+            # self.update()
+            # self.clicked = None
+
+            # HIGHLIGHT / highlight past position
+            highlight = self.whiteHighlight if self.squares[(from_square_r, from_square_c)][3] == "#eaebc8" else self.greenHighlight
+            self.itemconfigure(self.clicked, fill=highlight, outline=highlight, width=0)
             self.update()
             self.clicked = None
+            self.fromTo.append([from_square_r, from_square_c])
+
+            # Removing enemy piece highlight
+            self.highlighting()
+
+            # HIGHLIGHT / highlight new position
+            self.newClicked = self.squares[(r, c)][0]
+            highlight = self.whiteHighlight if self.squares[(r, c)][3] == "#eaebc8" else self.greenHighlight
+            self.itemconfigure(self.newClicked, fill=highlight, outline=highlight, width=0)
+            self.update()
+            self.newClicked = None
+            self.fromTo.append([r, c])
 
             # putting the next left click back onto the select_piece function
             self.bind("<Button-1>", self.select_piece)
@@ -439,7 +507,9 @@ class ChessBoard(tk.Canvas):
             for key, val in self.squares.items():
                 if val[1] != None:
                     val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
-        
+        #endregion
+
+        #region KNIGHT move piece
         if actual_piece.notation == "N" or actual_piece.notation == "Nb":
             # removing the piece's existence then its image from prior square
             self.squares[(from_square_r, from_square_c)][1] = None
@@ -460,9 +530,27 @@ class ChessBoard(tk.Canvas):
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, actual_piece.defends)
 
             # DESELECTION / no more outline
-            self.itemconfigure(self.clicked, fill=self.squares[(from_square_r, from_square_c)][3], outline=self.squares[(from_square_r, from_square_c)][3], width=0)
+            # self.itemconfigure(self.clicked, fill=self.squares[(from_square_r, from_square_c)][3], outline=self.squares[(from_square_r, from_square_c)][3], width=0)
+            # self.update()
+            # self.clicked = None
+
+            # HIGHLIGHT / highlight past position
+            highlight = self.whiteHighlight if self.squares[(from_square_r, from_square_c)][3] == "#eaebc8" else self.greenHighlight
+            self.itemconfigure(self.clicked, fill=highlight, outline=highlight, width=0)
             self.update()
             self.clicked = None
+            self.fromTo.append([from_square_r, from_square_c])
+
+            # Removing enemy piece highlight
+            self.highlighting()
+
+            # HIGHLIGHT / highlight new position
+            self.newClicked = self.squares[(r, c)][0]
+            highlight = self.whiteHighlight if self.squares[(r, c)][3] == "#eaebc8" else self.greenHighlight
+            self.itemconfigure(self.newClicked, fill=highlight, outline=highlight, width=0)
+            self.update()
+            self.newClicked = None
+            self.fromTo.append([r, c])
 
             # putting the next left click back onto the select_piece function
             self.bind("<Button-1>", self.select_piece)
@@ -471,7 +559,9 @@ class ChessBoard(tk.Canvas):
             for key, val in self.squares.items():
                 if val[1] != None:
                     val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
+        #endregion
 
+        #region ROOK move piece
         if actual_piece.notation == "R" or actual_piece.notation == "Rb":
             # removing the piece's existence then its image from prior square
             self.squares[(from_square_r, from_square_c)][1] = None
@@ -492,9 +582,27 @@ class ChessBoard(tk.Canvas):
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, actual_piece.defends, moved=True)
 
             # DESELECTION / no more outline
-            self.itemconfigure(self.clicked, fill=self.squares[(from_square_r, from_square_c)][3], outline=self.squares[(from_square_r, from_square_c)][3], width=0)
+            # self.itemconfigure(self.clicked, fill=self.squares[(from_square_r, from_square_c)][3], outline=self.squares[(from_square_r, from_square_c)][3], width=0)
+            # self.update()
+            # self.clicked = None
+
+            # HIGHLIGHT / highlight past position
+            highlight = self.whiteHighlight if self.squares[(from_square_r, from_square_c)][3] == "#eaebc8" else self.greenHighlight
+            self.itemconfigure(self.clicked, fill=highlight, outline=highlight, width=0)
             self.update()
             self.clicked = None
+            self.fromTo.append([from_square_r, from_square_c])
+
+            # Removing enemy piece highlight
+            self.highlighting()
+
+            # HIGHLIGHT / highlight new position
+            self.newClicked = self.squares[(r, c)][0]
+            highlight = self.whiteHighlight if self.squares[(r, c)][3] == "#eaebc8" else self.greenHighlight
+            self.itemconfigure(self.newClicked, fill=highlight, outline=highlight, width=0)
+            self.update()
+            self.newClicked = None
+            self.fromTo.append([r, c])
 
             # putting the next left click back onto the select_piece function
             self.bind("<Button-1>", self.select_piece)
@@ -503,7 +611,9 @@ class ChessBoard(tk.Canvas):
             for key, val in self.squares.items():
                 if val[1] != None:
                     val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
+        #endregion
 
+        #region PAWN move piece
         if actual_piece.notation == "P" or actual_piece.notation == "Pb":
             # removing the piece's existence then its image from prior square
             self.squares[(from_square_r, from_square_c)][1] = None
@@ -569,9 +679,28 @@ class ChessBoard(tk.Canvas):
             self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, actual_piece.defends, two_spaces=False, do_en_pass=actual_piece.do_en_pass, get_en_pass=actual_piece.get_en_pass, en_pass_count=actual_piece.en_pass_count)
 
             # DESELECTION / no more outline
-            self.itemconfigure(self.clicked, fill=self.squares[(from_square_r, from_square_c)][3], outline=self.squares[(from_square_r, from_square_c)][3], width=0)
+            # self.itemconfigure(self.clicked, fill=self.squares[(from_square_r, from_square_c)][3], outline=self.squares[(from_square_r, from_square_c)][3], width=0)
+            # self.update()
+            # self.clicked = None
+            # self.fromTo.append([from_square_r, from_square_c])
+
+            # HIGHLIGHT / highlight past position
+            highlight = self.whiteHighlight if self.squares[(from_square_r, from_square_c)][3] == "#eaebc8" else self.greenHighlight
+            self.itemconfigure(self.clicked, fill=highlight, outline=highlight, width=0)
             self.update()
             self.clicked = None
+            self.fromTo.append([from_square_r, from_square_c])
+
+            # Removing enemy piece highlight
+            self.highlighting()
+
+            # HIGHLIGHT / highlight new position
+            self.newClicked = self.squares[(r, c)][0]
+            highlight = self.whiteHighlight if self.squares[(r, c)][3] == "#eaebc8" else self.greenHighlight
+            self.itemconfigure(self.newClicked, fill=highlight, outline=highlight, width=0)
+            self.update()
+            self.newClicked = None
+            self.fromTo.append([r, c])
 
             # putting the next left click back onto the select_piece function
             self.bind("<Button-1>", self.select_piece)
@@ -580,7 +709,9 @@ class ChessBoard(tk.Canvas):
             for key, val in self.squares.items():
                 if val[1] != None:
                     val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
-        
+        #endregion
+
+        #region en passant
         # making sure en_passant is working properly 
         for key, val in self.squares.items():
             if val[1] != None:
@@ -595,7 +726,8 @@ class ChessBoard(tk.Canvas):
                         val[1].get_en_pass = False
                         val[1].en_pass_count = 0
                         # print(f"{val[1].color} pawn at ({val[1].pos_r},{val[1].pos_c}) get_en_pass is now {val[1].get_en_pass}")
-        
+        #endregion
+
         # make sure all pieces have their correct legal moves again
         self.all_white_legal_moves = 0
         self.all_black_legal_moves = 0
@@ -607,6 +739,7 @@ class ChessBoard(tk.Canvas):
                 else:
                     self.all_black_legal_moves += len(val[1].legal_moves)
         
+        #region checks / checkmate
         # CHECKS / CHECKMATE
         self.black_possibles = {}
         self.white_possibles = {}
@@ -685,9 +818,20 @@ class ChessBoard(tk.Canvas):
                                 for legal in val[1].legal_moves:
                                     if legal in checker.check_pathway:
                                         self.white_possibles[(val[1].pos_r,val[1].pos_c)] = legal
-        
-    # this function will also be used to find pieces that are defended by other pieces, add to the defends array, and add to the border for both kings
+        #endregion
+    
+    def highlighting(self):
+        if len(self.fromTo) > 2:
+                r,c = self.fromTo.pop(0)
+                self.itemconfigure(self.squares[(r, c)][0], fill=self.squares[(r, c)][3], outline=self.squares[(r, c)][3], width=0)
+                self.update()
+
+                r,c = self.fromTo.pop(0)
+                self.itemconfigure(self.squares[(r, c)][0], fill=self.squares[(r, c)][3], outline=self.squares[(r, c)][3], width=0)
+                self.update()
+
     def get_legal_moves(self, actual_piece, r, c, **kwargs):
+        #region black KING get legal moves
         if actual_piece.notation == "Kb":
             add_legal_moves = []
             add_defends = []
@@ -1413,7 +1557,9 @@ class ChessBoard(tk.Canvas):
             actual_piece.defends = add_defends
             actual_piece.border = new_add_border
             return add_legal_moves
+        #endregion
 
+        #region white KING get legal moves
         if actual_piece.notation == "K": 
             add_legal_moves = []
             add_defends = []
@@ -2156,7 +2302,9 @@ class ChessBoard(tk.Canvas):
             actual_piece.defends = add_defends
             actual_piece.border = new_add_border
             return add_legal_moves
-        
+        #endregion
+
+        #region QUEEN get legal moves
         if actual_piece.notation == "Q" or actual_piece.notation == "Qb":
             add_legal_moves = []
             add_defends = []
@@ -2585,7 +2733,9 @@ class ChessBoard(tk.Canvas):
 
             actual_piece.defends = add_defends
             return add_legal_moves
-
+        #endregion
+        
+        #region BISHOP get legal moves
         if actual_piece.notation == "B" or actual_piece.notation == "Bb":
             add_legal_moves = []
             add_defends = []
@@ -2806,7 +2956,9 @@ class ChessBoard(tk.Canvas):
 
             actual_piece.defends = add_defends
             return add_legal_moves
-        
+        #endregion
+
+        #region KNIGHT get legal moves
         if actual_piece.notation == "N" or actual_piece.notation == "Nb":
             add_legal_moves = []
             add_defends = []
@@ -2937,7 +3089,9 @@ class ChessBoard(tk.Canvas):
 
             actual_piece.defends = add_defends
             return add_legal_moves
+        #endregion
 
+        #region ROOK get legal moves
         if actual_piece.notation == "R" or actual_piece.notation == "Rb":
             add_legal_moves = []
             add_defends = []
@@ -2980,7 +3134,7 @@ class ChessBoard(tk.Canvas):
                             self.squares[(r, i)][1].pin_pathway = add_pin_pathway
                         else:
                             for piece in unpins:
-                                print('Piece Being Unpinned:',piece.notation)
+                                # print('Piece Being Unpinned:',piece.notation)
                                 piece.pinned = False
                                 piece.legal_moves = self.get_legal_moves(piece, piece.pos_r, piece.pos_c)
                             self.squares[(r, i)][1].pinned = False
@@ -3091,7 +3245,7 @@ class ChessBoard(tk.Canvas):
                             self.squares[(i, c)][1].pin_pathway = add_pin_pathway
                         else:
                             for piece in unpins:
-                                print('Piece Being Unpinned:', piece.notation)
+                                # print('Piece Being Unpinned:', piece.notation)
                                 piece.pinned = False
                                 piece.legal_moves = self.get_legal_moves(piece, piece.pos_r, piece.pos_c)
                             self.squares[(i, c)][1].pinned = False
@@ -3168,7 +3322,9 @@ class ChessBoard(tk.Canvas):
 
             actual_piece.defends = add_defends
             return add_legal_moves
+        #endregion
 
+        #region black PAWN get legal moves
         if actual_piece.notation == "Pb":
             add_legal_moves = []
             add_defends = []
@@ -3226,7 +3382,9 @@ class ChessBoard(tk.Canvas):
 
             actual_piece.defends = add_defends   
             return add_legal_moves
+        #endregion
 
+        #region white PAWN get legal moves
         if actual_piece.notation == "P":
             add_legal_moves = []
             add_defends = []
@@ -3284,6 +3442,7 @@ class ChessBoard(tk.Canvas):
                     
             actual_piece.defends = add_defends
             return add_legal_moves
+        #endregion
 
 #region start game
 root = tk.Tk()
@@ -3291,7 +3450,7 @@ root.title("Chess Game")
 root.configure(bg="#242320")
 board = ChessBoard(root, size=800)
 board.pack()
-board.draw_board()
+board.create_board()
 board.place_piece("Pb", "black", 1, 0, [(2,0), (3,0)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False, pin_pathway=[])
 board.place_piece("Pb", "black", 1, 1, [(2,1), (3,1)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False, pin_pathway=[])
 board.place_piece("Pb", "black", 1, 2, [(2,2), (3,2)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False, pin_pathway=[])

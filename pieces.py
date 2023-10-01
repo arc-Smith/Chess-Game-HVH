@@ -1,7 +1,8 @@
-# imports
+#region imports
 import os
 from tkinter import Tk, Canvas, PhotoImage
 import tkinter as tk
+#endregion 
 
 class Piece:
     def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends):
