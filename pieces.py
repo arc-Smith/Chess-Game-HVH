@@ -18,6 +18,7 @@ class Queen(Piece):
         super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
         self.check_pathway = check_pathway
         self.pinned = pinned
+        self.points = 9
 
 class King(Piece):
     def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, moved, border, in_check):
@@ -31,11 +32,13 @@ class Bishop(Piece):
         super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
         self.check_pathway = check_pathway
         self.pinned = pinned
+        self.points = 3
 
 class Knight(Piece):
     def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, pinned):
         super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
         self.pinned = pinned
+        self.points = 3
 
 class Rook(Piece):
     def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, moved, check_pathway, pinned, pin_pathway):
@@ -43,6 +46,7 @@ class Rook(Piece):
         self.moved = moved
         self.check_pathway = check_pathway
         self.pinned = pinned
+        self.points = 5
 
 class Pawn(Piece):
     def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, two_spaces, do_en_pass, get_en_pass, en_pass_count, pinned, pin_pathway):
@@ -52,6 +56,7 @@ class Pawn(Piece):
         self.get_en_pass = get_en_pass
         self.en_pass_count = en_pass_count
         self.pinned = pinned
+        self.points = 1
 
     def promote(self):
         promotion_window = tk.Toplevel()

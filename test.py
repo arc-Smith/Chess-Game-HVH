@@ -72,8 +72,8 @@ class ChessBoard(tk.Canvas):
         self.check_on_the_board = False
 
         # highlighting so it's clear whose turn it is
-        self.greenHighlight = "#C9CC3F"	
-        self.whiteHighlight = "#FFFAA0"
+        self.greenHighlight = "#C9CC3F"	# Pear
+        self.whiteHighlight = "#FFFAA0" # Pale Yellow
         self.fromTo = []
 
     def create_board(self):
@@ -152,8 +152,6 @@ class ChessBoard(tk.Canvas):
             self.squares[(row, col)][1] = Knight(notation, "white", row, col, legal_moves, defends, pinned)
         elif notation == "Nb":
             self.squares[(row, col)][1] = Knight(notation, "black", row, col, legal_moves, defends, pinned)
-        else:
-            self.squares[(row, col)][1] = Piece(notation, color, row, col, legal_moves, defends)
 
         # giving the square a unique image id to be used when moving pieces or removing pieces
         self.squares[(row, col)][2] = self.create_image(x, y, image=image, anchor="nw")

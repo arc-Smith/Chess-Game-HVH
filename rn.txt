@@ -1,0 +1,14 @@
+adding the points to each piece
+
+valid taking = pins+forks+skewer???+any other ideas here???
+check
+checkmate
+draw
+
+flip board+display winner
+
+displaying the rules (like touch to move and whatnot)
+making it more game based where a user selects if they want HvH or HvC
+
+different timed modes (not just unlimited)
+display game history
