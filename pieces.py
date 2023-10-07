@@ -6,59 +6,63 @@ import tkinter as tk
 
 class Piece:
     def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends):
-        self.notation = notation
+        self.notation = notation # white pieces have regular notation and black pieces have an added 'b' (ex. K for white king and Kb for black king)
         self.color = color
-        self.pos_r = pos_r
-        self.pos_c = pos_c
-        self.legal_moves = legal_moves
-        self.defends = defends
+        self.pos_r = pos_r # connects to the row position (0-7) that the Piece is at on the board which is represented as a HashMap filled with squares
+        self.pos_c = pos_c # connects to the column position (0-7) that the Piece is at on the board which is represented as a HashMap filled with squares
+        self.legal_moves = legal_moves # array of positions that the piece can move to
+        self.defends = defends # array holding positions (i.e. (r, c)) that contain a piece of the same color which is defended
 
 class Queen(Piece):
     def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, check_pathway, pinned, pin_pathway):
         super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
-        self.check_pathway = check_pathway
-        self.pinned = pinned
+        self.check_pathway = check_pathway # 
+        self.pinned = pinned # true or false value indicating whether a piece is pinned
+        self.pin_pathway = pin_pathway # array holding positions that the pinned piece can still move to (i.e. only squares that are inside of the pin pathway perhaps even taking its attacker)
         self.points = 9
 
 class King(Piece):
     def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, moved, border, in_check):
         super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
-        self.moved = moved
-        self.border = border
-        self.in_check = in_check
+        self.moved = moved # used to allow for castling with a Rook (if the King hasn't moved it can castle)
+        self.border = border # used to disallow the kings from touching
+        self.in_check = in_check # true or false value for the king being in check
 
 class Bishop(Piece):
     def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, check_pathway, pinned, pin_pathway):
         super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
-        self.check_pathway = check_pathway
-        self.pinned = pinned
+        self.check_pathway = check_pathway #
+        self.pinned = pinned # true or false value indicating whether a piece is pinned
+        self.pin_pathway = pin_pathway # array holding positions that the pinned piece can still move to (i.e. only squares that are inside of the pin pathway perhaps even taking its attacker)
         self.points = 3
 
 class Knight(Piece):
     def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, pinned):
         super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
-        self.pinned = pinned
+        self.pinned = pinned # true or false value indicating whether a piece is pinned
         self.points = 3
 
 class Rook(Piece):
     def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, moved, check_pathway, pinned, pin_pathway):
         super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
-        self.moved = moved
-        self.check_pathway = check_pathway
-        self.pinned = pinned
+        self.moved = moved # used to allow for castling with the King (if the Rook hasn't moved it can castle)
+        self.check_pathway = check_pathway # 
+        self.pinned = pinned # true or false value indicating whether a piece is pinned
+        self.pin_pathway = pin_pathway # array holding positions that the pinned piece can still move to (i.e. only squares that are inside of the pin pathway perhaps even taking its attacker)
         self.points = 5
 
 class Pawn(Piece):
     def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, two_spaces, do_en_pass, get_en_pass, en_pass_count, pinned, pin_pathway):
         super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
-        self.two_spaces = two_spaces
-        self.do_en_pass = do_en_pass
-        self.get_en_pass = get_en_pass
-        self.en_pass_count = en_pass_count
-        self.pinned = pinned
+        self.two_spaces = two_spaces # used for moving 2 squares
+        self.do_en_pass = do_en_pass # true or false value allowing a piece to en passant another
+        self.get_en_pass = get_en_pass # true or false value allowing another piece en passant
+        self.en_pass_count = en_pass_count # allows for en passant when the value is 1 meaning for 1 turn
+        self.pinned = pinned # true or false value indicating whether a piece is pinned
+        self.pin_pathway = pin_pathway # array holding positions that the pinned piece can still move to (i.e. only squares that are inside of the pin pathway perhaps even taking its attacker)
         self.points = 1
 
-    def promote(self):
+    def promote(self): # method for pawn promotion
         promotion_window = tk.Toplevel()
         promotion_window.title("Promote Pawn")
         promotion_window.geometry("300x150")
@@ -95,12 +99,12 @@ class Pawn(Piece):
             radio_knight = tk.Radiobutton(promotion_window, text="Knight", variable=radio_var, value="Nb")
             radio_knight.pack()
 
-        # window is waiting for a selection to be made and confirmed with the destroying of the window 
-        ok_button = tk.Button(promotion_window, text="Ok", command=promotion_window.destroy)
+        ok_button = tk.Button(promotion_window, text="Ok", command=promotion_window.destroy) # window is waiting for a selection to be made and confirmed from Ok
         ok_button.pack()
 
         promotion_window.wait_window()
 
         new_notation = radio_var.get()
 
+        # if the window is simply closed then whichever piece is currently selected will be the promotion
         return new_notation
