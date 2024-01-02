@@ -73,6 +73,7 @@ class ChessBoard(tk.Canvas):
         self.incheck_move = {}
         self.incheck_take = {}
         self.incheck_interpose = {}
+        self.checkers = [] # This is needed because having one or multiple pieces checking the King can impact whether all or one of moving, taking, or interposing is possible
 
         self.check_on_the_board = False
 
@@ -199,7 +200,6 @@ class ChessBoard(tk.Canvas):
         square_id = self.squares[(r, c)][0]
         self.clicked_piece = self.squares[(r, c)][1]
 
-        self.checkCheckmate()
         # if check is on the board then something must be done pertaining to it
         if self.check_on_the_board and self.turn_based[(self.turns) % 2] == "white":
             # if (r,c) not in self.white_possibles:
@@ -715,6 +715,7 @@ class ChessBoard(tk.Canvas):
                     val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
         #endregion
         self.en_passant()
+        self.checkCheckmate()
         # self.stalemateDraw() # STILL IN DEVELOPMENT
     
     def highlighting(self):
@@ -755,9 +756,6 @@ class ChessBoard(tk.Canvas):
     #                 self.all_black_legal_moves += len(val[1].legal_moves)
 
     def checkCheckmate(self):
-        checker_amount = 0
-        # checker = None
-
         black_check_pos = None
         white_check_pos = None
 
@@ -773,65 +771,47 @@ class ChessBoard(tk.Canvas):
                         black_check_pos = (val[1].pos_r,val[1].pos_c)
                         print('BLACK IS IN CHECK')
 
-        # if there's a check on the board
-        if black_check_pos != None or white_check_pos != None:
-            self.check_on_the_board = True
+        # handling the black king being in check
+        if black_check_pos != None:
+            self.check_on_the_board = True # this is now True so an action must be taken to get out of check
 
-            if self.turn_based[(self.turns+1) % 2] == "white": # if white has made the most recent move and possible gave check
-                for key, val in self.squares.items():
+            for key, val in self.squares.items():
                     if val[1] != None:
-                        # finding out what piece(s) has/have the king under attack 
+                        # finding out which piece(s) has/have the king under attack 
                         if val[1].color == "white":
                             if black_check_pos in val[1].legal_moves:
+                                self.checkers.append(val[1])
+            
+            # if there are multiple checkers and a knight is included then the only option is to move
+            if len(self.checkers) > 1:
+                if self.squares[black_check_pos][1].legal_moves:
+                    self.incheck_move[black_check_pos] = self.squares[black_check_pos][1].legal_moves # King can ONLY move out of the way
 
-                                checker_amount += 1
-                                # checker = val[1]
-            
+            elif len(self.checkers) == 1:
+                piece = self.checkers[0]
                 
-                # if checker_amount > 1:
-                #     for key, val in self.squares.items():
-                #         if val[1] != None:
-                #             # if there is more than 1 piece checking the king then the king must move
-                #             if val[1].notation == "Kb":
-                #                 self.black_possibles[black_check_pos] = val[1].legal_moves
-                # elif checker_amount == 1:
-                #     for key, val in self.squares.items():
-                #         if val[1] != None:
-                #             if val[1].notation == "Kb": # king moves to escape chess
-                #                 self.black_possibles[black_check_pos] = val[1].legal_moves
-                #             elif (checker.pos_r,checker.pos_c) in val[1].legal_moves: # an ally piece takes the piece that's checked the king
-                #                 self.black_possibles[(val[1].pos_r,val[1].pos_c)] = (checker.pos_r,checker.pos_c)
-                #             elif checker.notation == "Qb" or checker.notation == "Bb" or checker.notation == "Rb": # interpose
-                #                 for legal in val[1].legal_moves:
-                #                     if legal in checker.check_pathway:
-                #                         self.black_possibles[(val[1].pos_r,val[1].pos_c)] = legal
-            
-            # elif self.turn_based[(self.turns+1) % 2] == "black": # if white has made the most recent move and possible gave check
-            #     for key, val in self.squares.items():
-            #         if val[1] != None:
-            #             # finding out what piece(s) has/have king under attack 
-            #             if val[1].color == "black":
-            #                 if white_check_pos in val[1].legal_moves:
-            #                     checker_amount += 1
-            #                     checker = val[1]
+                if self.squares[black_check_pos][1].legal_moves:
+                    self.incheck_move[black_check_pos] = self.squares[black_check_pos][1].legal_moves # King can simply move out of the way
+
+                for key, val in self.squares.items():
+                    if val[1] != None:
+                        if (piece.pos_r, piece.pos_c) in val[1].legal_moves: # an ally piece takes the piece that's checked the king
+                            self.incheck_take[(val[1].pos_r, val[1].pos_c)] = [(piece.pos_r, piece.pos_c)]
                 
-            #     if checker_amount > 1:
-            #         for key, val in self.squares.items():
-            #             if val[1] != None:
-            #                 # if there is more than 1 piece checking the king then the king must move
-            #                 if val[1].notation == "K":
-            #                     self.white_possibles[white_check_pos] = val[1].legal_moves
-            #     elif checker_amount == 1:
-            #         for key, val in self.squares.items():
-            #             if val[1] != None:
-            #                 if val[1].notation == "K": # king moves to escape chess
-            #                     self.white_possibles[white_check_pos] = val[1].legal_moves
-            #                 elif (checker.pos_r,checker.pos_c) in val[1].legal_moves: # an ally piece takes the piece that's checked the king
-            #                     self.white_possibles[(val[1].pos_r,val[1].pos_c)] = (checker.pos_r,checker.pos_c)
-            #                 elif checker.notation == "Q" or checker.notation == "B" or checker.notation == "R": # interpose
-            #                     for legal in val[1].legal_moves:
-            #                         if legal in checker.check_pathway:
-            #                             self.white_possibles[(val[1].pos_r,val[1].pos_c)] = legal
+                interpose = []
+                if piece.notation == "Q" or piece.notation == "B" or piece.notation == "R": # interposition
+                    for key, val in self.squares.items():
+                        if val[1] != None and val[1].color == "black":
+                            for r,c in val[1].legal_moves:
+                                if (r, c) in piece.check_pathway:
+                                    interpose.append([r, c])
+                            if interpose:
+                                self.incheck_interpose[(val[1].pos_r, val[1].pos_c)] = interpose
+                            interpose = []
+                
+                print("I am in check but I can move:", self.incheck_move)
+                print("I am in check but someone can take:", self.incheck_take)
+                print("I am in check but someone can interpose:", self.incheck_interpose)
 
     def get_legal_moves(self, actual_piece, r, c, **kwargs):
         #region black KING get legal moves
