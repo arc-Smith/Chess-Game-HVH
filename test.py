@@ -820,6 +820,12 @@ class ChessBoard(tk.Canvas):
         black_check_pos = None
         white_check_pos = None
 
+        # Updating the moves specifically for the King
+        for key, val in self.squares.items():
+            if val[1] != None:
+                if val[1].notation == "K" or val[1].notation == "Kb":
+                    val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
+
         # find current position of black and white king who may be in check
         for key, val in self.squares.items():
             if val[1] != None:
@@ -852,7 +858,6 @@ class ChessBoard(tk.Canvas):
             
             # if there are multiple checkers then the only option is to move
             if len(self.checkers) > 1:
-                print(self.checkers)
                 if self.squares[black_check_pos][1].legal_moves:
                     self.incheck_move[black_check_pos] = self.squares[black_check_pos][1].legal_moves # King can ONLY move out of the way
             elif len(self.checkers) == 1:
@@ -877,9 +882,9 @@ class ChessBoard(tk.Canvas):
                                 self.incheck_interpose[(val[1].pos_r, val[1].pos_c)] = interpose
                             interpose = []
                 
-                # print("I the black king am in check but I can move:", self.incheck_move)
-                # print("I the black king am in check but someone can take:", self.incheck_take)
-                # print("I the black king am in check but someone can interpose:", self.incheck_interpose)
+                print("I the black king am in check but I can move:", self.incheck_move)
+                print("I the black king am in check but someone can take:", self.incheck_take)
+                print("I the black king am in check but someone can interpose:", self.incheck_interpose)
         
         # handling the white king being in check
         if white_check_pos != None:
@@ -894,7 +899,6 @@ class ChessBoard(tk.Canvas):
             
             # if there are multiple checkers then the only option is to move
             if len(self.checkers) > 1:
-                print(self.checkers)
                 if self.squares[white_check_pos][1].legal_moves:
                     self.incheck_move[white_check_pos] = self.squares[white_check_pos][1].legal_moves # King can ONLY move out of the way
             elif len(self.checkers) == 1:
@@ -919,10 +923,15 @@ class ChessBoard(tk.Canvas):
                                 self.incheck_interpose[(val[1].pos_r, val[1].pos_c)] = interpose
                             interpose = []
                 
-                # print("I the white king am in check but I can move:", self.incheck_move)
-                # print("I the white king am in check but someone can take:", self.incheck_take)
-                # print("I the white king am in check but someone can interpose:", self.incheck_interpose)
+                print("I the white king am in check but I can move:", self.incheck_move)
+                print("I the white king am in check but someone can take:", self.incheck_take)
+                print("I the white king am in check but someone can interpose:", self.incheck_interpose)
         
+        if black_check_pos:
+            print(self.check_on_the_board)
+            print(self.incheck_move)
+            print(self.incheck_take)
+            print(self.incheck_interpose)
         # if checkmate is found the game is over
         if self.check_on_the_board:
             if self.incheck_move == {} and self.incheck_take == {} and self.incheck_interpose == {}:
