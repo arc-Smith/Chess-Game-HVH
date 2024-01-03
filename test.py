@@ -3777,6 +3777,7 @@ def show_rules():
         "1. Click-to-move\n"
         "2. There is no draw button so verbal draws will be used instead\n"
         "3. Allow the highlights to be given for the previously moved piece before selecting a new piece to move\n"
+        "4. Only has unlimited time mode (for now)\n"
     )
     # Display a messagebox with the custom rules
     messagebox.showinfo("Custom Chess Rules", rules_text)
