@@ -11,6 +11,7 @@ from pieces import King
 from pieces import Queen
 import math
 from collections import defaultdict
+import copy
 #endregion
 
 #region chess piece images
@@ -63,9 +64,10 @@ class ChessBoard(tk.Canvas):
         self.turn_based = ["white", "black"] # variable used to allow for turn based gameplay from white to black using mod operator and adding 1 to turns variable
         self.turns = 0
 
-        # Using this for a stalemate draw I believe
-        self.all_white_legal_moves = 20
-        self.all_black_legal_moves = 20
+        # highlighting so it's clear whose turn it is
+        self.greenHighlight = "#C9CC3F"	# Pear
+        self.whiteHighlight = "#FFFAA0" # Pale Yellow
+        self.fromTo = []
 
         # possible moves for each player after being put in check
         # self.white_possibles = {}
@@ -77,10 +79,16 @@ class ChessBoard(tk.Canvas):
         self.checkers = [] # This is needed because having one or multiple pieces checking the King can impact whether all or one of moving, taking, or interposing is possible
         self.check_on_the_board = False
 
-        # highlighting so it's clear whose turn it is
-        self.greenHighlight = "#C9CC3F"	# Pear
-        self.whiteHighlight = "#FFFAA0" # Pale Yellow
-        self.fromTo = []
+        # stalemate draw
+        self.all_white_legal_moves = 20
+        self.all_black_legal_moves = 20
+
+        # insufficient material draw
+        self.all_white_pieces = {}
+        self.all_black_pieces = {}
+
+        # 3-fold repetition
+        self.game_states = []
 
     def create_board(self):
         square_size = self.size // 8 # each square will be 100x100
@@ -163,28 +171,6 @@ class ChessBoard(tk.Canvas):
         self.squares[(row, col)][2] = self.create_image(x, y, image=image, anchor="nw")
 
     def select_piece(self, event):  
-
-        #region draw condition
-        # [DRAWS]
-        # stalemate
-        # if self.all_white_legal_moves == 0 and self.turn_based[(self.turns) % 2] == "white":
-            # draw_window = tk.Toplevel()
-            # draw_window.title("Stalemate")
-            # draw_window.geometry("150x75")
-
-            # # window is waiting for a selection to be made and confirmed with the destroying of the window 
-            # ok_button = tk.Button(promotion_window, text="Ok", command=promotion_window.destroy)
-            # ok_button.pack()
-            # print("STALEMATE draw")
-
-        # for key, val in self.squares.items():
-        #     if val[1] != None:
-        #         if val[1].notation == "Kb":
-        #             print(f"BLACK king with in_check is currently {val[1].in_check}")
-        #         elif val[1].notation == "K":
-        #             print(f"WHITE king with in_check is currently {val[1].in_check}")
-        #endregion
-
         # finding the selected square
         r = 0
         c = 0
@@ -721,7 +707,7 @@ class ChessBoard(tk.Canvas):
         #endregion
         self.en_passant()
         self.pinsChecksCheckmate()
-        # self.stalemateDraw() # STILL IN DEVELOPMENT
+        self.draws()
     
     def highlighting(self):
         if len(self.fromTo) > 2:
@@ -747,18 +733,7 @@ class ChessBoard(tk.Canvas):
                         # print(f"{val[1].color} pawn at ({val[1].pos_r},{val[1].pos_c}) get_en_pass was {val[1].get_en_pass} before")
                         val[1].get_en_pass = False
                         val[1].en_pass_count = 0
-                        # print(f"{val[1].color} pawn at ({val[1].pos_r},{val[1].pos_c}) get_en_pass is now {val[1].get_en_pass}")
-    
-    # def stalemateDraw(self): # STILL IN DEVELOPMENT
-    #     self.all_white_legal_moves = 0
-    #     self.all_black_legal_moves = 0
-    #     for key, val in self.squares.items():
-    #         if val[1] != None:
-    #             val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
-    #             if val[1].color == "white":
-    #                 self.all_white_legal_moves += len(val[1].legal_moves)
-    #             else:
-    #                 self.all_black_legal_moves += len(val[1].legal_moves)
+                        # print(f"{val[1].color} pawn at ({val[1].pos_r},{val[1].pos_c}) get_en_pass is now {val[1].get_en_pass}")    
 
     def pinsChecksCheckmate(self):
         # Confirming pinned pieces and adjusting their legal moves based on the pin
@@ -772,13 +747,13 @@ class ChessBoard(tk.Canvas):
                                 if pinVal[1].notation == "Q" or pinVal[1].notation == "Qb" or pinVal[1].notation == "B" or pinVal[1].notation == "Bb" or pinVal[1].notation == "R" or pinVal[1].notation == "Rb":
                                     if pinVal[1].pin_pathway:
                                         # print(f"Check pathway of {pinVal[1].notation}", pinVal[1].check_pathway)
-                                        print(f"Pin pathway of {pinVal[1].notation}", pinVal[1].pin_pathway)
+                                        # print(f"Pin pathway of {pinVal[1].notation}", pinVal[1].pin_pathway)
                                         if (val[1].pos_r, val[1].pos_c) not in pinVal[1].pin_pathway:
                                             pinVal[1].pin_pathway.append((val[1].pos_r, val[1].pos_c))
                                             pinners.append(pinVal[1])
                                         else:
                                             pinners.append(pinVal[1])
-                        print("PINNERS:", pinners)
+                        # print("PINNERS:", pinners)
                         if len(pinners) > 1:
                             val[1].legal_moves = []
                         elif len(pinners) == 1:
@@ -787,7 +762,7 @@ class ChessBoard(tk.Canvas):
                                 if legal in pinners[0].pin_pathway or legal == (pinners[0].pos_r, pinners[0].pos_c):
                                     legal_moves_of_pinned_piece.append(legal)
                             val[1].legal_moves = legal_moves_of_pinned_piece
-                            print(f"I the {val[1].color} {val[1].notation} legal moves for me=", val[1].legal_moves)
+                            # print(f"I the {val[1].color} {val[1].notation} legal moves for me=", val[1].legal_moves)
                         # if len(self.clicked_piece.legal_moves) >= 1:
                         #     highlight = self.whiteHighlight if self.squares[(clicked_row, clicked_col)][3] == "#eaebc8" else self.greenHighlight
                         #     self.turns += 1
@@ -882,9 +857,9 @@ class ChessBoard(tk.Canvas):
                                 self.incheck_interpose[(val[1].pos_r, val[1].pos_c)] = interpose
                             interpose = []
                 
-                print("I the black king am in check but I can move:", self.incheck_move)
-                print("I the black king am in check but someone can take:", self.incheck_take)
-                print("I the black king am in check but someone can interpose:", self.incheck_interpose)
+                # print("I the black king am in check but I can move:", self.incheck_move)
+                # print("I the black king am in check but someone can take:", self.incheck_take)
+                # print("I the black king am in check but someone can interpose:", self.incheck_interpose)
         
         # handling the white king being in check
         if white_check_pos != None:
@@ -923,20 +898,94 @@ class ChessBoard(tk.Canvas):
                                 self.incheck_interpose[(val[1].pos_r, val[1].pos_c)] = interpose
                             interpose = []
                 
-                print("I the white king am in check but I can move:", self.incheck_move)
-                print("I the white king am in check but someone can take:", self.incheck_take)
-                print("I the white king am in check but someone can interpose:", self.incheck_interpose)
+                # print("I the white king am in check but I can move:", self.incheck_move)
+                # print("I the white king am in check but someone can take:", self.incheck_take)
+                # print("I the white king am in check but someone can interpose:", self.incheck_interpose)
         
-        if black_check_pos:
-            print(self.check_on_the_board)
-            print(self.incheck_move)
-            print(self.incheck_take)
-            print(self.incheck_interpose)
+        # if black_check_pos:
+        #     print(self.check_on_the_board)
+        #     print(self.incheck_move)
+        #     print(self.incheck_take)
+        #     print(self.incheck_interpose)
         # if checkmate is found the game is over
         if self.check_on_the_board:
             if self.incheck_move == {} and self.incheck_take == {} and self.incheck_interpose == {}:
                 messagebox.showinfo("Checkmate", "CHECKMATE White has won!") if self.turn_based[(self.turns) % 2] == "black" else messagebox.showinfo("Checkmate", "CHECKMATE Black has won!")
                 self.turn_based = [None, None] # ensures the pieces can't be moved again
+
+    def draws(self): # STILL IN DEVELOPMENT    
+        # stalemate
+        self.all_white_legal_moves = 0
+        self.all_black_legal_moves = 0
+        for key, val in self.squares.items():
+            if val[1] != None:
+                if val[1].color == "white":
+                    self.all_white_legal_moves += len(val[1].legal_moves)
+                else:
+                    self.all_black_legal_moves += len(val[1].legal_moves)
+        if self.all_white_legal_moves == 0 and self.turn_based[(self.turns) % 2] == "white":
+            messagebox.showinfo("Draw", "STALEMATE there is no winner.")
+            self.turn_based = [None, None] # ensures the pieces can't be moved again
+        elif self.all_black_legal_moves == 0 and self.turn_based[(self.turns) % 2] == "black":
+            messagebox.showinfo("Draw", "STALEMATE there is no winner.")
+            self.turn_based = [None, None] # ensures the pieces can't be moved again  
+        
+        # insufficient material
+        self.all_white_pieces = []
+        self.all_black_pieces = []
+        for key, val in self.squares.items():
+            if val[1] != None:
+                if val[1].color == "white":
+                    self.all_white_pieces.append(val[1].notation)
+                else:
+                    self.all_black_pieces.append(val[1].notation)
+        white_insufficient = False
+        black_insufficient = False
+        self.all_white_pieces = sorted(self.all_white_pieces)
+        self.all_black_pieces = sorted(self.all_black_pieces)
+        if self.all_white_pieces == ["K"] or self.all_white_pieces == ["K", "N"] or self.all_white_pieces == ["B", "K"]:
+            white_insufficient = True
+        if self.all_black_pieces == ["Kb"] or self.all_black_pieces == ["Kb", "Nb"] or self.all_black_pieces == ["Bb", "Kb"]:
+            black_insufficient = True
+        # print("white pieces left=", self.all_white_pieces)
+        # print("black pieces left=", self.all_black_pieces)
+        if white_insufficient and black_insufficient:
+            messagebox.showinfo("Draw", "INSUFFICIENT MATING MATERIAL there is no winner.")
+            self.turn_based = [None, None] # ensures the pieces can't be moved again
+
+        # 3-fold repetition
+        def are_board_states_equal(pos1, pos2):
+            for r in range(0, 8):
+                for c in range(0, 8):
+                    if pos1[(r, c)][1] == None and pos2[(r, c)][1] == None:
+                        continue
+                    elif pos1[(r, c)][1] != None and pos2[(r, c)][1] != None:
+                        if pos1[(r, c)][1].notation != pos2[(r, c)][1].notation:
+                            # print(pos1[(r, c)][1].notation)
+                            # print(pos2[(r, c)][1].notation)
+                            # print("returning false")
+                            return False
+                    else:
+                        # if pos1[(r, c)][1] != None:
+                        #     # print(pos1[(r, c)][1].notation)
+                        # if pos2[(r, c)][1] != None:
+                        #     # print(pos2[(r, c)][1].notation)
+                        # print("returning false")
+                        return False
+            return True
+        self.game_states.append(copy.deepcopy(self.squares))
+        repeated = False
+        print(len(self.game_states))
+        for a in range(0, len(self.game_states)):
+            for b in range(a + 1, len(self.game_states)):
+                for c in range(b + 1, len(self.game_states)):
+                    print("ENTERED")
+                    if are_board_states_equal(self.game_states[a], self.game_states[b]):
+                        if are_board_states_equal(self.game_states[b], self.game_states[c]):
+                            repeated = True
+        if repeated:
+            messagebox.showinfo("Draw", "3-FOLD REPETITION there is no winner.")
+            self.turn_based = [None, None] # ensures the pieces can't be moved again
 
     def get_legal_moves(self, actual_piece, r, c, **kwargs):
         #region black KING get legal moves
@@ -3692,11 +3741,13 @@ board.place_piece("P", "white", 6, 6, [(5, 6), (4, 6)], [], two_spaces=True, do_
 board.place_piece("P", "white", 6, 7, [(5, 7), (4, 7)], [], two_spaces=True, do_en_pass=False, get_en_pass=False, en_pass_count=0, pinned=False)
 board.place_piece("R", "white", 7, 0, [], [(6,0), (7,1)], moved=False, check_pathway=[], pinned=False, pin_pathway=[])
 board.place_piece("R", "white", 7, 7, [], [(6,7), (7,6)], moved=False, check_pathway=[], pinned=False, pin_pathway=[])
-board.place_piece("N", "white", 7, 1, [], [(5,0),(5,2)], pinned=False)
-board.place_piece("N", "white", 7, 6, [], [(5,7), (5,5)], pinned=False)
+board.place_piece("N", "white", 7, 1, [(5,0),(5,2)], [(6, 3)], pinned=False)
+board.place_piece("N", "white", 7, 6, [(5,7), (5,5)], [(6, 4)], pinned=False)
 board.place_piece("B", "white", 7, 2, [], [(6,1), (6,3)], check_pathway=[], pinned=False, pin_pathway=[])
 board.place_piece("B", "white", 7, 5, [], [(6,4), (6,6)], check_pathway=[], pinned=False, pin_pathway=[])
 board.place_piece("Q", "white", 7, 3, [], [(7,2), (6,2), (6,3), (6,4), (7,4)], check_pathway=[], pinned=False, pin_pathway=[])
 board.place_piece("K", "white", 7, 4, [], [(7,3), (6,3), (6,4), (6,5), (7,5)], moved=False, border=[(7,3), (6,3), (6,4), (6,5), (7,5)], in_check=False)
+print(board.squares[(0, 1)][1])
+board.game_states.append(copy.deepcopy(board.squares))
 root.mainloop()
 #endregion

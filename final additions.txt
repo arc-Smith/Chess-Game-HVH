@@ -1,13 +1,4 @@
 Draws:
-[stalemate] 
-no piece can move and there is not a check on the board at that moment (a check is done to see if there are no legal moves for any of the pieces perhaps there's a counter variable for all the legal moves of black / white if it is found to be there are 0 legal moves for the next player's turn then a draw is declared before piece selection)
-
-[insufficient mating material] 
-both sides have any of the following: (having an array of the current pieces on the board if it finds those specific combinations before selection of a piece then a draw is to be declared)
--lone king
--king and bishop
--king and knight
-
 [3-fold repetition] 
 if all other pieces are the same and the king + enemy piece checking it multiple times reach the same position a 2nd then 3rd time then 3-fold check has been found (as soon as the king is put into check then if it moves or if a piece interposes it then another check is made using the same piece then we can begin a sort of counter/checker for whether or not the same pos_r and pos_c are being reached)
 
