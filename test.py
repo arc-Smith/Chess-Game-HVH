@@ -771,7 +771,12 @@ class ChessBoard(tk.Canvas):
                             if pinVal[1] != None:
                                 if pinVal[1].notation == "Q" or pinVal[1].notation == "Qb" or pinVal[1].notation == "B" or pinVal[1].notation == "Bb" or pinVal[1].notation == "R" or pinVal[1].notation == "Rb":
                                     if pinVal[1].pin_pathway:
-                                        if (val[1].pos_r, val[1].pos_c) in pinVal[1].check_pathway:
+                                        # print(f"Check pathway of {pinVal[1].notation}", pinVal[1].check_pathway)
+                                        print(f"Pin pathway of {pinVal[1].notation}", pinVal[1].pin_pathway)
+                                        if (val[1].pos_r, val[1].pos_c) not in pinVal[1].pin_pathway:
+                                            pinVal[1].pin_pathway.append((val[1].pos_r, val[1].pos_c))
+                                            pinners.append(pinVal[1])
+                                        else:
                                             pinners.append(pinVal[1])
                         print("PINNERS:", pinners)
                         if len(pinners) > 1:
