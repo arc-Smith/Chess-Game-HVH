@@ -90,6 +90,9 @@ class ChessBoard(tk.Canvas):
         # 3-fold repetition
         self.game_states = []
 
+        # fifty move rule
+        self.fifty_move_rule = 0
+
     def create_board(self):
         square_size = self.size // 8 # each square will be 100x100
         white = "#eaebc8"
@@ -283,6 +286,8 @@ class ChessBoard(tk.Canvas):
             print("\n")
             self.bind("<Button-1>", lambda e: self.move_piece(e, from_square_r, from_square_c, from_square_id, actual_piece))
             return
+        
+        self.fifty_move_rule += 1
 
         #region KING move piece
         if actual_piece.notation == "K" or actual_piece.notation == "Kb":
@@ -297,6 +302,7 @@ class ChessBoard(tk.Canvas):
                 self.squares[(r, c)][1] = None
                 root.after(0000, self.delete, self.squares[(r, c)][2])
                 self.squares[(r, c)][2] = None
+                self.fifty_move_rule = 0
 
             # find the next legal moves for this piece
             add_legal_moves = self.get_legal_moves(actual_piece, r, c)
@@ -413,6 +419,7 @@ class ChessBoard(tk.Canvas):
                 self.squares[(r, c)][1] = None
                 root.after(0000, self.delete, self.squares[(r, c)][2])
                 self.squares[(r, c)][2] = None
+                self.fifty_move_rule = 0
 
             # find the next legal moves for this piece
             add_legal_moves = self.get_legal_moves(actual_piece, r, c)
@@ -465,6 +472,7 @@ class ChessBoard(tk.Canvas):
                 self.squares[(r, c)][1] = None
                 root.after(0000, self.delete, self.squares[(r, c)][2])
                 self.squares[(r, c)][2] = None
+                self.fifty_move_rule = 0
 
             # find the next legal moves for this piece
             add_legal_moves = self.get_legal_moves(actual_piece, r, c)
@@ -517,6 +525,7 @@ class ChessBoard(tk.Canvas):
                 self.squares[(r, c)][1] = None
                 root.after(0000, self.delete, self.squares[(r, c)][2])
                 self.squares[(r, c)][2] = None
+                self.fifty_move_rule = 0
 
             # find the next legal moves for this piece
             add_legal_moves = self.get_legal_moves(actual_piece, r, c)
@@ -569,6 +578,7 @@ class ChessBoard(tk.Canvas):
                 self.squares[(r, c)][1] = None
                 root.after(0000, self.delete, self.squares[(r, c)][2])
                 self.squares[(r, c)][2] = None
+                self.fifty_move_rule = 0
 
             # find the next legal moves for this piece
             add_legal_moves = self.get_legal_moves(actual_piece, r, c)
@@ -621,6 +631,7 @@ class ChessBoard(tk.Canvas):
                 self.squares[(r, c)][1] = None
                 root.after(0000, self.delete, self.squares[(r, c)][2])
                 self.squares[(r, c)][2] = None
+                self.fifty_move_rule = 0
             elif (self.squares[(r,c)][1] == None) and (self.squares[(r+1,c)][1] != None) and (self.squares[(r+1,c)][1].notation == "Pb") and (actual_piece.notation == "P") and (actual_piece.do_en_pass == True) and (self.squares[(r+1,c)][1].get_en_pass == True):
                 # removing the piece if it has been en passant-ed by White Pawn
                 print("REMOVING the BLACK pawn to the left/right of WHITE pawn")
@@ -628,6 +639,7 @@ class ChessBoard(tk.Canvas):
                 self.squares[(r+1, c)][1] = None
                 root.after(0000, self.delete, self.squares[(r+1, c)][2])
                 self.squares[(r+1, c)][2] = None
+                self.fifty_move_rule = 0
             elif (self.squares[(r,c)][1] == None) and (self.squares[(r-1,c)][1] != None) and (self.squares[(r-1,c)][1].notation == "P") and (actual_piece.notation == "Pb") and (actual_piece.do_en_pass == True) and (self.squares[(r-1,c)][1].get_en_pass == True):
                 # removing the piece if it has been en passant-ed by Black Pawn
                 print("REMOVING the WHITE pawn to the left/right of BLACK pawn")
@@ -635,6 +647,7 @@ class ChessBoard(tk.Canvas):
                 self.squares[(r-1, c)][1] = None
                 root.after(0000, self.delete, self.squares[(r-1, c)][2])
                 self.squares[(r-1, c)][2] = None
+                self.fifty_move_rule = 0
 
             # en passant given to enemy piece that's on left of white pawn
             if (c >= 1):
@@ -704,6 +717,8 @@ class ChessBoard(tk.Canvas):
             for key, val in self.squares.items():
                 if val[1] != None:
                     val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
+            
+            self.fifty_move_rule = 0
         #endregion
         self.en_passant()
         self.pinsChecksCheckmate()
@@ -975,16 +990,22 @@ class ChessBoard(tk.Canvas):
             return True
         self.game_states.append(copy.deepcopy(self.squares))
         repeated = False
-        print(len(self.game_states))
+        # print(len(self.game_states))
         for a in range(0, len(self.game_states)):
             for b in range(a + 1, len(self.game_states)):
                 for c in range(b + 1, len(self.game_states)):
-                    print("ENTERED")
+                    # print("ENTERED")
                     if are_board_states_equal(self.game_states[a], self.game_states[b]):
                         if are_board_states_equal(self.game_states[b], self.game_states[c]):
                             repeated = True
         if repeated:
             messagebox.showinfo("Draw", "3-FOLD REPETITION there is no winner.")
+            self.turn_based = [None, None] # ensures the pieces can't be moved again
+        
+        # fifty move rule
+        print("FIFTY MOVE RULE=", self.fifty_move_rule)
+        if self.fifty_move_rule == 50:
+            messagebox.showinfo("Draw", "FIFTY MOVE RULE there is no winner.")
             self.turn_based = [None, None] # ensures the pieces can't be moved again
 
     def get_legal_moves(self, actual_piece, r, c, **kwargs):
@@ -3747,7 +3768,7 @@ board.place_piece("B", "white", 7, 2, [], [(6,1), (6,3)], check_pathway=[], pinn
 board.place_piece("B", "white", 7, 5, [], [(6,4), (6,6)], check_pathway=[], pinned=False, pin_pathway=[])
 board.place_piece("Q", "white", 7, 3, [], [(7,2), (6,2), (6,3), (6,4), (7,4)], check_pathway=[], pinned=False, pin_pathway=[])
 board.place_piece("K", "white", 7, 4, [], [(7,3), (6,3), (6,4), (6,5), (7,5)], moved=False, border=[(7,3), (6,3), (6,4), (6,5), (7,5)], in_check=False)
-print(board.squares[(0, 1)][1])
+# print(board.squares[(0, 1)][1])
 board.game_states.append(copy.deepcopy(board.squares))
 root.mainloop()
 #endregion
