@@ -52,14 +52,13 @@ class Rook(Piece):
         self.points = 5
 
 class Pawn(Piece):
-    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, two_spaces, do_en_pass, get_en_pass, en_pass_count, pinned, pin_pathway):
+    def __init__(self, notation, color, pos_r, pos_c, legal_moves, defends, two_spaces, do_en_pass, get_en_pass, en_pass_count, pinned):
         super().__init__(notation, color, pos_r, pos_c, legal_moves, defends)
         self.two_spaces = two_spaces # used for moving 2 squares
         self.do_en_pass = do_en_pass # true or false value allowing a piece to en passant another
         self.get_en_pass = get_en_pass # true or false value allowing another piece en passant
         self.en_pass_count = en_pass_count # allows for en passant when the value is 1 meaning for 1 turn
         self.pinned = pinned # true or false value indicating whether a piece is pinned
-        self.pin_pathway = pin_pathway # array holding positions that the pinned piece can still move to (i.e. only squares that are inside of the pin pathway perhaps even taking its attacker)
         self.points = 1
 
     def promote(self): # method for pawn promotion
