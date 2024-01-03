@@ -1003,7 +1003,7 @@ class ChessBoard(tk.Canvas):
             self.turn_based = [None, None] # ensures the pieces can't be moved again
         
         # fifty move rule
-        print("FIFTY MOVE RULE=", self.fifty_move_rule)
+        # print("FIFTY MOVE RULE=", self.fifty_move_rule)
         if self.fifty_move_rule == 50:
             messagebox.showinfo("Draw", "FIFTY MOVE RULE there is no winner.")
             self.turn_based = [None, None] # ensures the pieces can't be moved again
@@ -3770,5 +3770,17 @@ board.place_piece("Q", "white", 7, 3, [], [(7,2), (6,2), (6,3), (6,4), (7,4)], c
 board.place_piece("K", "white", 7, 4, [], [(7,3), (6,3), (6,4), (6,5), (7,5)], moved=False, border=[(7,3), (6,3), (6,4), (6,5), (7,5)], in_check=False)
 # print(board.squares[(0, 1)][1])
 board.game_states.append(copy.deepcopy(board.squares))
+
+def show_rules():
+    rules_text = (
+        "Chess Game Rules:\n"
+        "1. Click-to-move\n"
+        "2. There is no draw button so verbal draws will be used instead\n"
+    )
+    # Display a messagebox with the custom rules
+    messagebox.showinfo("Custom Chess Rules", rules_text)
+delay_time = 500
+root.after(delay_time, show_rules)
+
 root.mainloop()
 #endregion

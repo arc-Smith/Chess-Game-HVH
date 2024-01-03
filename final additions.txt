@@ -1,3 +1,0 @@
-Draws:
-[fifty move rule]
-if no piece has been captured or no pawn has been moved in fifty consecutive moves then a draw is declared (each time a piece that's not a pawn is moved then fifty_move_draw gets +1 and each time a capture is NOT carried out then fifty_move_draw gets +1 on the other hand after each capture fifty_move_draw is set to 0 and after each pawn move fifty_move_draw is set to 0)
