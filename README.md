@@ -1,5 +1,5 @@
 # Gameplay
-https://github.com/arc-Smith/Chess-Game/assets/98622773/e9aa6a43-3a8c-4119-934d-a7be43d6b221
+https://github.com/arc-Smith/Chess-Game/assets/98622773/719b6011-f6ae-49b2-9edf-828b33ed47fd
 
 # Overview
 This is a chess game implemented using **Python** and Tkinter (standard GUI package). This chess game features pixel designs for the pieces made using the pixel design application Aseprite. The game provides a graphical user interface (GUI) that allows players to move the pieces by clicking on them with the mouse. Finally, the overarching goal is to allow for both human vs human (HvH), and human vs computer (HvC) gameplay using reinforcement learning.
