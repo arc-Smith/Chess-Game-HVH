@@ -3776,10 +3776,11 @@ def show_rules():
         "Chess Game Rules:\n"
         "1. Click-to-move\n"
         "2. There is no draw button so verbal draws will be used instead\n"
+        "3. Allow the highlights to be given for the previously moved piece before selecting a new piece to move\n"
     )
     # Display a messagebox with the custom rules
     messagebox.showinfo("Custom Chess Rules", rules_text)
-delay_time = 500
+delay_time = 5000
 root.after(delay_time, show_rules)
 
 root.mainloop()
