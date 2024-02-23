@@ -95,8 +95,8 @@ class ChessBoard(tk.Canvas):
 
     def create_board(self):
         square_size = self.size // 8 # each square will be 100x100
-        white = "#eaebc8"
-        green = "#638545"
+        white = "#CDA26F"
+        green = "#713A21"
         colors = [white, green] # two chosen chess board colors
 
         for row in range(8):
@@ -194,7 +194,7 @@ class ChessBoard(tk.Canvas):
             if self.clicked_piece != None and self.clicked_piece.color == self.turn_based[self.turns % 2]:
                     if (r, c) in self.incheck_move or (r, c) in self.incheck_take or (r, c) in self.incheck_interpose:
                         if len(self.clicked_piece.legal_moves) >= 1:
-                            highlight = self.whiteHighlight if self.squares[(clicked_row, clicked_col)][3] == "#eaebc8" else self.greenHighlight
+                            highlight = self.whiteHighlight if self.squares[(clicked_row, clicked_col)][3] == "#CDA26F" else self.greenHighlight
                             self.turns += 1
                             self.itemconfigure(square_id, fill=highlight, outline=highlight, width=0)
                             self.update()
@@ -221,7 +221,7 @@ class ChessBoard(tk.Canvas):
                     # if self.clicked_piece.notation != "K" and self.clicked_piece.notation != "Kb":
                     #     pass
                     if len(self.clicked_piece.legal_moves) >= 1:
-                            highlight = self.whiteHighlight if self.squares[(clicked_row, clicked_col)][3] == "#eaebc8" else self.greenHighlight
+                            highlight = self.whiteHighlight if self.squares[(clicked_row, clicked_col)][3] == "#CDA26F" else self.greenHighlight
                             self.turns += 1
                             self.itemconfigure(square_id, fill=highlight, outline=highlight, width=0)
                             self.update()
@@ -316,7 +316,7 @@ class ChessBoard(tk.Canvas):
             # self.clicked = None
 
             # HIGHLIGHT / highlight past position
-            highlight = self.whiteHighlight if self.squares[(from_square_r, from_square_c)][3] == "#eaebc8" else self.greenHighlight
+            highlight = self.whiteHighlight if self.squares[(from_square_r, from_square_c)][3] == "#CDA26F" else self.greenHighlight
             self.itemconfigure(self.clicked, fill=highlight, outline=highlight, width=0)
             self.update()
             self.clicked = None
@@ -327,7 +327,7 @@ class ChessBoard(tk.Canvas):
 
             # HIGHLIGHT / highlight new position
             self.newClicked = self.squares[(r, c)][0]
-            highlight = self.whiteHighlight if self.squares[(r, c)][3] == "#eaebc8" else self.greenHighlight
+            highlight = self.whiteHighlight if self.squares[(r, c)][3] == "#CDA26F" else self.greenHighlight
             self.itemconfigure(self.newClicked, fill=highlight, outline=highlight, width=0)
             self.update()
             self.newClicked = None
@@ -398,7 +398,7 @@ class ChessBoard(tk.Canvas):
                     self.place_piece(the_rook.notation, the_rook.color, 7, 5, add_legal_moves, the_rook.defends, moved=True)
 
             # putting the next left click back onto the select_piece function
-            self.bind("<Button-1>", self.select_piece)
+            # self.bind("<Button-1>", self.select_piece)
 
             # make sure all pieces have their correct legal moves
             for key, val in self.squares.items():
@@ -433,7 +433,7 @@ class ChessBoard(tk.Canvas):
             # self.clicked = None
 
             # HIGHLIGHT / highlight past position
-            highlight = self.whiteHighlight if self.squares[(from_square_r, from_square_c)][3] == "#eaebc8" else self.greenHighlight
+            highlight = self.whiteHighlight if self.squares[(from_square_r, from_square_c)][3] == "#CDA26F" else self.greenHighlight
             self.itemconfigure(self.clicked, fill=highlight, outline=highlight, width=0)
             self.update()
             self.clicked = None
@@ -444,14 +444,14 @@ class ChessBoard(tk.Canvas):
 
             # HIGHLIGHT / highlight new position
             self.newClicked = self.squares[(r, c)][0]
-            highlight = self.whiteHighlight if self.squares[(r, c)][3] == "#eaebc8" else self.greenHighlight
+            highlight = self.whiteHighlight if self.squares[(r, c)][3] == "#CDA26F" else self.greenHighlight
             self.itemconfigure(self.newClicked, fill=highlight, outline=highlight, width=0)
             self.update()
             self.newClicked = None
             self.fromTo.append([r, c])
 
             # putting the next left click back onto the select_piece function
-            self.bind("<Button-1>", self.select_piece)
+            # self.bind("<Button-1>", self.select_piece)
 
             # make sure all pieces have their correct legal moves
             for key, val in self.squares.items():
@@ -486,7 +486,7 @@ class ChessBoard(tk.Canvas):
             # self.clicked = None
 
             # HIGHLIGHT / highlight past position
-            highlight = self.whiteHighlight if self.squares[(from_square_r, from_square_c)][3] == "#eaebc8" else self.greenHighlight
+            highlight = self.whiteHighlight if self.squares[(from_square_r, from_square_c)][3] == "#CDA26F" else self.greenHighlight
             self.itemconfigure(self.clicked, fill=highlight, outline=highlight, width=0)
             self.update()
             self.clicked = None
@@ -497,14 +497,14 @@ class ChessBoard(tk.Canvas):
 
             # HIGHLIGHT / highlight new position
             self.newClicked = self.squares[(r, c)][0]
-            highlight = self.whiteHighlight if self.squares[(r, c)][3] == "#eaebc8" else self.greenHighlight
+            highlight = self.whiteHighlight if self.squares[(r, c)][3] == "#CDA26F" else self.greenHighlight
             self.itemconfigure(self.newClicked, fill=highlight, outline=highlight, width=0)
             self.update()
             self.newClicked = None
             self.fromTo.append([r, c])
 
             # putting the next left click back onto the select_piece function
-            self.bind("<Button-1>", self.select_piece)
+            # self.bind("<Button-1>", self.select_piece)
 
             # make sure all pieces have their correct legal moves
             for key, val in self.squares.items():
@@ -539,7 +539,7 @@ class ChessBoard(tk.Canvas):
             # self.clicked = None
 
             # HIGHLIGHT / highlight past position
-            highlight = self.whiteHighlight if self.squares[(from_square_r, from_square_c)][3] == "#eaebc8" else self.greenHighlight
+            highlight = self.whiteHighlight if self.squares[(from_square_r, from_square_c)][3] == "#CDA26F" else self.greenHighlight
             self.itemconfigure(self.clicked, fill=highlight, outline=highlight, width=0)
             self.update()
             self.clicked = None
@@ -550,14 +550,14 @@ class ChessBoard(tk.Canvas):
 
             # HIGHLIGHT / highlight new position
             self.newClicked = self.squares[(r, c)][0]
-            highlight = self.whiteHighlight if self.squares[(r, c)][3] == "#eaebc8" else self.greenHighlight
+            highlight = self.whiteHighlight if self.squares[(r, c)][3] == "#CDA26F" else self.greenHighlight
             self.itemconfigure(self.newClicked, fill=highlight, outline=highlight, width=0)
             self.update()
             self.newClicked = None
             self.fromTo.append([r, c])
 
             # putting the next left click back onto the select_piece function
-            self.bind("<Button-1>", self.select_piece)
+            # self.bind("<Button-1>", self.select_piece)
 
             # make sure all pieces have their correct legal moves
             for key, val in self.squares.items():
@@ -592,7 +592,7 @@ class ChessBoard(tk.Canvas):
             # self.clicked = None
 
             # HIGHLIGHT / highlight past position
-            highlight = self.whiteHighlight if self.squares[(from_square_r, from_square_c)][3] == "#eaebc8" else self.greenHighlight
+            highlight = self.whiteHighlight if self.squares[(from_square_r, from_square_c)][3] == "#CDA26F" else self.greenHighlight
             self.itemconfigure(self.clicked, fill=highlight, outline=highlight, width=0)
             self.update()
             self.clicked = None
@@ -603,14 +603,14 @@ class ChessBoard(tk.Canvas):
 
             # HIGHLIGHT / highlight new position
             self.newClicked = self.squares[(r, c)][0]
-            highlight = self.whiteHighlight if self.squares[(r, c)][3] == "#eaebc8" else self.greenHighlight
+            highlight = self.whiteHighlight if self.squares[(r, c)][3] == "#CDA26F" else self.greenHighlight
             self.itemconfigure(self.newClicked, fill=highlight, outline=highlight, width=0)
             self.update()
             self.newClicked = None
             self.fromTo.append([r, c])
 
             # putting the next left click back onto the select_piece function
-            self.bind("<Button-1>", self.select_piece)
+            # self.bind("<Button-1>", self.select_piece)
 
             # make sure all pieces have their correct legal moves
             for key, val in self.squares.items():
@@ -693,7 +693,7 @@ class ChessBoard(tk.Canvas):
             # self.fromTo.append([from_square_r, from_square_c])
 
             # HIGHLIGHT / highlight past position
-            highlight = self.whiteHighlight if self.squares[(from_square_r, from_square_c)][3] == "#eaebc8" else self.greenHighlight
+            highlight = self.whiteHighlight if self.squares[(from_square_r, from_square_c)][3] == "#CDA26F" else self.greenHighlight
             self.itemconfigure(self.clicked, fill=highlight, outline=highlight, width=0)
             self.update()
             self.clicked = None
@@ -704,14 +704,14 @@ class ChessBoard(tk.Canvas):
 
             # HIGHLIGHT / highlight new position
             self.newClicked = self.squares[(r, c)][0]
-            highlight = self.whiteHighlight if self.squares[(r, c)][3] == "#eaebc8" else self.greenHighlight
+            highlight = self.whiteHighlight if self.squares[(r, c)][3] == "#CDA26F" else self.greenHighlight
             self.itemconfigure(self.newClicked, fill=highlight, outline=highlight, width=0)
             self.update()
             self.newClicked = None
             self.fromTo.append([r, c])
 
             # putting the next left click back onto the select_piece function
-            self.bind("<Button-1>", self.select_piece)
+            # self.bind("<Button-1>", self.select_piece)
 
             # make sure all pieces have their correct legal moves
             for key, val in self.squares.items():
@@ -720,9 +720,14 @@ class ChessBoard(tk.Canvas):
             
             self.fifty_move_rule = 0
         #endregion
+        # make sure all pieces have their correct legal moves again
+            for key, val in self.squares.items():
+                if val[1] != None:
+                    val[1].legal_moves = self.get_legal_moves(val[1], val[1].pos_r, val[1].pos_c)
         self.en_passant()
         self.pinsChecksCheckmate()
         self.draws()
+        self.bind("<Button-1>", self.select_piece)
     
     def highlighting(self):
         if len(self.fromTo) > 2:
@@ -779,7 +784,7 @@ class ChessBoard(tk.Canvas):
                             val[1].legal_moves = legal_moves_of_pinned_piece
                             # print(f"I the {val[1].color} {val[1].notation} legal moves for me=", val[1].legal_moves)
                         # if len(self.clicked_piece.legal_moves) >= 1:
-                        #     highlight = self.whiteHighlight if self.squares[(clicked_row, clicked_col)][3] == "#eaebc8" else self.greenHighlight
+                        #     highlight = self.whiteHighlight if self.squares[(clicked_row, clicked_col)][3] == "#CDA26F" else self.greenHighlight
                         #     self.turns += 1
                         #     self.itemconfigure(square_id, fill=highlight, outline=highlight, width=0)
                         #     self.update()
@@ -793,7 +798,7 @@ class ChessBoard(tk.Canvas):
 
                         #     self.bind("<Button-1>", lambda e: self.move_piece(e, r, c, square_id, self.clicked_piece))
                         # elif len(self.clicked_piece.legal_moves) >= 1:
-                        #     highlight = self.whiteHighlight if self.squares[(clicked_row, clicked_col)][3] == "#eaebc8" else self.greenHighlight
+                        #     highlight = self.whiteHighlight if self.squares[(clicked_row, clicked_col)][3] == "#CDA26F" else self.greenHighlight
                         #     self.turns += 1
                         #     self.itemconfigure(square_id, fill=highlight, outline=highlight, width=0)
                         #     self.update()
@@ -839,12 +844,16 @@ class ChessBoard(tk.Canvas):
         if black_check_pos != None:
             self.check_on_the_board = True # this is now True so an action must be taken to get out of check
 
+            # kingCannotEscape = False
             for key, val in self.squares.items():
                     if val[1] != None:
                         # finding out which piece(s) has/have the king under attack 
                         if val[1].color == "white":
                             if black_check_pos in val[1].legal_moves:
                                 self.checkers.append(val[1])
+                            # if val[1].notation == "Q" or val[1].notation == "Qb" or val[1].notation == "B" or val[1].notation == "Bb" or val[1].notation == "R" or val[1].notation == "Rb":
+                            #     if black_check_pos in val[1].check_pathway:
+                            #         kingCannotEscape = True
             
             # if there are multiple checkers then the only option is to move
             if len(self.checkers) > 1:
@@ -856,6 +865,7 @@ class ChessBoard(tk.Canvas):
                 if self.squares[black_check_pos][1].legal_moves:
                     self.incheck_move[black_check_pos] = self.squares[black_check_pos][1].legal_moves # King can simply move out of the way
 
+
                 for key, val in self.squares.items():
                     if val[1] != None:
                         if (piece.pos_r, piece.pos_c) in val[1].legal_moves: # an ally piece takes the piece that's checked the king
@@ -866,7 +876,7 @@ class ChessBoard(tk.Canvas):
                     for key, val in self.squares.items():
                         if val[1] != None and val[1].color == "black":
                             for r,c in val[1].legal_moves:
-                                if (r, c) in piece.check_pathway:
+                                if (r, c) in piece.check_pathway and (r, c) in piece.legal_moves:
                                     interpose.append((r, c))
                             if interpose:
                                 self.incheck_interpose[(val[1].pos_r, val[1].pos_c)] = interpose
@@ -907,7 +917,7 @@ class ChessBoard(tk.Canvas):
                     for key, val in self.squares.items():
                         if val[1] != None and val[1].color == "white":
                             for r,c in val[1].legal_moves:
-                                if (r, c) in piece.check_pathway:
+                                if (r, c) in piece.check_pathway and (r, c) in piece.legal_moves:
                                     interpose.append((r, c))
                             if interpose:
                                 self.incheck_interpose[(val[1].pos_r, val[1].pos_c)] = interpose
@@ -928,7 +938,7 @@ class ChessBoard(tk.Canvas):
                 messagebox.showinfo("Checkmate", "CHECKMATE White has won!") if self.turn_based[(self.turns) % 2] == "black" else messagebox.showinfo("Checkmate", "CHECKMATE Black has won!")
                 self.turn_based = [None, None] # ensures the pieces can't be moved again
 
-    def draws(self): # STILL IN DEVELOPMENT    
+    def draws(self):  
         # stalemate
         self.all_white_legal_moves = 0
         self.all_black_legal_moves = 0
@@ -1111,10 +1121,18 @@ class ChessBoard(tk.Canvas):
                                 if((r-i,c-i) in val[1].legal_moves) or ((r-i,c-i) in val[1].defends):
                                     add_legal_moves.remove((r-i,c-i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                    if ((r-i,c-i) in val[1].check_pathway):
+                                        add_legal_moves.remove((r-i,c-i))
+                                        break
                             if val[1].notation == "R":
                                 if((r-i,c-i) in val[1].legal_moves) or ((r-i,c-i) in val[1].defends):
                                     add_legal_moves.remove((r-i,c-i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                    if ((r-i,c-i) in val[1].check_pathway):
+                                        add_legal_moves.remove((r-i,c-i))
+                                        break
                             if val[1].notation == "P":
                                 # checking the diagonals of the white Pawn
                                 if((r-i,c-i) == (val[1].pos_r-1,val[1].pos_c-1)) or ((r-i,c-i) in val[1].defends):
@@ -1127,6 +1145,10 @@ class ChessBoard(tk.Canvas):
                                 if((r-i,c-i) in val[1].legal_moves) or ((r-i,c-i) in val[1].defends):
                                     add_legal_moves.remove((r-i,c-i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                    if ((r-i,c-i) in val[1].check_pathway):
+                                        add_legal_moves.remove((r-i,c-i))
+                                        break
                             if val[1].notation == "N":
                                 if((r-i,c-i) in val[1].legal_moves) or ((r-i,c-i) in val[1].defends):
                                     add_legal_moves.remove((r-i,c-i))
@@ -1196,10 +1218,18 @@ class ChessBoard(tk.Canvas):
                                 if((r+i,c-i) in val[1].legal_moves) or ((r+i,c-i) in val[1].defends):
                                     add_legal_moves.remove((r+i,c-i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r+i,c-i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r+i,c-i))
+                                            break
                             if val[1].notation == "R":
                                 if((r+i,c-i) in val[1].legal_moves) or ((r+i,c-i) in val[1].defends):
                                     add_legal_moves.remove((r+i,c-i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r+i,c-i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r+i,c-i))
+                                            break
                             if val[1].notation == "P":
                                 # checking the diagonals of the white Pawn
                                 if((r+i,c-i) == (val[1].pos_r-1,val[1].pos_c-1)) or ((r+i,c-i) in val[1].defends):
@@ -1212,6 +1242,10 @@ class ChessBoard(tk.Canvas):
                                 if((r+i,c-i) in val[1].legal_moves) or ((r+i,c-i) in val[1].defends):
                                     add_legal_moves.remove((r+i,c-i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r+i,c-i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r+i,c-i))
+                                            break
                             if val[1].notation == "N":
                                 if((r+i,c-i) in val[1].legal_moves) or ((r+i,c-i) in val[1].defends):
                                     add_legal_moves.remove((r+i,c-i))
@@ -1281,10 +1315,18 @@ class ChessBoard(tk.Canvas):
                                 if((r-i,c+i) in val[1].legal_moves) or ((r-i,c+i) in val[1].defends):
                                     add_legal_moves.remove((r-i,c+i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r-i,c+i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r-i,c+i))
+                                            break
                             if val[1].notation == "R":
                                 if((r-i,c+i) in val[1].legal_moves) or ((r-i,c+i) in val[1].defends):
                                     add_legal_moves.remove((r-i,c+i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r-i,c+i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r-i,c+i))
+                                            break
                             if val[1].notation == "P":
                                 # checking the diagonals of the white Pawn
                                 if((r-i,c+i) == (val[1].pos_r-1,val[1].pos_c-1)) or ((r-i,c+i) in val[1].defends):
@@ -1297,6 +1339,10 @@ class ChessBoard(tk.Canvas):
                                 if((r-i,c+i) in val[1].legal_moves) or ((r-i,c+i) in val[1].defends):
                                     add_legal_moves.remove((r-i,c+i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r-i,c+i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r-i,c+i))
+                                            break
                             if val[1].notation == "N":
                                 if((r-i,c+i) in val[1].legal_moves) or ((r-i,c+i) in val[1].defends):
                                     add_legal_moves.remove((r-i,c+i))
@@ -1366,10 +1412,18 @@ class ChessBoard(tk.Canvas):
                                 if((r+i,c+i) in val[1].legal_moves) or ((r+i,c+i) in val[1].defends):
                                     add_legal_moves.remove((r+i,c+i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r+i,c+i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r+i,c+i))
+                                            break
                             if val[1].notation == "R":
                                 if((r+i,c+i) in val[1].legal_moves):
                                     add_legal_moves.remove((r+i,c+i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r+i,c+i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r+i,c+i))
+                                            break
                             if val[1].notation == "P":
                                 # checking the diagonals of the white Pawn
                                 if((r+i,c+i) == (val[1].pos_r-1,val[1].pos_c-1)) or ((r+i,c+i) in val[1].defends):
@@ -1382,6 +1436,10 @@ class ChessBoard(tk.Canvas):
                                 if((r+i,c+i) in val[1].legal_moves) or ((r+i,c+i) in val[1].defends):
                                     add_legal_moves.remove((r+i,c+i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r+i,c+i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r+i,c+i))
+                                            break
                             if val[1].notation == "N":
                                 if((r+i,c+i) in val[1].legal_moves) or ((r+i,c+i) in val[1].defends):
                                     add_legal_moves.remove((r+i,c+i))
@@ -1453,10 +1511,18 @@ class ChessBoard(tk.Canvas):
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends):
                                     add_legal_moves.remove((r,i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r,i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r,i))
+                                            break
                             if val[1].notation == "R":
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends):
                                     add_legal_moves.remove((r,i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r,i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r,i))
+                                            break
                             if val[1].notation == "P":
                                 # checking the diagonals of the white Pawn
                                 if((r,i) == (val[1].pos_r-1,val[1].pos_c-1)) or ((r,i) in val[1].defends):
@@ -1469,6 +1535,10 @@ class ChessBoard(tk.Canvas):
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends):
                                     add_legal_moves.remove((r,i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r,i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r,i))
+                                            break
                             if val[1].notation == "N":
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends):
                                     add_legal_moves.remove((r,i))
@@ -1540,10 +1610,18 @@ class ChessBoard(tk.Canvas):
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends):
                                     add_legal_moves.remove((r,i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r,i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r,i))
+                                            break
                             if val[1].notation == "R":
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends):
                                     add_legal_moves.remove((r,i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r,i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r,i))
+                                            break
                             if val[1].notation == "P":
                                 # checking the diagonals of the white Pawn
                                 if((r,i) == (val[1].pos_r-1,val[1].pos_c-1)) or ((r,i) in val[1].defends):
@@ -1556,6 +1634,10 @@ class ChessBoard(tk.Canvas):
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends):
                                     add_legal_moves.remove((r,i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r,i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r,i))
+                                            break
                             if val[1].notation == "N":
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends):
                                     add_legal_moves.remove((r,i))
@@ -1627,10 +1709,18 @@ class ChessBoard(tk.Canvas):
                                 if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends):
                                     add_legal_moves.remove((i,c))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((i,c) in val[1].check_pathway):
+                                            add_legal_moves.remove((i,c))
+                                            break
                             if val[1].notation == "R":
                                 if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends):
                                     add_legal_moves.remove((i,c))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((i,c) in val[1].check_pathway):
+                                            add_legal_moves.remove((i,c))
+                                            break
                             if val[1].notation == "P":
                                 # checking the diagonals of the white Pawn
                                 if((i,c) == (val[1].pos_r-1,val[1].pos_c-1)) or ((i,c) in val[1].defends):
@@ -1643,6 +1733,10 @@ class ChessBoard(tk.Canvas):
                                 if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends):
                                     add_legal_moves.remove((i,c))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((i,c) in val[1].check_pathway):
+                                            add_legal_moves.remove((i,c))
+                                            break
                             if val[1].notation == "N":
                                 if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends):
                                     add_legal_moves.remove((i,c))
@@ -1714,10 +1808,18 @@ class ChessBoard(tk.Canvas):
                                 if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends):
                                     add_legal_moves.remove((i,c))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((i,c) in val[1].check_pathway):
+                                            add_legal_moves.remove((i,c))
+                                            break
                             if val[1].notation == "R":
                                 if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends):
                                     add_legal_moves.remove((i,c))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((i,c) in val[1].check_pathway):
+                                            add_legal_moves.remove((i,c))
+                                            break
                             if val[1].notation == "P":
                                 # checking the diagonals of the white Pawn
                                 if((i,c) == (val[1].pos_r-1,val[1].pos_c-1)) or ((i,c) in val[1].defends):
@@ -1730,6 +1832,10 @@ class ChessBoard(tk.Canvas):
                                 if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends):
                                     add_legal_moves.remove((i,c))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((i,c) in val[1].check_pathway):
+                                            add_legal_moves.remove((i,c))
+                                            break
                             if val[1].notation == "N":
                                 if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends):
                                     add_legal_moves.remove((i,c))
@@ -1851,10 +1957,18 @@ class ChessBoard(tk.Canvas):
                                 if((r-i,c-i) in val[1].legal_moves) or ((r-i,c-i) in val[1].defends):
                                     add_legal_moves.remove((r-i,c-i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r-i,c-i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r-i,c-i))
+                                            break
                             if val[1].notation == "Rb":
                                 if((r-i,c-i) in val[1].legal_moves) or ((r-i,c-i) in val[1].defends):
                                     add_legal_moves.remove((r-i,c-i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r-i,c-i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r-i,c-i))
+                                            break
                             if val[1].notation == "Pb":
                                 # checking the diagonals of the black Pawn
                                 if((r-i,c-i) == (val[1].pos_r+1,val[1].pos_c-1)) or ((r-i,c-i) in val[1].defends):
@@ -1867,6 +1981,10 @@ class ChessBoard(tk.Canvas):
                                 if((r-i,c-i) in val[1].legal_moves) or ((r-i,c-i) in val[1].defends):
                                     add_legal_moves.remove((r-i,c-i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r-i,c-i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r-i,c-i))
+                                            break
                             if val[1].notation == "Nb":
                                 if((r-i,c-i) in val[1].legal_moves) or ((r-i,c-i) in val[1].defends):
                                     add_legal_moves.remove((r-i,c-i))
@@ -1939,10 +2057,18 @@ class ChessBoard(tk.Canvas):
                                 if((r+i,c-i) in val[1].legal_moves) or ((r+i,c-i) in val[1].defends):
                                     add_legal_moves.remove((r+i,c-i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r+i,c-i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r+i,c-i))
+                                            break
                             if val[1].notation == "Rb":
                                 if((r+i,c-i) in val[1].legal_moves) or ((r+i,c-i) in val[1].defends):
                                     add_legal_moves.remove((r+i,c-i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r+i,c-i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r+i,c-i))
+                                            break
                             if val[1].notation == "Pb":
                                 # checking the diagonals of the black Pawn
                                 if((r+i,c-i) == (val[1].pos_r+1,val[1].pos_c-1)) or ((r+i,c-i) in val[1].defends):
@@ -1955,6 +2081,10 @@ class ChessBoard(tk.Canvas):
                                 if((r+i,c-i) in val[1].legal_moves) or ((r+i,c-i) in val[1].defends):
                                     add_legal_moves.remove((r+i,c-i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r+i,c-i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r+i,c-i))
+                                            break
                             if val[1].notation == "Nb":
                                 if((r+i,c-i) in val[1].legal_moves) or ((r+i,c-i) in val[1].defends):
                                     add_legal_moves.remove((r+i,c-i))
@@ -2026,10 +2156,18 @@ class ChessBoard(tk.Canvas):
                                 if((r-i,c+i) in val[1].legal_moves) or ((r-i,c+i) in val[1].defends):
                                     add_legal_moves.remove((r-i,c+i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r-i,c+i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r-i,c+i))
+                                            break
                             if val[1].notation == "Rb":
                                 if((r-i,c+i) in val[1].legal_moves) or ((r-i,c+i) in val[1].defends):
                                     add_legal_moves.remove((r-i,c+i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r-i,c+i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r-i,c+i))
+                                            break
                             if val[1].notation == "Pb":
                                 # checking the diagonals of the black Pawn
                                 if((r-i,c+i) == (val[1].pos_r+1,val[1].pos_c-1)) or ((r-i,c+i) in val[1].defends):
@@ -2042,6 +2180,10 @@ class ChessBoard(tk.Canvas):
                                 if((r-i,c+i) in val[1].legal_moves) or ((r-i,c+i) in val[1].defends):
                                     add_legal_moves.remove((r-i,c+i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r-i,c+i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r-i,c+i))
+                                            break
                             if val[1].notation == "Nb":
                                 if((r-i,c+i) in val[1].legal_moves) or ((r-i,c+i) in val[1].defends):
                                     add_legal_moves.remove((r-i,c+i))
@@ -2113,10 +2255,18 @@ class ChessBoard(tk.Canvas):
                                 if((r+i,c+i) in val[1].legal_moves) or ((r+i,c+i) in val[1].defends):
                                     add_legal_moves.remove((r+i,c+i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r+i,c+i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r+i,c+i))
+                                            break
                             if val[1].notation == "Rb":
                                 if((r+i,c+i) in val[1].legal_moves):
                                     add_legal_moves.remove((r+i,c+i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r+i,c+i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r+i,c+i))
+                                            break
                             if val[1].notation == "Pb":
                                 # checking the diagonals of the black Pawn
                                 if((r+i,c+i) == (val[1].pos_r+1,val[1].pos_c-1)) or ((r+i,c+i) in val[1].defends):
@@ -2129,6 +2279,10 @@ class ChessBoard(tk.Canvas):
                                 if((r+i,c+i) in val[1].legal_moves) or ((r+i,c+i) in val[1].defends):
                                     add_legal_moves.remove((r+i,c+i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r+i,c+i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r+i,c+i))
+                                            break
                             if val[1].notation == "Nb":
                                 if((r+i,c+i) in val[1].legal_moves) or ((r+i,c+i) in val[1].defends):
                                     add_legal_moves.remove((r+i,c+i))
@@ -2202,10 +2356,18 @@ class ChessBoard(tk.Canvas):
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends):
                                     add_legal_moves.remove((r,i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r,i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r,i))
+                                            break
                             if val[1].notation == "Rb":
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends):
                                     add_legal_moves.remove((r,i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r,i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r,i))
+                                            break
                             if val[1].notation == "Pb":
                                 # checking the diagonals of the black Pawn
                                 if((r,i) == (val[1].pos_r+1,val[1].pos_c-1)) or ((r,i) in val[1].defends):
@@ -2218,6 +2380,10 @@ class ChessBoard(tk.Canvas):
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends):
                                     add_legal_moves.remove((r,i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r,i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r,i))
+                                            break
                             if val[1].notation == "Nb":
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends):
                                     add_legal_moves.remove((r,i))
@@ -2291,10 +2457,18 @@ class ChessBoard(tk.Canvas):
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends):
                                     add_legal_moves.remove((r,i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r,i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r,i))
+                                            break
                             if val[1].notation == "Rb":
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends):
                                     add_legal_moves.remove((r,i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r,i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r,i))
+                                            break
                             if val[1].notation == "Pb":
                                 # checking the diagonals of the black Pawn
                                 if((r,i) == (val[1].pos_r+1,val[1].pos_c-1)) or ((r,i) in val[1].defends):
@@ -2307,6 +2481,10 @@ class ChessBoard(tk.Canvas):
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends):
                                     add_legal_moves.remove((r,i))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((r,i) in val[1].check_pathway):
+                                            add_legal_moves.remove((r,i))
+                                            break
                             if val[1].notation == "Nb":
                                 if((r,i) in val[1].legal_moves) or ((r,i) in val[1].defends):
                                     add_legal_moves.remove((r,i))
@@ -2380,10 +2558,18 @@ class ChessBoard(tk.Canvas):
                                 if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends):
                                     add_legal_moves.remove((i,c))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((i,c) in val[1].check_pathway):
+                                            add_legal_moves.remove((i,c))
+                                            break
                             if val[1].notation == "Rb":
                                 if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends):
                                     add_legal_moves.remove((i,c))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((i,c) in val[1].check_pathway):
+                                            add_legal_moves.remove((i,c))
+                                            break
                             if val[1].notation == "Pb":
                                 # checking the diagonals of the black Pawn
                                 if((i,c) == (val[1].pos_r+1,val[1].pos_c-1)) or ((i,c) in val[1].defends):
@@ -2396,6 +2582,10 @@ class ChessBoard(tk.Canvas):
                                 if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends):
                                     add_legal_moves.remove((i,c))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((i,c) in val[1].check_pathway):
+                                            add_legal_moves.remove((i,c))
+                                            break
                             if val[1].notation == "Nb":
                                 if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends):
                                     add_legal_moves.remove((i,c))
@@ -2469,10 +2659,18 @@ class ChessBoard(tk.Canvas):
                                 if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends):
                                     add_legal_moves.remove((i,c))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((i,c) in val[1].check_pathway):
+                                            add_legal_moves.remove((i,c))
+                                            break
                             if val[1].notation == "Rb":
                                 if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends):
                                     add_legal_moves.remove((i,c))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((i,c) in val[1].check_pathway):
+                                            add_legal_moves.remove((i,c))
+                                            break
                             if val[1].notation == "Pb":
                                 # checking the diagonals of the black Pawn
                                 if((i,c) == (val[1].pos_r+1,val[1].pos_c-1)) or ((i,c) in val[1].defends):
@@ -2485,6 +2683,10 @@ class ChessBoard(tk.Canvas):
                                 if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends):
                                     add_legal_moves.remove((i,c))
                                     break
+                                elif val[1].check_pathway: # updated checkpathway here
+                                        if ((i,c) in val[1].check_pathway):
+                                            add_legal_moves.remove((i,c))
+                                            break
                             if val[1].notation == "Nb":
                                 if((i,c) in val[1].legal_moves) or ((i,c) in val[1].defends):
                                     add_legal_moves.remove((i,c))
@@ -2514,7 +2716,7 @@ class ChessBoard(tk.Canvas):
             add_check_pathway = []
 
             add_pin_pathway = []
-            pin2 = [] # will hold all values that are in the pathway of a possible pin if they second piece is a King then a pin has occurred
+            pin2 = [] # will hold all values that are in the pathway of a possible pin if the second piece is a King then a pin has occurred
             
             for i in range(1,8):
                 if r-i < 0 or c-i < 0:
@@ -2555,7 +2757,6 @@ class ChessBoard(tk.Canvas):
                             # self.squares[(r-i, c-i)][1].pin_pathway = add_pin_pathway
                         else:
                             self.squares[(r-i, c-i)][1].pinned = False
-
                         i=8
                         break
                     else:
@@ -2563,6 +2764,16 @@ class ChessBoard(tk.Canvas):
                         self.squares[(r-i, c-i)][1].in_check = True 
                         # # print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
                         actual_piece.check_pathway = [pos for pos in add_check_pathway]
+
+                        for position in range(i, 8):
+                            if r-position < 0 or c-position < 0:
+                                i=8
+                                break
+                            elif self.squares[(r-position, c-position)][1] == None:
+                                actual_piece.check_pathway.append((r-position, c-position))
+                            else:
+                                continue
+                        
                         i=8
                         break
                 # a piece to the diagonal top left that is an ally has been reached
@@ -2620,6 +2831,16 @@ class ChessBoard(tk.Canvas):
                         self.squares[(r+i, c-i)][1].in_check = True 
                         # # print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
                         actual_piece.check_pathway = [pos for pos in add_check_pathway]
+
+                        for position in range(i, 8):
+                            if r+position > 7 or c-position < 0:
+                                i=8
+                                break
+                            elif self.squares[(r+position, c-position)][1] == None:
+                                actual_piece.check_pathway.append((r+position, c-position))
+                            else:
+                                continue
+
                         i=8
                         break
                 # a piece to the diagonal bottom left that is an ally has been reached
@@ -2677,6 +2898,16 @@ class ChessBoard(tk.Canvas):
                         self.squares[(r-i, c+i)][1].in_check = True 
                         # # print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
                         actual_piece.check_pathway = [pos for pos in add_check_pathway]
+
+                        for position in range(i, 8):
+                            if r-position < 0 or c+position > 7:
+                                i=8
+                                break
+                            elif self.squares[(r-position, c+position)][1] == None:
+                                actual_piece.check_pathway.append((r-position, c+position))
+                            else:
+                                continue
+
                         i=8
                         break
                 # a piece to the diagonal top right that is an ally has been reached
@@ -2734,6 +2965,16 @@ class ChessBoard(tk.Canvas):
                         self.squares[(r+i, c+i)][1].in_check = True 
                         # # print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
                         actual_piece.check_pathway = [pos for pos in add_check_pathway]
+
+                        for position in range(i, 8):
+                            if r+position > 7 or c+position > 7:
+                                i=8
+                                break
+                            elif self.squares[(r+position, c+position)][1] == None:
+                                actual_piece.check_pathway.append((r+position, c+position))
+                            else:
+                                continue
+
                         i=8
                         break
                 # a piece to the diagonal bottom right that is an ally has been reached
@@ -2790,6 +3031,15 @@ class ChessBoard(tk.Canvas):
                         self.squares[(r, i)][1].in_check = True 
                         # # print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
                         actual_piece.check_pathway = [pos for pos in add_check_pathway]
+
+                        for position in range(c,-1,-1):
+                            if position == c:
+                                continue
+                            elif self.squares[(r, position)][1] == None:
+                                actual_piece.check_pathway.append((r, position))
+                            else:
+                                continue
+
                         i=-1
                         break
                 # a piece to the left that is an ally has been reached
@@ -2846,6 +3096,15 @@ class ChessBoard(tk.Canvas):
                         self.squares[(r, i)][1].in_check = True 
                         # # print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
                         actual_piece.check_pathway = [pos for pos in add_check_pathway]
+
+                        for position in range(c,8):
+                            if position == c:
+                                continue
+                            elif self.squares[(r, position)][1] == None:
+                                actual_piece.check_pathway.append((r, position))
+                            else:
+                                continue
+
                         i=8
                         break
                 # a piece to the right that is an ally has been reached
@@ -2902,6 +3161,15 @@ class ChessBoard(tk.Canvas):
                         self.squares[(i, c)][1].in_check = True 
                         # # print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
                         actual_piece.check_pathway = [pos for pos in add_check_pathway]
+
+                        for position in range(r,-1,-1):
+                            if position == r:
+                                continue
+                            elif self.squares[(position, c)][1] == None:
+                                actual_piece.check_pathway.append((position, c))
+                            else:
+                                continue
+
                         i=-1
                         break
                 # a piece above that is an ally has been reached
@@ -2958,6 +3226,15 @@ class ChessBoard(tk.Canvas):
                         self.squares[(i, c)][1].in_check = True 
                         # # print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
                         actual_piece.check_pathway = [pos for pos in add_check_pathway]
+
+                        for position in range(r,8):
+                            if position == r:
+                                continue
+                            elif self.squares[(position, c)][1] == None:
+                                actual_piece.check_pathway.append((position, c))
+                            else:
+                                continue
+
                         i=8
                         break
                 # a piece below that is an ally has been reached
@@ -3029,6 +3306,16 @@ class ChessBoard(tk.Canvas):
                         self.squares[(r-i, c-i)][1].in_check = True 
                         # print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
                         actual_piece.check_pathway = [pos for pos in add_check_pathway]
+
+                        for position in range(i,8):
+                            if r-position < 0 or c-position < 0:
+                                i=8
+                                break
+                            elif self.squares[(r-position, c-position)][1] == None:
+                                actual_piece.check_pathway.append((r-position, c-position))
+                            else:
+                                continue
+
                         i=8
                         break
                 # a piece to the diagonal top left that is an ally has been reached
@@ -3086,6 +3373,16 @@ class ChessBoard(tk.Canvas):
                         self.squares[(r+i, c-i)][1].in_check = True 
                         # print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
                         actual_piece.check_pathway = [pos for pos in add_check_pathway]
+
+                        for position in range(1,8):
+                            if r+position > 7 or c-position < 0:
+                                i=8
+                                break
+                            elif self.squares[(r+position, c-position)][1] == None:
+                                actual_piece.check_pathway.append((r+position, c-position))
+                            else:
+                                continue
+
                         i=8
                         break
                 # a piece to the diagonal bottom left that is an ally has been reached
@@ -3152,6 +3449,16 @@ class ChessBoard(tk.Canvas):
                         self.squares[(r-i, c+i)][1].in_check = True 
                         # print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
                         actual_piece.check_pathway = [pos for pos in add_check_pathway]
+
+                        for position in range(1,8):
+                            if r-position < 0 or c+position > 7:
+                                i=8
+                                break
+                            elif self.squares[(r-position, c+position)][1] == None:
+                                actual_piece.check_pathway.append((r-position, c+position))
+                            else:
+                                continue
+
                         i=-8
                         break
                 # a piece to the diagonal top right that is an ally has been reached
@@ -3208,6 +3515,16 @@ class ChessBoard(tk.Canvas):
                         self.squares[(r+i, c+i)][1].in_check = True 
                         # print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
                         actual_piece.check_pathway = [pos for pos in add_check_pathway]
+
+                        for position in range(1,8):
+                            if r+position > 7 or c+position > 7:
+                                i=8
+                                break
+                            elif self.squares[(r+position, c+position)][1] == None:
+                                actual_piece.check_pathway.append((r+position, c+position))
+                            else:
+                                continue
+
                         i=8
                         break
                 # a piece to the diagonal bottom right that is an ally has been reached
@@ -3418,6 +3735,15 @@ class ChessBoard(tk.Canvas):
                         self.squares[(r, i)][1].in_check = True 
                         # print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
                         actual_piece.check_pathway = [pos for pos in add_check_pathway]
+
+                        for position in range(c,-1,-1):
+                            if position==c:
+                                continue
+                            elif self.squares[(r, position)][1] == None:
+                                actual_piece.check_pathway.append((r, position))
+                            else:
+                                continue
+
                         i=-1
                         break
                 # a piece to the left that is an ally has been reached
@@ -3474,6 +3800,15 @@ class ChessBoard(tk.Canvas):
                         self.squares[(r, i)][1].in_check = True 
                         # print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
                         actual_piece.check_pathway = [pos for pos in add_check_pathway]
+
+                        for position in range(c,8):
+                            if position==c:
+                                continue
+                            elif self.squares[(r, position)][1] == None:
+                                actual_piece.check_pathway.append((r, position))
+                            else:
+                                continue
+
                         i=-1
                         break
                 # a piece to the right that is an ally has been reached
@@ -3537,6 +3872,15 @@ class ChessBoard(tk.Canvas):
                         self.squares[(i, c)][1].in_check = True 
                         # print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
                         actual_piece.check_pathway = [pos for pos in add_check_pathway]
+
+                        for position in range(r,-1,-1):
+                            if position==r:
+                                continue
+                            elif self.squares[(position, c)][1] == None:
+                                actual_piece.check_pathway.append((position, c))
+                            else:
+                                continue
+                        
                         i=-1
                         break
                 # a piece above that is an ally has been reached
@@ -3593,6 +3937,15 @@ class ChessBoard(tk.Canvas):
                         self.squares[(i, c)][1].in_check = True 
                         # print(f"{actual_piece.notation} at ({actual_piece.pos_r},{actual_piece.pos_c}) has CHANGED IT")
                         actual_piece.check_pathway = [pos for pos in add_check_pathway]
+
+                        for position in range(r,8):
+                            if position==r:
+                                continue
+                            elif self.squares[(position, c)][1] == None:
+                                actual_piece.check_pathway.append((position, c))
+                            else:
+                                continue
+
                         i=-1
                         break
                 # a piece below that is an ally has been reached
@@ -3781,7 +4134,7 @@ def show_rules():
     )
     # Display a messagebox with the custom rules
     messagebox.showinfo("Custom Chess Rules", rules_text)
-delay_time = 5000
+delay_time = 0
 root.after(delay_time, show_rules)
 
 root.mainloop()
