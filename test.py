@@ -173,6 +173,8 @@ class ChessBoard(tk.Canvas):
         # giving the square a unique image id to be used when moving pieces or removing pieces
         self.squares[(row, col)][2] = self.create_image(x, y, image=image, anchor="nw")
 
+        return self.squares[(row, col)][1]
+
     def select_piece(self, event):  
         # finding the selected square
         r = 0
@@ -632,7 +634,7 @@ class ChessBoard(tk.Canvas):
                 root.after(0000, self.delete, self.squares[(r, c)][2])
                 self.squares[(r, c)][2] = None
                 self.fifty_move_rule = 0
-            elif (self.squares[(r,c)][1] == None) and (self.squares[(r+1,c)][1] != None) and (self.squares[(r+1,c)][1].notation == "Pb") and (actual_piece.notation == "P") and (actual_piece.do_en_pass == True) and (self.squares[(r+1,c)][1].get_en_pass == True):
+            elif (actual_piece.notation == "P") and (actual_piece.do_en_pass == True) and (self.squares[(r,c)][1] == None) and (self.squares[(r+1,c)][1] != None) and (self.squares[(r+1,c)][1].notation == "Pb") and (self.squares[(r+1,c)][1].get_en_pass == True):
                 # removing the piece if it has been en passant-ed by White Pawn
                 print("REMOVING the BLACK pawn to the left/right of WHITE pawn")
                 print(f"BLACK pawn to be removed is at ({r+1},{c})\n")
@@ -640,7 +642,7 @@ class ChessBoard(tk.Canvas):
                 root.after(0000, self.delete, self.squares[(r+1, c)][2])
                 self.squares[(r+1, c)][2] = None
                 self.fifty_move_rule = 0
-            elif (self.squares[(r,c)][1] == None) and (self.squares[(r-1,c)][1] != None) and (self.squares[(r-1,c)][1].notation == "P") and (actual_piece.notation == "Pb") and (actual_piece.do_en_pass == True) and (self.squares[(r-1,c)][1].get_en_pass == True):
+            elif (actual_piece.notation == "Pb") and (actual_piece.do_en_pass == True) and (self.squares[(r,c)][1] == None) and (self.squares[(r-1,c)][1] != None) and (self.squares[(r-1,c)][1].notation == "P") and (self.squares[(r-1,c)][1].get_en_pass == True):
                 # removing the piece if it has been en passant-ed by Black Pawn
                 print("REMOVING the WHITE pawn to the left/right of BLACK pawn")
                 print(f"WHITE pawn to be removed is at ({r-1},{c})\n")
@@ -674,9 +676,25 @@ class ChessBoard(tk.Canvas):
             new_notation = None
             if r==0 and actual_piece.notation == "P":
                 new_notation = actual_piece.promote()
+                if new_notation == "Q":
+                    actual_piece = Queen("Q", "white", r, c, [], [], [], [], [])
+                elif new_notation == "R":
+                    actual_piece = Rook("R", "white", r, c, [], [], [], [], [])
+                elif new_notation == "B":
+                    actual_piece = Bishop("B", "white", r, c, [], [], [], [], [])
+                elif new_notation == "N":
+                    actual_piece = Knight("N", "white", r, c, [], [], [], [], [])
                 actual_piece.notation = new_notation
             elif r==7 and actual_piece.notation == "Pb":
                 new_notation = actual_piece.promote()
+                if new_notation == "Qb":
+                    actual_piece = Queen("Q", "black", r, c, [], [], [], [], [])
+                elif new_notation == "Rb":
+                    actual_piece = Rook("R", "black", r, c, [], [], [], [], [])
+                elif new_notation == "Bb":
+                    actual_piece = Bishop("B", "black", r, c, [], [], [], [], [])
+                elif new_notation == "Nb":
+                    actual_piece = Knight("N", "black", r, c, [], [], [], [], [])
                 actual_piece.notation = new_notation
             
 
@@ -684,7 +702,11 @@ class ChessBoard(tk.Canvas):
             add_legal_moves = self.get_legal_moves(actual_piece, r, c)
 
             # placing the piece onto a new square with its image
-            self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, actual_piece.defends, two_spaces=False, do_en_pass=actual_piece.do_en_pass, get_en_pass=actual_piece.get_en_pass, en_pass_count=actual_piece.en_pass_count)
+            if not new_notation:
+                self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, actual_piece.defends, two_spaces=False, do_en_pass=actual_piece.do_en_pass, get_en_pass=actual_piece.get_en_pass, en_pass_count=actual_piece.en_pass_count)
+            else:
+                self.place_piece(actual_piece.notation, actual_piece.color, r, c, add_legal_moves, actual_piece.defends)
+
 
             # DESELECTION / no more outline
             # self.itemconfigure(self.clicked, fill=self.squares[(from_square_r, from_square_c)][3], outline=self.squares[(from_square_r, from_square_c)][3], width=0)
@@ -756,16 +778,16 @@ class ChessBoard(tk.Canvas):
                         # print(f"{val[1].color} pawn at ({val[1].pos_r},{val[1].pos_c}) get_en_pass is now {val[1].get_en_pass}")    
 
     def pinsChecksCheckmate(self):
-        # Confirming pinned pieces and adjusting their legal moves based on the pin
+        # Confirming pinned pieces and adjusting their legal moves for WHITE PIECES that are pinned
         for key, val in self.squares.items():
-            if val[1] != None:
+            if val[1] != None and val[1].color == "white":
                 if val[1].notation != "K" and val[1].notation != "Kb":
                     if val[1].pinned == True:
                         pinners = []
                         for pinKey, pinVal in self.squares.items():
                             if pinVal[1] != None:
-                                if pinVal[1].notation == "Q" or pinVal[1].notation == "Qb" or pinVal[1].notation == "B" or pinVal[1].notation == "Bb" or pinVal[1].notation == "R" or pinVal[1].notation == "Rb":
-                                    if pinVal[1].pin_pathway:
+                                if pinVal[1].notation == "Qb" or pinVal[1].notation == "Bb" or pinVal[1].notation == "Rb":
+                                    if pinVal[1].pin_pathway and pinVal[1] != val[1]:
                                         # print(f"Check pathway of {pinVal[1].notation}", pinVal[1].check_pathway)
                                         # print(f"Pin pathway of {pinVal[1].notation}", pinVal[1].pin_pathway)
                                         if (val[1].pos_r, val[1].pos_c) not in pinVal[1].pin_pathway:
@@ -774,6 +796,35 @@ class ChessBoard(tk.Canvas):
                                         else:
                                             pinners.append(pinVal[1])
                         # print("PINNERS:", pinners)
+                        # print("pinners' notations:",pinners[0].notation)
+                        if len(pinners) > 1:
+                            val[1].legal_moves = []
+                        elif len(pinners) == 1:
+                            legal_moves_of_pinned_piece = []
+                            for legal in val[1].legal_moves:
+                                if legal in pinners[0].pin_pathway or legal == (pinners[0].pos_r, pinners[0].pos_c):
+                                    legal_moves_of_pinned_piece.append(legal)
+                            val[1].legal_moves = legal_moves_of_pinned_piece
+        
+        # Confirming pinned pieces and adjusting their legal moves for BLACK PIECES that are pinned
+        for key, val in self.squares.items():
+            if val[1] != None and val[1].color == "black":
+                if val[1].notation != "K" and val[1].notation != "Kb":
+                    if val[1].pinned == True:
+                        pinners = []
+                        for pinKey, pinVal in self.squares.items():
+                            if pinVal[1] != None:
+                                if pinVal[1].notation == "Q" or pinVal[1].notation == "B" or pinVal[1].notation == "R":
+                                    if pinVal[1].pin_pathway and pinVal[1] != val[1]:
+                                        # print(f"Check pathway of {pinVal[1].notation}", pinVal[1].check_pathway)
+                                        # print(f"Pin pathway of {pinVal[1].notation}", pinVal[1].pin_pathway)
+                                        if (val[1].pos_r, val[1].pos_c) not in pinVal[1].pin_pathway:
+                                            pinVal[1].pin_pathway.append((val[1].pos_r, val[1].pos_c))
+                                            pinners.append(pinVal[1])
+                                        else:
+                                            pinners.append(pinVal[1])
+                        # print("PINNERS:", pinners)
+                        # print("pinners' notations:",pinners[0].notation)
                         if len(pinners) > 1:
                             val[1].legal_moves = []
                         elif len(pinners) == 1:
@@ -4127,11 +4178,16 @@ board.game_states.append(copy.deepcopy(board.squares))
 def show_rules():
     rules_text = (
         "Chess Game Rules:\n"
-        "1. Click-to-move\n"
-        "2. There is no draw button so verbal draws will be used instead\n"
-        "3. Allow the highlights to be given for the previously moved piece before selecting a new piece to move\n"
-        "4. Only has unlimited time mode (for now)\n"
+        "1. Click-move\n"
+        "2. Before moving, wait for highlights\n"
     )
+    # rules_text = (
+    #     "Chess Game Rules:\n"
+    #     "1. Click-move\n"
+    #     "2. There is no draw button so verbal draws will be used instead\n"
+    #     "3. Allow the highlights to be given for the previously moved piece before selecting a new piece to move\n"
+    #     "4. Only has unlimited time mode (for now)\n"
+    # )
     # Display a messagebox with the custom rules
     messagebox.showinfo("Custom Chess Rules", rules_text)
 delay_time = 0
