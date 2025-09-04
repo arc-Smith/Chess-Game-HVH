@@ -2,14 +2,11 @@
 https://github.com/arc-Smith/Chess-Game/assets/98622773/719b6011-f6ae-49b2-9edf-828b33ed47fd
 
 # Overview
-This is a chess game implemented using **Python** and Tkinter (standard GUI package). This chess game features pixel designs for the pieces made using the pixel design application Aseprite. The game provides a graphical user interface (GUI) that allows players to move the pieces by clicking on them with the mouse. Finally, the overarching goal is to allow for both human vs human (HvH), and human vs computer (HvC) gameplay using reinforcement learning.
+This is a chess game implemented using **Python** and Tkinter (standard GUI package). This chess game includes pixel designs for the pieces made using the pixel design application Aseprite. The game provides a graphical user interface (GUI) that allows players to move the pieces by clicking on them with the mouse. Finally, the overarching goal is to allow for both human vs human (HvH) and human vs computer (HvC) gameplay using reinforcement learning.
 
 <img width="400" alt="Screenshot 2023-05-31 at 10 59 58 AM" src="https://github.com/arc-Smith/Chess-Game/assets/98622773/3e996dcc-4882-42bb-8d14-4b0b267d7bfd">
 
-## Honors Project
-This chess game project is developed as part of an honors project under the supervision of Professor Miriam Briskman. The project aims to demonstrate the application of programming skills specifically for Python and game development principles learned from independent research.
-
-## Installation
+# Installation
 **1. Clone the repository:** 
 - open the Terminal
 - "git clone https://github.com/arc-Smith/chess-game.git"
@@ -26,5 +23,5 @@ This chess game project is developed as part of an honors project under the supe
 - Indicates wins and draws
 - Highlights piece movements
 
-## Credits
-This game project is an honors project developed under the supervision of Professor Miriam Briskman. It is created and maintained by Ahmai Chaney-Smith(https://github.com/arc-Smith).
+## Honors Project
+This chess game is an honors project developed under the supervision of Professor Miriam Briskman. The project aims to demonstrate the application of programming skills specifically for Python and game development principles learned from independent research. Created and maintained by Ahmai Chaney-Smith(https://github.com/arc-Smith).
