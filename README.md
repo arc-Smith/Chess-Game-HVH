@@ -24,4 +24,4 @@ This is a chess game implemented using **Python** and Tkinter (standard GUI pack
 - Indicates wins and draws
 
 ## Honors Project
-This chess game is an honors project developed under the supervision of Professor Miriam Briskman. The project aims to demonstrate the application of programming skills specifically for Python and game development principles learned from independent research. Created and maintained by Ahmai Chaney-Smith(https://github.com/arc-Smith).
+This chess game is an honors project developed under the supervision of Professor Miriam Briskman. The project aims to demonstrate the application of programming skills specifically for Python and game development principles learned from independent research. Created and maintained by Ahmai Chaney-Smith (https://github.com/arc-Smith).
