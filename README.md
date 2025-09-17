@@ -1,4 +1,4 @@
-# Chess Game: Human-vs-Human
+# Chess Game: Human vs. Human
 ## Gameplay
 
 https://github.com/arc-Smith/Chess-Game/assets/98622773/719b6011-f6ae-49b2-9edf-828b33ed47fd
